@@ -1,11 +1,17 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Download, FileText, Mail, Eye, Pencil } from "lucide-react";
+import { Download, Mail, Eye, Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import TemplateSelector, { type TemplateName } from "@/components/resume/TemplateSelector";
+import ResumeCustomizer from "@/components/resume/ResumeCustomizer";
+import ExecutiveTemplate from "@/components/resume/templates/ExecutiveTemplate";
+import MinimalTemplate from "@/components/resume/templates/MinimalTemplate";
+import ModernTemplate from "@/components/resume/templates/ModernTemplate";
+import CreativeTemplate from "@/components/resume/templates/CreativeTemplate";
 
 const resumeData = {
   name: "Priya Sharma",
@@ -59,6 +65,23 @@ const resumeData = {
 const ResumeBuilder = () => {
   const [showCoverLetter, setShowCoverLetter] = useState(false);
   const [activeTab, setActiveTab] = useState<"resume" | "cover">("resume");
+  const [template, setTemplate] = useState<TemplateName>("executive");
+  const [fontSize, setFontSize] = useState(13);
+  const [showPhoto, setShowPhoto] = useState(false);
+  const [showSummary, setShowSummary] = useState(true);
+  const [accentColor, setAccentColor] = useState("hsl(43 75% 52%)");
+  const [showCustomizer, setShowCustomizer] = useState(true);
+
+  const templateProps = { data: resumeData, accentColor, fontSize, showSummary };
+
+  const renderTemplate = () => {
+    switch (template) {
+      case "executive": return <ExecutiveTemplate {...templateProps} />;
+      case "minimal": return <MinimalTemplate {...templateProps} />;
+      case "modern": return <ModernTemplate {...templateProps} />;
+      case "creative": return <CreativeTemplate {...templateProps} />;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -70,7 +93,7 @@ const ResumeBuilder = () => {
             <h1 className="font-display text-2xl md:text-4xl font-bold text-foreground">
               Your Enhanced <span className="text-gradient-gold">Resume</span>
             </h1>
-            <p className="font-body text-sm text-muted-foreground mt-1">AI-optimized and ATS-ready</p>
+            <p className="font-body text-sm text-muted-foreground mt-1">AI-optimized, ATS-ready, psychology-tuned</p>
           </div>
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
@@ -83,11 +106,17 @@ const ResumeBuilder = () => {
           </div>
         </motion.div>
 
+        {/* Template Selector */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-6">
+          <h2 className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3">Choose Template</h2>
+          <TemplateSelector selected={template} onChange={setTemplate} />
+        </motion.div>
+
         {/* Tabs */}
         {showCoverLetter && (
           <div className="flex gap-2 mb-6">
             {[
-              { key: "resume" as const, label: "Resume", icon: FileText },
+              { key: "resume" as const, label: "Resume", icon: Pencil },
               { key: "cover" as const, label: "Cover Letter", icon: Mail },
             ].map((tab) => (
               <button
@@ -104,107 +133,53 @@ const ResumeBuilder = () => {
           </div>
         )}
 
-        {/* Resume Preview */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          {activeTab === "resume" ? (
-            <div className="bg-foreground rounded-2xl p-8 md:p-12 max-w-3xl mx-auto shadow-2xl">
-              {/* Name */}
-              <div className="border-b-2 border-primary pb-4 mb-6">
-                <h1 className="font-display text-3xl font-bold text-background">{resumeData.name}</h1>
-                <p className="font-body text-sm text-background/70 mt-1">{resumeData.title}</p>
-                <div className="flex flex-wrap gap-4 mt-2 font-body text-xs text-background/60">
-                  <span>{resumeData.email}</span>
-                  <span>{resumeData.phone}</span>
-                  <span>{resumeData.location}</span>
+        {/* Main Layout */}
+        <div className="grid md:grid-cols-[1fr_240px] gap-6">
+          {/* Resume Preview */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            {activeTab === "resume" ? (
+              renderTemplate()
+            ) : (
+              <div className="bg-foreground rounded-2xl p-8 md:p-12 max-w-3xl mx-auto shadow-2xl">
+                <div className="font-body text-sm text-background/80 leading-relaxed space-y-4">
+                  <p>Dear Hiring Manager,</p>
+                  <p>
+                    I am writing to express my strong interest in the Software Developer position at your organization. With 2+ years of hands-on experience in building scalable web applications and a solid foundation in Python, React, and Machine Learning, I am confident in my ability to contribute meaningfully to your team.
+                  </p>
+                  <p>
+                    In my current role at TechCorp Solutions, I have engineered RESTful APIs handling 10,000+ daily requests, optimized database performance by 45%, and led a successful migration to microservices architecture. These experiences have honed my ability to solve complex technical challenges while delivering measurable business impact.
+                  </p>
+                  <p>
+                    What excites me most about this opportunity is the chance to apply my problem-solving skills to real-world challenges at scale. I am particularly drawn to your team's focus on innovation and user-centric development.
+                  </p>
+                  <p>
+                    I would welcome the opportunity to discuss how my skills and experience align with your team's needs. Thank you for considering my application.
+                  </p>
+                  <p>
+                    Sincerely,<br />
+                    <span className="font-semibold text-background">{resumeData.name}</span>
+                  </p>
                 </div>
               </div>
+            )}
+          </motion.div>
 
-              {/* Summary */}
-              <div className="mb-6">
-                <h2 className="font-body text-xs font-bold uppercase tracking-widest text-primary mb-2">Professional Summary</h2>
-                <p className="font-body text-sm text-background/80 leading-relaxed">{resumeData.summary}</p>
-              </div>
-
-              {/* Experience */}
-              <div className="mb-6">
-                <h2 className="font-body text-xs font-bold uppercase tracking-widest text-primary mb-3">Experience</h2>
-                {resumeData.experience.map((exp, i) => (
-                  <div key={i}>
-                    <div className="flex justify-between items-baseline">
-                      <h3 className="font-body text-sm font-bold text-background">{exp.role}</h3>
-                      <span className="font-body text-xs text-background/50">{exp.period}</span>
-                    </div>
-                    <p className="font-body text-xs text-background/60 mb-2">{exp.company}</p>
-                    <ul className="space-y-1.5">
-                      {exp.bullets.map((b, j) => (
-                        <li key={j} className="font-body text-xs text-background/75 flex gap-2">
-                          <span className="text-primary mt-0.5">▸</span> {b}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </div>
-
-              {/* Projects */}
-              <div className="mb-6">
-                <h2 className="font-body text-xs font-bold uppercase tracking-widest text-primary mb-3">Projects</h2>
-                <div className="space-y-4">
-                  {resumeData.projects.map((proj, i) => (
-                    <div key={i}>
-                      <h3 className="font-body text-sm font-bold text-background">{proj.name}</h3>
-                      <ul className="space-y-1.5 mt-1">
-                        {proj.bullets.map((b, j) => (
-                          <li key={j} className="font-body text-xs text-background/75 flex gap-2">
-                            <span className="text-primary mt-0.5">▸</span> {b}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Skills */}
-              <div className="mb-6">
-                <h2 className="font-body text-xs font-bold uppercase tracking-widest text-primary mb-2">Skills</h2>
-                <div className="flex flex-wrap gap-2">
-                  {resumeData.skills.map((s) => (
-                    <span key={s} className="font-body text-xs px-2.5 py-1 rounded border border-background/20 text-background/70">{s}</span>
-                  ))}
-                </div>
-              </div>
-
-              {/* Education */}
-              <div>
-                <h2 className="font-body text-xs font-bold uppercase tracking-widest text-primary mb-2">Education</h2>
-                <p className="font-body text-sm text-background/80">{resumeData.education}</p>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-foreground rounded-2xl p-8 md:p-12 max-w-3xl mx-auto shadow-2xl">
-              <div className="font-body text-sm text-background/80 leading-relaxed space-y-4">
-                <p>Dear Hiring Manager,</p>
-                <p>
-                  I am writing to express my strong interest in the Software Developer position at your organization. With 2+ years of hands-on experience in building scalable web applications and a solid foundation in Python, React, and Machine Learning, I am confident in my ability to contribute meaningfully to your team.
-                </p>
-                <p>
-                  In my current role at TechCorp Solutions, I have engineered RESTful APIs handling 10,000+ daily requests, optimized database performance by 45%, and led a successful migration to microservices architecture. These experiences have honed my ability to solve complex technical challenges while delivering measurable business impact.
-                </p>
-                <p>
-                  What excites me most about this opportunity is the chance to apply my problem-solving skills to real-world challenges at scale. I am particularly drawn to your team's focus on innovation and user-centric development.
-                </p>
-                <p>
-                  I would welcome the opportunity to discuss how my skills and experience align with your team's needs. Thank you for considering my application.
-                </p>
-                <p>
-                  Sincerely,<br />
-                  <span className="font-semibold text-background">{resumeData.name}</span>
-                </p>
-              </div>
-            </div>
+          {/* Customizer Sidebar */}
+          {activeTab === "resume" && (
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
+              <ResumeCustomizer
+                fontSize={fontSize}
+                setFontSize={setFontSize}
+                showPhoto={showPhoto}
+                setShowPhoto={setShowPhoto}
+                showSummary={showSummary}
+                setShowSummary={setShowSummary}
+                accentColor={accentColor}
+                setAccentColor={setAccentColor}
+              />
+            </motion.div>
           )}
-        </motion.div>
+        </div>
 
         {/* Actions */}
         <div className="flex justify-center gap-4 mt-8">

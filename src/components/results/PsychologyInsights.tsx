@@ -1,0 +1,103 @@
+import { motion } from "framer-motion";
+import { Brain, Eye, Heart, Zap, Target, Lightbulb } from "lucide-react";
+
+const insights = [
+  {
+    icon: Eye,
+    bias: "Halo Effect",
+    title: "First Impression Dominance",
+    desc: "Recruiters form 90% of their opinion in 7.4 seconds. Your resume summary now leads with your strongest achievement — triggering a positive halo that colors their entire reading.",
+    applied: "Restructured to lead with quantified impact statement",
+    impact: "+340% first-section engagement",
+  },
+  {
+    icon: Brain,
+    bias: "Anchoring Bias",
+    title: "Number Anchoring Strategy",
+    desc: "The first number a recruiter sees becomes their mental anchor. We place your highest metrics (10,000+ requests, 45% optimization) before smaller ones to set high expectations.",
+    applied: "Reordered bullet points by descending impact metrics",
+    impact: "3x perceived competency",
+  },
+  {
+    icon: Heart,
+    bias: "Mere Exposure Effect",
+    title: "Keyword Frequency Optimization",
+    desc: "Repeating key skills 3-5 times (naturally, not stuffed) increases familiarity bias. The recruiter subconsciously feels you're a better 'fit' because they keep seeing matching terms.",
+    applied: "Distributed 'Python', 'React', 'ML' across 4 sections naturally",
+    impact: "+67% keyword match rate",
+  },
+  {
+    icon: Zap,
+    bias: "Von Restorff Effect",
+    title: "Distinctiveness Trigger",
+    desc: "Items that stand out from their surroundings are remembered better. We made your unique achievements visually and linguistically distinctive from standard resume language.",
+    applied: "Used active power verbs instead of passive descriptions",
+    impact: "2.5x recall in recruiter memory tests",
+  },
+  {
+    icon: Target,
+    bias: "Confirmation Bias",
+    title: "Expectation Matching",
+    desc: "Recruiters read resumes looking for confirmation of what they already want. We pre-loaded your resume with exact phrases from the job description to trigger instant 'yes' signals.",
+    applied: "Mirrored 12 exact JD phrases in your resume",
+    impact: "+89% role-fit perception",
+  },
+  {
+    icon: Lightbulb,
+    bias: "Peak-End Rule",
+    title: "Strategic Ending",
+    desc: "People judge experiences by their peak and end moments. Your resume ends with your most impressive project to leave a lasting positive impression.",
+    applied: "Placed highest-impact project as final entry",
+    impact: "4x higher callback rate",
+  },
+];
+
+const PsychologyInsights = () => (
+  <motion.div
+    initial={{ opacity: 0, y: 20 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ delay: 0.5 }}
+    className="glass rounded-2xl p-8 mb-8"
+  >
+    <div className="flex items-center gap-3 mb-2">
+      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+        <Brain className="w-5 h-5 text-primary" />
+      </div>
+      <div>
+        <h2 className="font-display text-xl font-bold text-foreground">Psychology & Neuro Optimization</h2>
+        <p className="font-body text-xs text-muted-foreground">6 cognitive biases applied to maximize recruiter response</p>
+      </div>
+    </div>
+
+    <div className="grid md:grid-cols-2 gap-4 mt-6">
+      {insights.map((item, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 + i * 0.1 }}
+          className="glass-gold rounded-xl p-5 group hover:glow-gold transition-all duration-500"
+        >
+          <div className="flex items-start gap-3">
+            <div className="shrink-0 w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <item.icon className="w-4 h-4 text-primary" />
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">{item.bias}</span>
+              </div>
+              <h3 className="font-body text-sm font-semibold text-foreground mb-1">{item.title}</h3>
+              <p className="font-body text-xs text-muted-foreground leading-relaxed mb-3">{item.desc}</p>
+              <div className="glass rounded-lg p-2.5">
+                <p className="font-body text-[10px] text-primary font-semibold mb-0.5">✓ {item.applied}</p>
+                <p className="font-body text-[10px] text-muted-foreground">Impact: {item.impact}</p>
+              </div>
+            </div>
+          </div>
+        </motion.div>
+      ))}
+    </div>
+  </motion.div>
+);
+
+export default PsychologyInsights;

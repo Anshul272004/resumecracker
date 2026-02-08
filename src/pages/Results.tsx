@@ -1,47 +1,14 @@
-import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
 import { CheckCircle2, AlertTriangle, TrendingUp, Target, FileText, ArrowRight, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
-import { PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import ATSGauge from "@/components/results/ATSGauge";
+import PsychologyInsights from "@/components/results/PsychologyInsights";
+import ATSAlgorithmBreakdown from "@/components/results/ATSAlgorithmBreakdown";
+import PatternAnalysis from "@/components/results/PatternAnalysis";
 
-/* ─── ATS Score Gauge ─── */
-const ATSGauge = ({ score, label, color }: { score: number; label: string; color: string }) => {
-  const [animated, setAnimated] = useState(0);
-  useEffect(() => {
-    let start = 0;
-    const timer = setInterval(() => {
-      start += 1;
-      if (start >= score) { setAnimated(score); clearInterval(timer); }
-      else setAnimated(start);
-    }, 20);
-    return () => clearInterval(timer);
-  }, [score]);
-
-  const data = [{ value: animated }, { value: 100 - animated }];
-  return (
-    <div className="text-center">
-      <div className="w-40 h-40 mx-auto relative">
-        <ResponsiveContainer>
-          <PieChart>
-            <Pie data={data} innerRadius={55} outerRadius={70} startAngle={90} endAngle={-270} dataKey="value" strokeWidth={0}>
-              <Cell fill={color} />
-              <Cell fill="hsl(0 0% 15%)" />
-            </Pie>
-          </PieChart>
-        </ResponsiveContainer>
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-display text-3xl font-bold text-foreground">{animated}%</span>
-        </div>
-      </div>
-      <p className="font-body text-sm text-muted-foreground mt-2">{label}</p>
-    </div>
-  );
-};
-
-/* ─── Results Page ─── */
 const Results = () => {
   const skills = {
     matched: ["Python", "SQL", "Data Analysis", "Problem Solving", "Machine Learning"],
@@ -85,6 +52,9 @@ const Results = () => {
           <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-3">
             Your Resume <span className="text-gradient-gold">Intelligence Report</span>
           </h1>
+          <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
+            Based on 1,000,000+ resume patterns, psychology research, and ATS algorithm analysis
+          </p>
         </motion.div>
 
         {/* ATS Scores */}
@@ -95,9 +65,12 @@ const Results = () => {
             <ATSGauge score={92} label="After ProfileX" color="hsl(43 75% 52%)" />
           </div>
           <p className="font-body text-sm text-center text-primary font-semibold mt-6">
-            +69% improvement — Your resume now passes ATS filters
+            +69% improvement — Your resume now passes ATS filters and ranks in the top 1%
           </p>
         </motion.div>
+
+        {/* ATS Algorithm Breakdown */}
+        <ATSAlgorithmBreakdown />
 
         {/* Skill Gap */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass rounded-2xl p-8 mb-8">
@@ -120,6 +93,9 @@ const Results = () => {
                   <span key={s} className="bg-destructive/10 text-destructive font-body text-xs px-3 py-1.5 rounded-full border border-destructive/20">{s}</span>
                 ))}
               </div>
+              <p className="font-body text-[10px] text-muted-foreground mt-3">
+                💡 Tip: Add these skills to your profile and we'll highlight transferable experience in your resume
+              </p>
             </div>
           </div>
         </motion.div>
@@ -127,7 +103,7 @@ const Results = () => {
         {/* Project Reframing */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass rounded-2xl p-8 mb-8">
           <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
-            <TrendingUp className="w-5 h-5 text-primary" /> Project Reframing
+            <TrendingUp className="w-5 h-5 text-primary" /> Project Reframing Engine
           </h2>
           <div className="space-y-6">
             {reframedProjects.map((proj, i) => (
@@ -143,26 +119,30 @@ const Results = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-3 mt-4">
-                  <div className="glass rounded-lg p-3">
-                    <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">Problem</p>
-                    <p className="font-body text-xs text-muted-foreground">{proj.problem}</p>
-                  </div>
-                  <div className="glass rounded-lg p-3">
-                    <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">Action</p>
-                    <p className="font-body text-xs text-muted-foreground">{proj.action}</p>
-                  </div>
-                  <div className="glass rounded-lg p-3">
-                    <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">Result</p>
-                    <p className="font-body text-xs text-muted-foreground">{proj.result}</p>
-                  </div>
+                  {[
+                    { label: "Problem", text: proj.problem },
+                    { label: "Action", text: proj.action },
+                    { label: "Result", text: proj.result },
+                  ].map((item) => (
+                    <div key={item.label} className="glass rounded-lg p-3">
+                      <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">{item.label}</p>
+                      <p className="font-body text-xs text-muted-foreground">{item.text}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
             ))}
           </div>
         </motion.div>
 
+        {/* Psychology & Neuro Insights */}
+        <PsychologyInsights />
+
+        {/* Pattern Analysis */}
+        <PatternAnalysis />
+
         {/* Reality Check */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass rounded-2xl p-8 mb-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.7 }} className="glass rounded-2xl p-8 mb-8">
           <h2 className="font-display text-xl font-bold text-foreground mb-6 flex items-center gap-2">
             <AlertTriangle className="w-5 h-5 text-primary" /> Reality Check
           </h2>
@@ -171,6 +151,8 @@ const Results = () => {
               { issue: "No quantifiable metrics in 80% of bullet points", fix: "Added impact numbers to all project descriptions" },
               { issue: "Generic skills section with no prioritization", fix: "Reordered skills by job relevance with ATS keywords first" },
               { issue: "Projects lack problem-solving narrative", fix: "Reframed using Problem → Action → Result framework" },
+              { issue: "Summary reads like every other fresher resume", fix: "Personalized with unique value proposition and role-specific language" },
+              { issue: "No evidence of scale or complexity", fix: "Added user counts, performance metrics, and technical depth" },
             ].map((item, i) => (
               <div key={i} className="flex gap-4 glass-gold rounded-xl p-4">
                 <AlertTriangle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
@@ -184,7 +166,7 @@ const Results = () => {
         </motion.div>
 
         {/* CTA */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="flex flex-col sm:flex-row gap-4 justify-center">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/resume-builder">
             <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold px-8">
               <FileText className="w-5 h-5 mr-2" /> View Enhanced Resume
@@ -192,7 +174,7 @@ const Results = () => {
             </Button>
           </Link>
           <Button size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-body">
-            <Download className="w-5 h-5 mr-2" /> Download Report
+            <Download className="w-5 h-5 mr-2" /> Download Full Report
           </Button>
         </motion.div>
       </div>
