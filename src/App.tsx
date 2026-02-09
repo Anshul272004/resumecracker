@@ -7,6 +7,7 @@ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Results from "./pages/Results";
 import ResumeBuilder from "./pages/ResumeBuilder";
+import InterviewPrep from "./pages/InterviewPrep";
 import Pricing from "./pages/Pricing";
 import About from "./pages/About";
 import NotFound from "./pages/NotFound";
@@ -24,6 +25,7 @@ const App = () => (
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/results" element={<Results />} />
           <Route path="/resume-builder" element={<ResumeBuilder />} />
+          <Route path="/interview-prep" element={<InterviewPrep />} />
           <Route path="/pricing" element={<Pricing />} />
           <Route path="/about" element={<About />} />
           <Route path="*" element={<NotFound />} />

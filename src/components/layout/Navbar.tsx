@@ -1,24 +1,29 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const navItems = [
+  { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Results", href: "#before-after" },
-  { label: "Pricing", href: "#pricing" },
+  { label: "Results", href: "/results" },
+  { label: "Interview Prep", href: "/interview-prep" },
+  { label: "Pricing", href: "/pricing" },
   { label: "About", href: "/about" },
 ];
 
 const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const isActive = (href: string) => location.pathname === href;
 
   return (
     <nav
@@ -37,7 +42,7 @@ const Navbar = () => {
         </Link>
 
         {/* Desktop */}
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-6 lg:flex">
           {navItems.map((item) =>
             item.href.startsWith("#") ? (
               <a
@@ -51,7 +56,9 @@ const Navbar = () => {
               <Link
                 key={item.label}
                 to={item.href}
-                className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                className={`font-body text-sm font-medium transition-colors hover:text-primary ${
+                  isActive(item.href) ? "text-primary" : "text-muted-foreground"
+                }`}
               >
                 {item.label}
               </Link>
@@ -59,20 +66,20 @@ const Navbar = () => {
           )}
           <Link to="/dashboard">
             <Button className="bg-gradient-gold font-body font-semibold text-primary-foreground hover:opacity-90">
-              Get Started
+              Start Free
             </Button>
           </Link>
         </div>
 
         {/* Mobile toggle */}
-        <button className="md:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button className="lg:hidden text-foreground" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="glass mt-2 mx-4 rounded-xl p-6 md:hidden animate-fade-in">
+        <div className="glass mt-2 mx-4 rounded-xl p-6 lg:hidden animate-fade-in">
           <div className="flex flex-col gap-4">
             {navItems.map((item) =>
               item.href.startsWith("#") ? (
@@ -88,7 +95,7 @@ const Navbar = () => {
                 <Link
                   key={item.label}
                   to={item.href}
-                  className="font-body text-sm text-muted-foreground hover:text-primary"
+                  className={`font-body text-sm hover:text-primary ${isActive(item.href) ? "text-primary" : "text-muted-foreground"}`}
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
@@ -97,7 +104,7 @@ const Navbar = () => {
             )}
             <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
               <Button className="w-full bg-gradient-gold font-body font-semibold text-primary-foreground">
-                Get Started
+                Start Free
               </Button>
             </Link>
           </div>
