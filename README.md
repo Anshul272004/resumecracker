@@ -1,8 +1,8 @@
 # Welcome to your Lovable project
 
-## Project info
+## 🚀 Live Demo
+[https://YOUR-LOVABLE-LIVE-LINK](https://resumecracker.lovable.app)
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
 
 ## How can I edit this code?
 
