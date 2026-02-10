@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { Shield, CheckCircle2, XCircle, AlertTriangle } from "lucide-react";
+import { Shield, CheckCircle2, XCircle } from "lucide-react";
 
 const atsChecks = [
   { check: "Header Parsing", status: "pass", before: "Complex multi-column header", after: "Clean single-column with all contact info", weight: "High" },
@@ -19,32 +19,32 @@ const ATSAlgorithmBreakdown = () => (
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: 0.4 }}
-    className="glass rounded-2xl p-8 mb-8"
+    className="glass-deep rounded-2xl p-8 md:p-10 mb-8"
   >
     <div className="flex items-center gap-3 mb-6">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-        <Shield className="w-5 h-5 text-primary" />
+      <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shadow-gold">
+        <Shield className="w-6 h-6 text-primary" />
       </div>
       <div>
-        <h2 className="font-display text-xl font-bold text-foreground">ATS Algorithm Breakdown</h2>
-        <p className="font-body text-xs text-muted-foreground">10 critical checks your resume must pass — all cleared ✓</p>
+        <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">ATS Algorithm Breakdown</h2>
+        <p className="font-body text-sm text-muted-foreground">10 critical checks your resume must pass — all cleared ✓</p>
       </div>
     </div>
 
-    <div className="space-y-2">
+    <div className="space-y-3">
       {atsChecks.map((item, i) => (
         <motion.div
           key={i}
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.5 + i * 0.05 }}
-          className="glass-gold rounded-xl p-4 grid grid-cols-12 gap-3 items-center"
+          className="glass-gold rounded-xl p-4 grid grid-cols-12 gap-3 items-center lift-hover"
         >
           <div className="col-span-1">
-            <CheckCircle2 className="w-4 h-4 text-primary" />
+            <CheckCircle2 className="w-5 h-5 text-primary" />
           </div>
           <div className="col-span-2">
-            <p className="font-body text-xs font-semibold text-foreground">{item.check}</p>
+            <p className="font-body text-sm font-semibold text-foreground">{item.check}</p>
             <span className={`font-body text-[10px] px-2 py-0.5 rounded-full ${
               item.weight === "Critical" ? "bg-destructive/10 text-destructive" :
               item.weight === "High" ? "bg-primary/10 text-primary" :
@@ -53,25 +53,25 @@ const ATSAlgorithmBreakdown = () => (
           </div>
           <div className="col-span-4">
             <div className="flex items-start gap-1.5">
-              <XCircle className="w-3 h-3 text-destructive shrink-0 mt-0.5" />
-              <p className="font-body text-[11px] text-muted-foreground line-through decoration-destructive/30">{item.before}</p>
+              <XCircle className="w-3.5 h-3.5 text-destructive shrink-0 mt-0.5" />
+              <p className="font-body text-xs text-muted-foreground line-through decoration-destructive/30">{item.before}</p>
             </div>
           </div>
           <div className="col-span-1 flex justify-center">
-            <span className="text-primary font-body text-xs">→</span>
+            <span className="text-primary font-body text-sm">→</span>
           </div>
           <div className="col-span-4">
             <div className="flex items-start gap-1.5">
-              <CheckCircle2 className="w-3 h-3 text-primary shrink-0 mt-0.5" />
-              <p className="font-body text-[11px] text-foreground">{item.after}</p>
+              <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+              <p className="font-body text-xs text-foreground">{item.after}</p>
             </div>
           </div>
         </motion.div>
       ))}
     </div>
 
-    <div className="mt-6 glass-gold rounded-xl p-4 text-center">
-      <p className="font-body text-sm text-primary font-semibold">
+    <div className="mt-6 glass-gold-deep rounded-xl p-5 text-center glow-gold">
+      <p className="font-body text-base text-primary font-semibold">
         🏆 All 10/10 ATS checks passed — Your resume is in the top 1% of applicants
       </p>
     </div>

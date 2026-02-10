@@ -90,10 +90,22 @@
     border: 1px solid hsl(0 0% 20% / 0.3);
   }
 
+  .glass-deep {
+    background: hsl(0 0% 6% / 0.8);
+    backdrop-filter: blur(30px);
+    border: 1px solid hsl(0 0% 20% / 0.4);
+  }
+
   .glass-gold {
     background: hsl(43 75% 52% / 0.05);
     backdrop-filter: blur(20px);
     border: 1px solid hsl(43 75% 52% / 0.15);
+  }
+
+  .glass-gold-deep {
+    background: hsl(43 75% 52% / 0.08);
+    backdrop-filter: blur(30px);
+    border: 1px solid hsl(43 75% 52% / 0.25);
   }
 
   .glow-gold {
@@ -104,8 +116,49 @@
     box-shadow: 0 0 60px -10px hsl(43 75% 52% / 0.4);
   }
 
+  .glow-gold-xl {
+    box-shadow: 0 0 80px -10px hsl(43 75% 52% / 0.5), 0 0 120px -20px hsl(43 75% 52% / 0.2);
+  }
+
+  .shadow-gold {
+    box-shadow: 0 10px 40px -10px hsl(43 75% 52% / 0.25);
+  }
+
+  .shadow-gold-lg {
+    box-shadow: 0 20px 60px -15px hsl(43 75% 52% / 0.35);
+  }
+
   .text-shadow-gold {
     text-shadow: 0 0 40px hsl(43 75% 52% / 0.3);
+  }
+
+  .text-shadow-gold-lg {
+    text-shadow: 0 0 80px hsl(43 75% 52% / 0.5), 0 0 120px hsl(43 75% 52% / 0.2);
+  }
+
+  .lift-hover {
+    @apply transition-all duration-500;
+  }
+  .lift-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 40px -10px hsl(43 75% 52% / 0.2);
+  }
+
+  .border-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .border-shine::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(135deg, hsl(43 80% 65% / 0.5), transparent 40%, transparent 60%, hsl(43 75% 52% / 0.5));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
   }
 }
 
@@ -142,6 +195,17 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px -5px hsl(43 75% 52% / 0.3); }
+  50% { box-shadow: 0 0 40px -5px hsl(43 75% 52% / 0.6); }
+}
+
+@keyframes border-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 .animate-float {
   animation: float linear infinite;
 }
@@ -153,6 +217,10 @@
 
 .animate-pulse-gold {
   animation: pulse-gold 2s infinite;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 3s ease-in-out infinite;
 }
 
 /* Scrollbar styling */
