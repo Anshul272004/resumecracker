@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Download, Mail, Eye, Pencil } from "lucide-react";
+import { Download, Mail, Eye, Pencil, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
+import { Slider } from "@/components/ui/slider";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import TemplateSelector, { type TemplateName } from "@/components/resume/TemplateSelector";
@@ -12,6 +13,7 @@ import ExecutiveTemplate from "@/components/resume/templates/ExecutiveTemplate";
 import MinimalTemplate from "@/components/resume/templates/MinimalTemplate";
 import ModernTemplate from "@/components/resume/templates/ModernTemplate";
 import CreativeTemplate from "@/components/resume/templates/CreativeTemplate";
+import ATSMiniWidget from "@/components/resume/ATSMiniWidget";
 
 const resumeData = {
   name: "Priya Sharma",
@@ -70,7 +72,8 @@ const ResumeBuilder = () => {
   const [showPhoto, setShowPhoto] = useState(false);
   const [showSummary, setShowSummary] = useState(true);
   const [accentColor, setAccentColor] = useState("hsl(43 75% 52%)");
-  const [showCustomizer, setShowCustomizer] = useState(true);
+  const [lineSpacing, setLineSpacing] = useState([1.5]);
+  const [marginSize, setMarginSize] = useState<"narrow" | "normal" | "wide">("normal");
 
   const templateProps = { data: resumeData, accentColor, fontSize, showSummary };
 
@@ -90,18 +93,21 @@ const ResumeBuilder = () => {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div>
-            <h1 className="font-display text-2xl md:text-4xl font-bold text-foreground">
+            <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground">
               Your Enhanced <span className="text-gradient-gold">Resume</span>
             </h1>
             <p className="font-body text-sm text-muted-foreground mt-1">AI-optimized, ATS-ready, psychology-tuned</p>
           </div>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <div className="flex items-center gap-2">
               <Switch checked={showCoverLetter} onCheckedChange={setShowCoverLetter} />
               <Label className="font-body text-sm text-muted-foreground">Cover Letter</Label>
             </div>
-            <Button className="bg-gradient-gold text-primary-foreground font-body font-semibold">
+            <Button className="bg-gradient-gold text-primary-foreground font-body font-semibold shadow-gold">
               <Download className="w-4 h-4 mr-2" /> Download PDF
+            </Button>
+            <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-body">
+              <FileText className="w-4 h-4 mr-2" /> DOCX
             </Button>
           </div>
         </motion.div>
@@ -134,11 +140,19 @@ const ResumeBuilder = () => {
         )}
 
         {/* Main Layout */}
-        <div className="grid md:grid-cols-[1fr_240px] gap-6">
+        <div className="grid md:grid-cols-[1fr_280px] gap-6">
           {/* Resume Preview */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="relative">
             {activeTab === "resume" ? (
-              renderTemplate()
+              <div style={{ lineHeight: lineSpacing[0] }}>
+                <div className={`${marginSize === "narrow" ? "px-4" : marginSize === "wide" ? "px-16" : "px-8"}`}>
+                  {renderTemplate()}
+                </div>
+                {/* Watermark overlay for free tier */}
+                <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.08] rotate-[-30deg]">
+                  <span className="font-display text-6xl md:text-8xl font-bold text-primary whitespace-nowrap">PROFILEX PREVIEW</span>
+                </div>
+              </div>
             ) : (
               <div className="bg-foreground rounded-2xl p-8 md:p-12 max-w-3xl mx-auto shadow-2xl">
                 <div className="font-body text-sm text-background/80 leading-relaxed space-y-4">
@@ -166,7 +180,32 @@ const ResumeBuilder = () => {
 
           {/* Customizer Sidebar */}
           {activeTab === "resume" && (
-            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }}>
+            <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="space-y-4">
+              {/* ATS Mini Widget */}
+              <ATSMiniWidget score={92} />
+
+              {/* Line Spacing */}
+              <div className="glass rounded-xl p-4">
+                <Label className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3 block">Line Spacing</Label>
+                <Slider value={lineSpacing} onValueChange={setLineSpacing} min={1} max={2} step={0.1} className="mb-2" />
+                <span className="font-body text-[10px] text-muted-foreground">{lineSpacing[0].toFixed(1)}x</span>
+              </div>
+
+              {/* Margin Control */}
+              <div className="glass rounded-xl p-4">
+                <Label className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3 block">Margins</Label>
+                <div className="flex gap-2">
+                  {(["narrow", "normal", "wide"] as const).map((m) => (
+                    <button key={m} onClick={() => setMarginSize(m)}
+                      className={`flex-1 font-body text-xs py-2 rounded-lg transition-all capitalize ${
+                        marginSize === m ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+                      }`}>
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               <ResumeCustomizer
                 fontSize={fontSize}
                 setFontSize={setFontSize}
