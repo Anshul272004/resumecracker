@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { CheckCircle2, AlertTriangle, TrendingUp, Target, FileText, ArrowRight, Download, Eye, Users, Clock, Crosshair } from "lucide-react";
+import { CheckCircle2, AlertTriangle, TrendingUp, Target, FileText, ArrowRight, Download, Eye, Users, Clock, Crosshair, Share2, ListChecks } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -8,6 +8,8 @@ import ATSGauge from "@/components/results/ATSGauge";
 import PsychologyInsights from "@/components/results/PsychologyInsights";
 import ATSAlgorithmBreakdown from "@/components/results/ATSAlgorithmBreakdown";
 import PatternAnalysis from "@/components/results/PatternAnalysis";
+import ReportCard from "@/components/results/ReportCard";
+import KeywordDensity from "@/components/results/KeywordDensity";
 
 const Results = () => {
   const skills = {
@@ -47,6 +49,14 @@ const Results = () => {
     { issue: "No evidence of scale or complexity", fix: "Added user counts, performance metrics, and technical depth", severity: "Medium" },
   ];
 
+  const actionPlan = [
+    { step: "Download your enhanced resume", icon: Download, done: false },
+    { step: "Review & customize in Resume Builder", icon: FileText, done: false },
+    { step: "Prepare with Interview Prep Engine", icon: Target, done: false },
+    { step: "Apply to target roles with confidence", icon: TrendingUp, done: false },
+    { step: "Share your score & inspire others", icon: Share2, done: false },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -76,6 +86,12 @@ const Results = () => {
             +69% improvement — Your resume now passes ATS filters and ranks in the top 1%
           </p>
         </motion.div>
+
+        {/* Report Card */}
+        <ReportCard />
+
+        {/* Keyword Density */}
+        <KeywordDensity />
 
         {/* Recruiter Simulation */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-gold-deep rounded-2xl p-8 md:p-10 mb-8 glow-gold border-shine">
@@ -264,6 +280,30 @@ const Results = () => {
           </div>
         </motion.div>
 
+        {/* Action Plan */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.78 }} className="glass-deep rounded-2xl p-8 md:p-10 mb-8">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shadow-gold">
+              <ListChecks className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">Your Action Plan</h2>
+              <p className="font-body text-sm text-muted-foreground">Follow these steps to maximize your results</p>
+            </div>
+          </div>
+          <div className="space-y-3">
+            {actionPlan.map((item, i) => (
+              <div key={i} className="flex items-center gap-4 glass-gold rounded-xl p-4 lift-hover">
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+                  <span className="font-display text-sm font-bold text-primary">{i + 1}</span>
+                </div>
+                <item.icon className="w-4 h-4 text-primary shrink-0" />
+                <span className="font-body text-sm text-foreground">{item.step}</span>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
         {/* CTA */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.8 }} className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link to="/resume-builder">
@@ -275,6 +315,11 @@ const Results = () => {
           <Button size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-body px-8 py-6">
             <Download className="w-5 h-5 mr-2" /> Download Full Report
           </Button>
+          <Link to="/interview-prep">
+            <Button size="lg" variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-body px-8 py-6">
+              <Target className="w-5 h-5 mr-2" /> Start Interview Prep
+            </Button>
+          </Link>
         </motion.div>
       </div>
       <Footer />

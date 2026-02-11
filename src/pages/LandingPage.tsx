@@ -4,12 +4,13 @@ import { motion, useInView } from "framer-motion";
 import {
   ArrowRight, CheckCircle2, FileText, Target, Zap, Star, Shield, TrendingUp,
   ChevronRight, Brain, BarChart3, Crown, Eye, Lock, Sparkles, Users, Award,
-  MessageSquare, Mail, Timer, Gift, BadgeCheck, Flame, Heart
+  MessageSquare, Mail, Timer, Gift, BadgeCheck, Flame, Heart, Play, XCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import LiveActivityTicker from "@/components/LiveActivityTicker";
 
 /* ─── Typewriter Hook ─── */
 const useTypewriter = (texts: string[], speed = 80, pause = 2000) => {
@@ -63,7 +64,7 @@ const Counter = ({ end, suffix = "", label }: { end: number; suffix?: string; la
 
   return (
     <div ref={ref} className="text-center">
-      <div className="font-display text-4xl md:text-5xl font-bold text-primary">{count}{suffix}</div>
+      <div className="font-display text-5xl md:text-6xl font-bold text-primary text-shadow-gold">{count}{suffix}</div>
       <p className="font-body text-sm text-muted-foreground mt-2">{label}</p>
     </div>
   );
@@ -122,9 +123,25 @@ const LandingPage = () => {
     { name: "Arjun Kapoor", role: "Full Stack at Swiggy", quote: "The cover letter AI is insane. Recruiter literally told me it was the best cover letter they'd ever read.", avatar: "AK", rating: 5, date: "2 weeks ago" },
   ];
 
+  const competitors = [
+    { feature: "ATS Optimization", profilex: true, zety: false, novoresume: false, canva: false },
+    { feature: "Psychology-Based Framing", profilex: true, zety: false, novoresume: false, canva: false },
+    { feature: "Project Reframing AI", profilex: true, zety: false, novoresume: false, canva: false },
+    { feature: "Interview Prep Engine", profilex: true, zety: false, novoresume: false, canva: false },
+    { feature: "Cover Letter Generator", profilex: true, zety: true, novoresume: true, canva: false },
+    { feature: "Free Preview", profilex: true, zety: false, novoresume: false, canva: true },
+    { feature: "Cognitive Bias Application", profilex: true, zety: false, novoresume: false, canva: false },
+    { feature: "1M+ Pattern Analysis", profilex: true, zety: false, novoresume: false, canva: false },
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+
+      {/* Live Activity Ticker */}
+      <div className="pt-16">
+        <LiveActivityTicker />
+      </div>
 
       {/* ═══ HERO ═══ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -132,7 +149,7 @@ const LandingPage = () => {
         <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-primary/5 blur-[120px]" />
         <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full bg-primary/8 blur-[100px]" />
 
-        <div className="container relative z-10 mx-auto px-6 text-center pt-20">
+        <div className="container relative z-10 mx-auto px-6 text-center pt-10">
           <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
             <div className="inline-flex items-center gap-2 glass-gold rounded-full px-5 py-2 mb-8">
               <Zap className="w-4 h-4 text-primary" />
@@ -141,7 +158,7 @@ const LandingPage = () => {
           </motion.div>
 
           <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
-            className="font-display text-4xl sm:text-5xl md:text-7xl font-bold text-foreground leading-tight mb-6 max-w-4xl mx-auto">
+            className="font-display text-5xl sm:text-6xl md:text-8xl font-bold text-foreground leading-tight mb-6 max-w-5xl mx-auto text-shadow-gold">
             {typewriterText}
             <span className="inline-block w-[3px] h-[1em] bg-primary ml-1 animate-pulse" />
           </motion.h1>
@@ -160,12 +177,12 @@ const LandingPage = () => {
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link to="/dashboard">
-              <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-base px-8 py-6 animate-gold-pulse hover:opacity-90 transition-opacity">
+              <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-lg px-10 py-7 animate-gold-pulse hover:opacity-90 transition-opacity shadow-gold-lg">
                 Start Free Resume <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>
             <Link to="/results">
-              <Button variant="outline" size="lg" className="font-body border-primary/30 text-primary hover:bg-primary/10 px-8 py-6">
+              <Button variant="outline" size="lg" className="font-body border-primary/30 text-primary hover:bg-primary/10 px-8 py-7 text-base">
                 See Sample Result
               </Button>
             </Link>
@@ -197,11 +214,35 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ═══ WATCH DEMO ═══ */}
+      <section className="py-20 border-y border-border bg-secondary/20">
+        <div className="container mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
+            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">See It In Action</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
+              Watch <span className="text-gradient-gold">ProfileX</span> Transform a Resume
+            </h2>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
+            className="max-w-3xl mx-auto glass-gold-deep rounded-2xl p-1 glow-gold-xl border-shine">
+            <div className="bg-secondary/80 rounded-xl aspect-video flex items-center justify-center relative overflow-hidden group cursor-pointer">
+              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
+              <div className="relative z-10 flex flex-col items-center gap-4">
+                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-all group-hover:scale-110 duration-300 shadow-gold-lg">
+                  <Play className="w-8 h-8 text-primary ml-1" />
+                </div>
+                <p className="font-body text-sm text-muted-foreground">2-minute walkthrough</p>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ═══ VALUE PROPOSITION ═══ */}
-      <section className="py-16 border-y border-border bg-secondary/20">
+      <section className="py-16 border-b border-border">
         <div className="container mx-auto px-6">
           <div className="text-center mb-8">
-            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground">
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground">
               What <span className="text-gradient-gold">ProfileX</span> Does For You
             </h2>
           </div>
@@ -212,11 +253,11 @@ const LandingPage = () => {
               { icon: Sparkles, title: "Gets You Interviews", desc: "Our users report 3x more interview calls within 2 weeks of using ProfileX." },
             ].map((v, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="text-center">
-                <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/10 mb-4">
-                  <v.icon className="w-7 h-7 text-primary" />
+                className="text-center glass-gold rounded-2xl p-8 lift-hover border-shine">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-4">
+                  <v.icon className="w-8 h-8 text-primary" />
                 </div>
-                <h3 className="font-display text-lg font-bold text-foreground mb-2">{v.title}</h3>
+                <h3 className="font-display text-xl font-bold text-foreground mb-2">{v.title}</h3>
                 <p className="font-body text-sm text-muted-foreground">{v.desc}</p>
               </motion.div>
             ))}
@@ -225,7 +266,7 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ STATS ═══ */}
-      <section className="py-20 border-b border-border">
+      <section className="py-24 border-b border-border">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             <Counter end={70} suffix="%" label="Resumes Fail ATS" />
@@ -248,9 +289,9 @@ const LandingPage = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
             {benefits.map((b, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="glass-gold rounded-2xl p-6 text-center hover:glow-gold transition-all duration-500">
-                <p className="font-display text-3xl font-bold text-primary">{b.stat}</p>
-                <p className="font-body text-xs text-muted-foreground mt-2">{b.desc}</p>
+                className="glass-gold rounded-2xl p-8 text-center lift-hover border-shine">
+                <p className="font-display text-4xl md:text-5xl font-bold text-primary text-shadow-gold">{b.stat}</p>
+                <p className="font-body text-xs text-muted-foreground mt-3">{b.desc}</p>
               </motion.div>
             ))}
           </div>
@@ -271,9 +312,9 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {features.map((f, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.08 }}
-                className="glass-gold rounded-2xl p-8 group hover:glow-gold transition-all duration-500">
-                <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 mb-5 group-hover:bg-primary/20 transition-colors">
-                  <f.icon className="w-6 h-6 text-primary" />
+                className="glass-gold rounded-2xl p-8 group lift-hover border-shine">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-xl bg-primary/10 mb-5 group-hover:bg-primary/20 transition-colors shadow-gold">
+                  <f.icon className="w-7 h-7 text-primary" />
                 </div>
                 <h3 className="font-display text-lg font-bold text-foreground mb-2">{f.title}</h3>
                 <p className="font-body text-sm text-muted-foreground leading-relaxed">{f.desc}</p>
@@ -300,7 +341,7 @@ const LandingPage = () => {
               { icon: Zap, title: "Download & Get Interviews", desc: "Preview for free, then download your premium resume, cover letter, and prep for interviews." },
             ].map((step, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.2 }}
-                className="glass-gold rounded-2xl p-8 text-center group hover:glow-gold transition-all duration-500">
+                className="glass-gold rounded-2xl p-8 text-center group lift-hover border-shine">
                 <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/10 mb-6 group-hover:bg-primary/20 transition-colors">
                   <step.icon className="w-7 h-7 text-primary" />
                 </div>
@@ -313,12 +354,52 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ═══ PROFILEX vs OTHERS ═══ */}
+      <section className="py-24 bg-secondary/30">
+        <div className="container mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
+            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Comparison</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
+              ProfileX vs <span className="text-gradient-gold">Others</span>
+            </h2>
+            <p className="font-body text-sm text-muted-foreground">See why 15,000+ professionals switched to ProfileX</p>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="glass-deep rounded-2xl p-8 max-w-4xl mx-auto overflow-x-auto border-shine">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border">
+                  <th className="font-body text-sm text-left text-muted-foreground py-3 pr-4">Feature</th>
+                  <th className="font-body text-sm text-center py-3 px-3 text-primary font-bold">ProfileX</th>
+                  <th className="font-body text-sm text-center py-3 px-3 text-muted-foreground">Zety</th>
+                  <th className="font-body text-sm text-center py-3 px-3 text-muted-foreground">NovoResume</th>
+                  <th className="font-body text-sm text-center py-3 px-3 text-muted-foreground">Canva</th>
+                </tr>
+              </thead>
+              <tbody>
+                {competitors.map((row) => (
+                  <tr key={row.feature} className="border-b border-border/50">
+                    <td className="font-body text-xs text-muted-foreground py-3 pr-4">{row.feature}</td>
+                    {[row.profilex, row.zety, row.novoresume, row.canva].map((val, ci) => (
+                      <td key={ci} className="text-center py-3 px-3">
+                        {val ? <CheckCircle2 className="w-4 h-4 text-primary mx-auto" /> : <XCircle className="w-4 h-4 text-muted-foreground/30 mx-auto" />}
+                      </td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </motion.div>
+        </div>
+      </section>
+
       {/* ═══ FREEMIUM PREVIEW ═══ */}
-      <section className="py-20 bg-secondary/30">
+      <section className="py-20">
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-12">
             <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Free vs Premium</span>
-            <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
               Start Free. <span className="text-gradient-gold">Upgrade When You See Value.</span>
             </h2>
             <p className="font-body text-sm text-muted-foreground max-w-lg mx-auto">
@@ -327,7 +408,7 @@ const LandingPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-8 max-w-3xl mx-auto">
-            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass rounded-2xl p-8">
+            <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass rounded-2xl p-8 lift-hover">
               <div className="flex items-center gap-2 mb-4">
                 <Gift className="w-5 h-5 text-primary" />
                 <h3 className="font-display text-xl font-bold text-foreground">Free Forever</h3>
@@ -347,7 +428,7 @@ const LandingPage = () => {
               </Link>
             </motion.div>
 
-            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass-gold rounded-2xl p-8 glow-gold relative">
+            <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="glass-gold rounded-2xl p-8 glow-gold relative border-shine">
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="bg-gradient-gold text-primary-foreground font-body text-xs font-bold px-4 py-1 rounded-full">UNLOCK FULL POWER</span>
               </div>
@@ -364,7 +445,7 @@ const LandingPage = () => {
                 ))}
               </ul>
               <Link to="/pricing">
-                <Button className="w-full mt-6 bg-gradient-gold text-primary-foreground font-body font-semibold animate-gold-pulse">
+                <Button className="w-full mt-6 bg-gradient-gold text-primary-foreground font-body font-semibold animate-gold-pulse shadow-gold">
                   Upgrade for ₹299 <ArrowRight className="w-4 h-4 ml-1" />
                 </Button>
               </Link>
@@ -374,7 +455,7 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ BEFORE / AFTER ═══ */}
-      <section id="before-after" className="py-24">
+      <section id="before-after" className="py-24 bg-secondary/30">
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">The Transformation</span>
@@ -403,7 +484,7 @@ const LandingPage = () => {
             </motion.div>
 
             <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
-              className="glass-gold rounded-2xl p-8 glow-gold">
+              className="glass-gold rounded-2xl p-8 glow-gold border-shine">
               <div className="flex items-center gap-2 mb-6">
                 <div className="h-2 w-2 rounded-full bg-primary" />
                 <span className="font-body text-xs font-bold text-primary uppercase tracking-wider">After ProfileX</span>
@@ -429,7 +510,7 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ REVIEWS & SOCIAL PROOF ═══ */}
-      <section className="py-24 bg-secondary/30">
+      <section className="py-24">
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-4">
             <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Success Stories</span>
@@ -446,9 +527,9 @@ const LandingPage = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
             {reviews.map((r, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                className="glass rounded-2xl p-6 hover:glass-gold transition-all duration-500 group">
+                className="glass rounded-2xl p-6 hover:glass-gold transition-all duration-500 group lift-hover">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gradient-gold flex items-center justify-center shadow-gold">
                     <span className="font-body text-xs font-bold text-primary-foreground">{r.avatar}</span>
                   </div>
                   <div>
@@ -466,19 +547,19 @@ const LandingPage = () => {
             ))}
           </div>
 
-          {/* As seen on */}
+          {/* As seen on - styled badges */}
           <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-            className="flex flex-wrap items-center justify-center gap-8 mt-16 pt-8 border-t border-border">
+            className="flex flex-wrap items-center justify-center gap-6 mt-16 pt-8 border-t border-border">
             <span className="font-body text-xs text-muted-foreground uppercase tracking-wider">Trusted by professionals at</span>
             {["Google", "Amazon", "Microsoft", "Flipkart", "Razorpay", "Swiggy"].map((co) => (
-              <span key={co} className="font-display text-lg font-bold text-muted-foreground/40">{co}</span>
+              <span key={co} className="glass-gold rounded-lg px-4 py-2 font-display text-sm font-bold text-primary/60 border border-primary/10">{co}</span>
             ))}
           </motion.div>
         </div>
       </section>
 
       {/* ═══ PRICING PREVIEW ═══ */}
-      <section id="pricing" className="py-24">
+      <section id="pricing" className="py-24 bg-secondary/30">
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
             <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Pricing</span>
@@ -495,15 +576,15 @@ const LandingPage = () => {
               { name: "Elite", price: "₹199", period: "/month", features: ["Everything in Pro", "Unlimited Edits", "4 Premium Templates", "LinkedIn Optimization", "Priority Support"], popular: false },
             ].map((plan, i) => (
               <motion.div key={i} initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.15 }}
-                className={`relative rounded-2xl p-8 transition-all duration-500 ${plan.popular ? "glass-gold glow-gold scale-105" : "glass hover:glass-gold"}`}>
+                className={`relative rounded-2xl p-8 transition-all duration-500 lift-hover ${plan.popular ? "glass-gold glow-gold scale-105 border-shine" : "glass hover:glass-gold"}`}>
                 {plan.popular && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="bg-gradient-gold text-primary-foreground font-body text-xs font-bold px-4 py-1 rounded-full">MOST POPULAR</span>
+                    <span className="bg-gradient-gold text-primary-foreground font-body text-xs font-bold px-4 py-1 rounded-full animate-pulse-gold">MOST POPULAR</span>
                   </div>
                 )}
                 <h3 className="font-display text-xl font-bold text-foreground mb-2">{plan.name}</h3>
                 <div className="flex items-baseline gap-1 mb-6">
-                  <span className="font-display text-4xl font-bold text-primary">{plan.price}</span>
+                  <span className="font-display text-5xl font-bold text-primary text-shadow-gold">{plan.price}</span>
                   <span className="font-body text-sm text-muted-foreground">{plan.period}</span>
                 </div>
                 <ul className="space-y-3 mb-8">
@@ -515,7 +596,7 @@ const LandingPage = () => {
                   ))}
                 </ul>
                 <Link to="/pricing">
-                  <Button className={`w-full font-body font-semibold ${plan.popular ? "bg-gradient-gold text-primary-foreground" : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"}`}>
+                  <Button className={`w-full font-body font-semibold ${plan.popular ? "bg-gradient-gold text-primary-foreground shadow-gold" : "bg-secondary text-foreground hover:bg-primary hover:text-primary-foreground"}`}>
                     Choose {plan.name} <ChevronRight className="w-4 h-4 ml-1" />
                   </Button>
                 </Link>
@@ -541,12 +622,12 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ EMAIL CAPTURE ═══ */}
-      <section className="py-16 bg-secondary/30">
+      <section className="py-16">
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="glass-gold rounded-2xl p-8 md:p-12 max-w-2xl mx-auto text-center glow-gold">
+            className="glass-gold rounded-2xl p-8 md:p-12 max-w-2xl mx-auto text-center glow-gold border-shine">
             <Mail className="w-8 h-8 text-primary mx-auto mb-4" />
-            <h2 className="font-display text-2xl font-bold text-foreground mb-2">
+            <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2">
               Get Free Resume Tips & Career Hacks
             </h2>
             <p className="font-body text-sm text-muted-foreground mb-6">
@@ -580,7 +661,7 @@ const LandingPage = () => {
       <section className="py-24">
         <div className="container mx-auto px-6 text-center">
           <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-            className="glass-gold rounded-3xl p-12 md:p-20 glow-gold-lg max-w-3xl mx-auto">
+            className="glass-gold rounded-3xl p-12 md:p-20 glow-gold-lg max-w-3xl mx-auto border-shine">
             <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-6">
               Ready to <span className="text-gradient-gold">Win</span>?
             </h2>
@@ -591,7 +672,7 @@ const LandingPage = () => {
               ⏰ Start free — no credit card required. See results before you pay.
             </p>
             <Link to="/dashboard">
-              <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-base px-10 py-6 animate-gold-pulse">
+              <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-lg px-10 py-7 animate-gold-pulse shadow-gold-lg">
                 Start Free Resume Now <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
             </Link>

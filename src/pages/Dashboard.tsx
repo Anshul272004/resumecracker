@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
+import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,7 @@ import { useNavigate } from "react-router-dom";
 const steps = [
   { icon: Upload, label: "Upload Resume" },
   { icon: User, label: "About You" },
+  { icon: Target, label: "Target Role" },
   { icon: FileText, label: "Job Description" },
   { icon: Lightbulb, label: "Your Projects" },
   { icon: Sparkles, label: "Generate" },
@@ -20,19 +21,22 @@ const steps = [
 const contextualTips: Record<number, { icon: string; tip: string }> = {
   0: { icon: "📄", tip: "Upload your latest resume — even if it's not perfect. We'll enhance everything." },
   1: { icon: "💡", tip: "Be specific about skills. 'Python' is better than 'Programming'." },
-  2: { icon: "🎯", tip: "Copy the exact job description. We match keywords precisely." },
-  3: { icon: "🚀", tip: "Add achievements, not just responsibilities. Numbers make the difference." },
-  4: { icon: "✨", tip: "Sit back — our AI is applying 6 cognitive biases and ATS optimization." },
+  2: { icon: "🎯", tip: "Specify your target role — we'll customize everything for that exact position." },
+  3: { icon: "🔍", tip: "Copy the exact job description. We match keywords precisely." },
+  4: { icon: "🚀", tip: "Add achievements, not just responsibilities. Numbers make the difference." },
+  5: { icon: "✨", tip: "Sit back — our AI is applying 6 cognitive biases and ATS optimization." },
 };
 
 const generationStages = [
   "Parsing resume structure...",
   "Extracting key skills & experience...",
   "Analyzing target job keywords...",
+  "Matching industry-specific keywords...",
   "Reframing projects with P-A-R framework...",
   "Applying psychology & neuro optimizations...",
   "Running ATS compatibility checks...",
   "Generating cover letter...",
+  "Generating interview questions...",
   "Final quality assurance...",
 ];
 
@@ -41,6 +45,8 @@ const Dashboard = () => {
   const [dragOver, setDragOver] = useState(false);
   const [fileName, setFileName] = useState("");
   const [profile, setProfile] = useState({ type: "", experience: "", education: "", skills: "", certifications: "" });
+  const [targetRole, setTargetRole] = useState("");
+  const [targetCompany, setTargetCompany] = useState("");
   const [jobDesc, setJobDesc] = useState("");
   const [projects, setProjects] = useState([{ name: "", problem: "", action: "", impact: "" }]);
   const [generating, setGenerating] = useState(false);
@@ -62,7 +68,7 @@ const Dashboard = () => {
         }
         return prev + 1;
       });
-    }, 600);
+    }, 500);
   };
 
   const triggerAutoSave = () => {
@@ -80,13 +86,13 @@ const Dashboard = () => {
             {steps.map((s, i) => (
               <div key={i} className="flex flex-col items-center gap-2 flex-1">
                 <div
-                  className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
+                  className={`w-10 h-10 md:w-12 md:h-12 rounded-full flex items-center justify-center transition-all duration-500 ${
                     i <= currentStep ? "bg-gradient-gold text-primary-foreground shadow-gold" : "bg-secondary text-muted-foreground"
                   }`}
                 >
-                  <s.icon className="w-5 h-5" />
+                  <s.icon className="w-4 h-4 md:w-5 md:h-5" />
                 </div>
-                <span className="font-body text-[10px] text-muted-foreground hidden sm:block">{s.label}</span>
+                <span className="font-body text-[9px] md:text-[10px] text-muted-foreground hidden sm:block">{s.label}</span>
               </div>
             ))}
           </div>
@@ -151,6 +157,16 @@ const Dashboard = () => {
                     </>
                   )}
                 </div>
+                {fileName && (
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mt-6 glass-gold rounded-xl p-4">
+                    <p className="font-body text-xs text-primary font-semibold mb-2">📋 Detected from Resume</p>
+                    <div className="flex flex-wrap gap-2">
+                      {["Python", "React", "SQL", "Machine Learning", "B.Tech CS"].map((skill) => (
+                        <span key={skill} className="bg-primary/10 text-primary font-body text-xs px-3 py-1 rounded-full">{skill}</span>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
               </div>
             )}
 
@@ -196,8 +212,45 @@ const Dashboard = () => {
               </div>
             )}
 
-            {/* Step 2: Job Description */}
+            {/* Step 2: Target Role */}
             {currentStep === 2 && (
+              <div>
+                <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-2">Target Role</h2>
+                <p className="font-body text-sm text-muted-foreground mb-8">Tell us what role you're applying for — we'll customize everything for it.</p>
+                <div className="space-y-5">
+                  <div>
+                    <Label className="font-body text-sm text-foreground">Target Role / Position</Label>
+                    <Input value={targetRole} onChange={(e) => { setTargetRole(e.target.value); triggerAutoSave(); }}
+                      placeholder="e.g. Software Developer, Data Analyst, Product Manager" className="mt-2 bg-secondary border-border" />
+                  </div>
+                  <div>
+                    <Label className="font-body text-sm text-foreground">Target Company (optional)</Label>
+                    <Input value={targetCompany} onChange={(e) => { setTargetCompany(e.target.value); triggerAutoSave(); }}
+                      placeholder="e.g. Google, Amazon, Razorpay" className="mt-2 bg-secondary border-border" />
+                  </div>
+                  {targetRole && (
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-gold rounded-xl p-4">
+                      <p className="font-body text-xs text-primary font-semibold mb-2">🎯 AI will optimize for:</p>
+                      <ul className="space-y-1">
+                        {[
+                          `Keywords specific to "${targetRole}" roles`,
+                          "Industry-standard action verbs",
+                          `Interview questions for ${targetRole}`,
+                          targetCompany ? `${targetCompany}'s hiring patterns` : "General industry patterns",
+                        ].map((item, i) => (
+                          <li key={i} className="font-body text-xs text-muted-foreground flex items-center gap-2">
+                            <CheckCircle2 className="w-3 h-3 text-primary shrink-0" /> {item}
+                          </li>
+                        ))}
+                      </ul>
+                    </motion.div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Step 3: Job Description */}
+            {currentStep === 3 && (
               <div>
                 <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-2">Target Job Description</h2>
                 <p className="font-body text-sm text-muted-foreground mb-8">Paste the job description — we'll extract keywords and optimize accordingly.</p>
@@ -220,8 +273,8 @@ const Dashboard = () => {
               </div>
             )}
 
-            {/* Step 3: Projects */}
-            {currentStep === 3 && (
+            {/* Step 4: Projects */}
+            {currentStep === 4 && (
               <div>
                 <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-2">Your Projects</h2>
                 <p className="font-body text-sm text-muted-foreground mb-4">Tell us about your projects — even "faltu" ones. We'll reframe them into impact stories.</p>
@@ -252,8 +305,8 @@ const Dashboard = () => {
               </div>
             )}
 
-            {/* Step 4: Generate */}
-            {currentStep === 4 && (
+            {/* Step 5: Generate */}
+            {currentStep === 5 && (
               <div className="text-center py-8">
                 {!generating ? (
                   <>
@@ -261,9 +314,30 @@ const Dashboard = () => {
                       <Sparkles className="w-10 h-10 text-primary" />
                     </div>
                     <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-2">Ready to Transform</h2>
-                    <p className="font-body text-sm text-muted-foreground mb-8 max-w-md mx-auto">
+                    <p className="font-body text-sm text-muted-foreground mb-6 max-w-md mx-auto">
                       Our AI will analyze your profile, reframe projects, and generate an ATS-optimized resume.
                     </p>
+
+                    {/* What You'll Get */}
+                    <div className="glass-gold rounded-xl p-5 mb-8 text-left max-w-md mx-auto">
+                      <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3">📦 What You'll Get</p>
+                      <div className="space-y-2">
+                        {[
+                          "ATS-Optimized Resume (92%+ score)",
+                          "Project Reframing with P-A-R Framework",
+                          "AI Cover Letter Generation",
+                          "Keyword Density Analysis",
+                          "Interview Prep Questions (25+)",
+                          "Psychology & Neuro Insights Report",
+                        ].map((item, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
+                            <span className="font-body text-xs text-foreground">{item}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
                     <Button onClick={handleGenerate} size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold px-10 py-6 animate-gold-pulse shadow-gold-lg">
                       <Sparkles className="w-5 h-5 mr-2" /> Generate My Resume
                     </Button>
@@ -277,7 +351,7 @@ const Dashboard = () => {
                     </div>
                     <h2 className="font-display text-2xl font-bold text-foreground mb-2">AI is Working Its Magic...</h2>
                     <p className="font-body text-xs text-muted-foreground mb-6 flex items-center justify-center gap-1">
-                      <Clock className="w-3 h-3" /> Estimated time: ~{Math.max(1, Math.round((generationStages.length - genStage) * 0.6))}s remaining
+                      <Clock className="w-3 h-3" /> Estimated time: ~{Math.max(1, Math.round((generationStages.length - genStage) * 0.5))}s remaining
                     </p>
                     <div className="space-y-2 mt-6 max-w-sm mx-auto">
                       {generationStages.map((t, i) => (
@@ -317,9 +391,9 @@ const Dashboard = () => {
           >
             <ChevronLeft className="w-4 h-4 mr-1" /> Back
           </Button>
-          {currentStep < 4 && (
+          {currentStep < 5 && (
             <Button
-              onClick={() => setCurrentStep(Math.min(4, currentStep + 1))}
+              onClick={() => setCurrentStep(Math.min(5, currentStep + 1))}
               className="bg-gradient-gold text-primary-foreground font-body font-semibold shadow-gold"
             >
               Next <ChevronRight className="w-4 h-4 ml-1" />

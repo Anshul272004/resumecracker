@@ -1,11 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { CheckCircle2, ChevronRight, Shield, Zap, Star, Crown, Heart, Lock, Timer, Gift, Award, Calculator } from "lucide-react";
+import { CheckCircle2, ChevronRight, Shield, Zap, Star, Crown, Heart, Lock, Timer, Gift, Award, Calculator, GraduationCap } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import CountdownTimer from "@/components/CountdownTimer";
 
 const plans = [
   {
@@ -35,6 +38,7 @@ const plans = [
   },
   {
     name: "Elite", price: "₹199", period: "/month",
+    annualPrice: "₹149",
     description: "For serious job seekers — unlimited power",
     userCount: "890+",
     features: ["Everything in Pro", "Unlimited Job-Specific Edits", "Real-time AI Suggestions", "LinkedIn Profile Optimization", "Unlimited Interview Prep", "Dedicated Support Channel", "Early Access to New Features", "Custom Resume Branding"],
@@ -54,10 +58,13 @@ const faqs = [
   { q: "Can I upgrade later?", a: "Yes. Start Free and upgrade anytime. Your work is saved." },
   { q: "What payment methods do you accept?", a: "All major credit/debit cards, UPI, net banking, and wallets. SSL-encrypted and secure." },
   { q: "How is the Lifetime deal different?", a: "Everything in Elite but one-time payment. Best value if you're actively job hunting." },
+  { q: "Do you offer student discounts?", a: "Yes! Students with a valid .edu email get 30% off any paid plan. Use code STUDENT30 at checkout." },
+  { q: "Can I use ProfileX for multiple job applications?", a: "Starter supports 1 JD, Pro supports 3, and Elite offers unlimited. Each generates a unique optimized resume." },
 ];
 
 const Pricing = () => {
   const [showSavings, setShowSavings] = useState(false);
+  const [isAnnual, setIsAnnual] = useState(false);
 
   return (
     <div className="min-h-screen bg-background">
@@ -66,7 +73,7 @@ const Pricing = () => {
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">
           <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Pricing</span>
-          <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold text-foreground mb-4 text-shadow-gold">
+          <h1 className="font-display text-5xl md:text-7xl lg:text-8xl font-bold text-foreground mb-4 text-shadow-gold">
             Invest in Your <span className="text-gradient-gold">Future</span>
           </h1>
           <p className="font-body text-base md:text-lg text-muted-foreground max-w-lg mx-auto">
@@ -74,13 +81,28 @@ const Pricing = () => {
           </p>
         </motion.div>
 
-        {/* Urgency */}
+        {/* Countdown Timer */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.15 }}
+          className="flex justify-center mb-4">
+          <CountdownTimer />
+        </motion.div>
+
+        {/* Student Discount Banner */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}
-          className="flex items-center justify-center gap-2 mb-10">
-          <div className="inline-flex items-center gap-2 bg-destructive/10 border border-destructive/20 rounded-full px-5 py-2">
-            <Timer className="w-4 h-4 text-destructive" />
-            <span className="font-body text-xs text-destructive font-semibold">🔥 Limited: First 100 users get 50% off Pro — Only 23 spots left!</span>
+          className="flex items-center justify-center gap-2 mb-6">
+          <div className="inline-flex items-center gap-2 glass-gold rounded-full px-5 py-2">
+            <GraduationCap className="w-4 h-4 text-primary" />
+            <span className="font-body text-xs text-primary font-semibold">🎓 Students get 30% off — Use code STUDENT30</span>
           </div>
+        </motion.div>
+
+        {/* Billing Toggle */}
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.22 }}
+          className="flex items-center justify-center gap-3 mb-10">
+          <span className={`font-body text-sm ${!isAnnual ? "text-primary font-semibold" : "text-muted-foreground"}`}>Monthly</span>
+          <Switch checked={isAnnual} onCheckedChange={setIsAnnual} />
+          <span className={`font-body text-sm ${isAnnual ? "text-primary font-semibold" : "text-muted-foreground"}`}>Annual</span>
+          {isAnnual && <span className="font-body text-xs text-primary bg-primary/10 px-2 py-1 rounded-full">Save 25%</span>}
         </motion.div>
 
         {/* Savings Calculator */}
@@ -119,12 +141,12 @@ const Pricing = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
               className={`relative rounded-2xl p-6 flex flex-col transition-all duration-500 lift-hover ${
-                plan.popular ? "glass-gold-deep glow-gold-xl lg:scale-105" : "glass hover:glass-gold"
+                plan.popular ? "glass-gold-deep glow-gold-xl lg:scale-105 border-shine" : "glass hover:glass-gold"
               }`}
             >
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <span className="bg-gradient-gold text-primary-foreground font-body text-xs font-bold px-4 py-1 rounded-full shadow-gold">
+                  <span className="bg-gradient-gold text-primary-foreground font-body text-xs font-bold px-4 py-1 rounded-full shadow-gold animate-pulse-gold">
                     MOST POPULAR
                   </span>
                 </div>
@@ -143,8 +165,12 @@ const Pricing = () => {
               <p className="font-body text-[10px] text-muted-foreground mb-2">{plan.description}</p>
               <p className="font-body text-[10px] text-primary/70 mb-4">👥 {plan.userCount} users chose this plan</p>
               <div className="flex items-baseline gap-1 mb-6">
-                <span className="font-display text-5xl font-bold text-primary text-shadow-gold">{plan.price}</span>
-                <span className="font-body text-sm text-muted-foreground">{plan.period}</span>
+                <span className="font-display text-5xl font-bold text-primary text-shadow-gold">
+                  {isAnnual && plan.annualPrice ? plan.annualPrice : plan.price}
+                </span>
+                <span className="font-body text-sm text-muted-foreground">
+                  {isAnnual && plan.annualPrice ? "/month (billed annually)" : plan.period}
+                </span>
               </div>
               <ul className="space-y-2.5 mb-6 flex-1">
                 {plan.features.map((f, j) => (
@@ -241,6 +267,7 @@ const Pricing = () => {
                 { name: "Build & Edit Resume", free: true, starter: true, pro: true, elite: true },
                 { name: "ATS Score Check", free: true, starter: true, pro: true, elite: true },
                 { name: "PDF Download", free: false, starter: true, pro: true, elite: true },
+                { name: "DOCX Export", free: false, starter: false, pro: true, elite: true },
                 { name: "Keyword Analysis", free: false, starter: true, pro: true, elite: true },
                 { name: "Cover Letter", free: false, starter: false, pro: true, elite: true },
                 { name: "Project Reframing", free: false, starter: false, pro: true, elite: true },
@@ -299,11 +326,11 @@ const Pricing = () => {
         {/* Final CTA */}
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="text-center">
           <Link to="/dashboard">
-            <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold px-10 py-6 animate-gold-pulse shadow-gold-lg text-base">
+            <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold px-10 py-7 animate-gold-pulse shadow-gold-lg text-lg">
               Start Free Resume Now <ChevronRight className="w-5 h-5 ml-1" />
             </Button>
           </Link>
-          <p className="font-body text-xs text-muted-foreground mt-3">No credit card required. Start free, upgrade anytime.</p>
+          <p className="font-body text-xs text-muted-foreground mt-4">No credit card required. Free forever plan available.</p>
         </motion.div>
       </div>
       <Footer />
