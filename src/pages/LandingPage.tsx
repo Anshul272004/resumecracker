@@ -4,7 +4,7 @@ import { motion, useInView } from "framer-motion";
 import {
   ArrowRight, CheckCircle2, FileText, Target, Zap, Star, Shield, TrendingUp,
   ChevronRight, Brain, BarChart3, Crown, Eye, Lock, Sparkles, Users, Award,
-  MessageSquare, Mail, Timer, Gift, BadgeCheck, Flame, Heart, Play, XCircle
+  MessageSquare, Mail, Timer, Gift, BadgeCheck, Flame, Heart, XCircle
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -82,6 +82,21 @@ const Particles = () => (
     ))}
   </div>
 );
+
+/* ─── Template Showcase Data ─── */
+const templateShowcaseRow1 = [
+  { name: "The Executive", subtitle: "Satya Nadella Style", color: "hsl(43 75% 52%)", skills: ["Python", "React", "AWS"] },
+  { name: "The Minimalist", subtitle: "Steve Jobs Style", color: "hsl(0 0% 70%)", skills: ["Design", "UX", "Swift"] },
+  { name: "The Modern Pro", subtitle: "Sundar Pichai Style", color: "hsl(215 80% 55%)", skills: ["ML", "Java", "Cloud"] },
+  { name: "The Standout", subtitle: "Bold & Distinctive", color: "hsl(350 70% 55%)", skills: ["Node", "Go", "K8s"] },
+];
+
+const templateShowcaseRow2 = [
+  { name: "The Elegant", subtitle: "Hermès Aesthetic", color: "hsl(43 60% 40%)", skills: ["SQL", "Docker", "CI/CD"] },
+  { name: "The Bold", subtitle: "Elon Musk Style", color: "hsl(155 70% 45%)", skills: ["Rust", "C++", "Linux"] },
+  { name: "The Executive", subtitle: "Premium Gold", color: "hsl(43 75% 52%)", skills: ["TypeScript", "Next.js", "GCP"] },
+  { name: "The Modern Pro", subtitle: "Tech-Forward", color: "hsl(270 70% 55%)", skills: ["FastAPI", "Redis", "Kafka"] },
+];
 
 /* ─── Landing Page ─── */
 const LandingPage = () => {
@@ -214,27 +229,58 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ═══ WATCH DEMO ═══ */}
-      <section className="py-20 border-y border-border bg-secondary/20">
+      {/* ═══ DYNAMIC TEMPLATE SHOWCASE ═══ */}
+      <section className="py-20 border-y border-border bg-secondary/20 overflow-hidden">
         <div className="container mx-auto px-6">
           <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-10">
-            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">See It In Action</span>
+            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Premium Templates</span>
             <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
-              Watch <span className="text-gradient-gold">ProfileX</span> Transform a Resume
+              6 Elite <span className="text-gradient-gold">Resume Templates</span>
             </h2>
+            <p className="font-body text-sm text-muted-foreground">Inspired by Fortune 500 leaders. Auto-scrolling showcase.</p>
           </motion.div>
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-            className="max-w-3xl mx-auto glass-gold-deep rounded-2xl p-1 glow-gold-xl border-shine">
-            <div className="bg-secondary/80 rounded-xl aspect-video flex items-center justify-center relative overflow-hidden group cursor-pointer">
-              <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-background/60" />
-              <div className="relative z-10 flex flex-col items-center gap-4">
-                <div className="w-20 h-20 rounded-full bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-all group-hover:scale-110 duration-300 shadow-gold-lg">
-                  <Play className="w-8 h-8 text-primary ml-1" />
+        </div>
+
+        {/* Row 1 - scrolls left */}
+        <div className="relative mb-4">
+          <div className="flex gap-4 animate-ticker-left">
+            {[...templateShowcaseRow1, ...templateShowcaseRow1].map((t, i) => (
+              <div key={i} className="shrink-0 w-[220px] glass-gold rounded-xl p-4 hover:scale-105 hover:glow-gold transition-all duration-300 cursor-pointer group">
+                <div className="h-2 rounded-full mb-3" style={{ backgroundColor: t.color }} />
+                <div className="h-3 w-3/4 rounded bg-foreground/10 mb-2" />
+                <div className="space-y-1.5 mb-3">
+                  {[1,2,3].map(j => <div key={j} className="h-1.5 rounded bg-foreground/5" style={{ width: `${70 + Math.random() * 30}%` }} />)}
                 </div>
-                <p className="font-body text-sm text-muted-foreground">2-minute walkthrough</p>
+                <div className="flex gap-1 mb-3">
+                  {t.skills.map((s,j) => <span key={j} className="text-[7px] px-1.5 py-0.5 rounded-full border border-foreground/10 text-muted-foreground">{s}</span>)}
+                </div>
+                <div className="h-1 w-full rounded bg-foreground/5 mb-1" />
+                <p className="font-body text-[10px] font-bold text-primary mt-2 group-hover:text-foreground transition-colors">{t.name}</p>
+                <p className="font-body text-[8px] text-muted-foreground">{t.subtitle}</p>
               </div>
-            </div>
-          </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2 - scrolls right */}
+        <div className="relative">
+          <div className="flex gap-4 animate-ticker-right">
+            {[...templateShowcaseRow2, ...templateShowcaseRow2].map((t, i) => (
+              <div key={i} className="shrink-0 w-[220px] glass-gold rounded-xl p-4 hover:scale-105 hover:glow-gold transition-all duration-300 cursor-pointer group">
+                <div className="h-2 rounded-full mb-3" style={{ backgroundColor: t.color }} />
+                <div className="h-3 w-3/4 rounded bg-foreground/10 mb-2" />
+                <div className="space-y-1.5 mb-3">
+                  {[1,2,3].map(j => <div key={j} className="h-1.5 rounded bg-foreground/5" style={{ width: `${70 + Math.random() * 30}%` }} />)}
+                </div>
+                <div className="flex gap-1 mb-3">
+                  {t.skills.map((s,j) => <span key={j} className="text-[7px] px-1.5 py-0.5 rounded-full border border-foreground/10 text-muted-foreground">{s}</span>)}
+                </div>
+                <div className="h-1 w-full rounded bg-foreground/5 mb-1" />
+                <p className="font-body text-[10px] font-bold text-primary mt-2 group-hover:text-foreground transition-colors">{t.name}</p>
+                <p className="font-body text-[8px] text-muted-foreground">{t.subtitle}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
-import { Crown, Sparkles, Briefcase, Palette } from "lucide-react";
+import { Crown, Sparkles, Briefcase, Palette, Gem, Rocket } from "lucide-react";
 
-export type TemplateName = "executive" | "minimal" | "modern" | "creative";
+export type TemplateName = "executive" | "minimal" | "modern" | "creative" | "elegant" | "bold";
 
 interface TemplateSelectorProps {
   selected: TemplateName;
@@ -13,10 +13,12 @@ const templates: { id: TemplateName; name: string; subtitle: string; icon: React
   { id: "minimal", name: "The Minimalist", subtitle: "Steve Jobs Style", icon: Sparkles, inspiration: "Less is more, whitespace mastery, elegant" },
   { id: "modern", name: "The Modern Pro", subtitle: "Sundar Pichai Style", icon: Briefcase, inspiration: "Tech-forward, structured, data-driven" },
   { id: "creative", name: "The Standout", subtitle: "Bold & Distinctive", icon: Palette, inspiration: "Eye-catching, unique layout, memorable" },
+  { id: "elegant", name: "The Elegant", subtitle: "Hermès Aesthetic", icon: Gem, inspiration: "Luxury serif, thin gold lines, sophisticated" },
+  { id: "bold", name: "The Bold", subtitle: "Elon Musk Style", icon: Rocket, inspiration: "High contrast, large name, modern impact" },
 ];
 
 const TemplateSelector = ({ selected, onChange }: TemplateSelectorProps) => (
-  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
     {templates.map((t) => (
       <motion.button
         key={t.id}
