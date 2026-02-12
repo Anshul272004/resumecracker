@@ -13,6 +13,8 @@ import ExecutiveTemplate from "@/components/resume/templates/ExecutiveTemplate";
 import MinimalTemplate from "@/components/resume/templates/MinimalTemplate";
 import ModernTemplate from "@/components/resume/templates/ModernTemplate";
 import CreativeTemplate from "@/components/resume/templates/CreativeTemplate";
+import ElegantTemplate from "@/components/resume/templates/ElegantTemplate";
+import BoldTemplate from "@/components/resume/templates/BoldTemplate";
 import ATSMiniWidget from "@/components/resume/ATSMiniWidget";
 
 const resumeData = {
@@ -74,6 +76,9 @@ const ResumeBuilder = () => {
   const [accentColor, setAccentColor] = useState("hsl(43 75% 52%)");
   const [lineSpacing, setLineSpacing] = useState([1.5]);
   const [marginSize, setMarginSize] = useState<"narrow" | "normal" | "wide">("normal");
+  const [fontFamily, setFontFamily] = useState("'Inter', sans-serif");
+  const [fontColor, setFontColor] = useState("hsl(0 0% 100%)");
+  const [headerStyle, setHeaderStyle] = useState("left");
 
   const templateProps = { data: resumeData, accentColor, fontSize, showSummary };
 
@@ -83,6 +88,8 @@ const ResumeBuilder = () => {
       case "minimal": return <MinimalTemplate {...templateProps} />;
       case "modern": return <ModernTemplate {...templateProps} />;
       case "creative": return <CreativeTemplate {...templateProps} />;
+      case "elegant": return <ElegantTemplate {...templateProps} />;
+      case "bold": return <BoldTemplate {...templateProps} />;
     }
   };
 
@@ -215,6 +222,12 @@ const ResumeBuilder = () => {
                 setShowSummary={setShowSummary}
                 accentColor={accentColor}
                 setAccentColor={setAccentColor}
+                fontFamily={fontFamily}
+                setFontFamily={setFontFamily}
+                fontColor={fontColor}
+                setFontColor={setFontColor}
+                headerStyle={headerStyle}
+                setHeaderStyle={setHeaderStyle}
               />
             </motion.div>
           )}
