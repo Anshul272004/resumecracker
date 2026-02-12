@@ -1,188 +1,101 @@
 
 
-# ProfileX Ultra-Premium Enhancement -- Missing Features & Full Polish
+# ProfileX Enhancement -- Dynamic Showcase, Premium Templates & LeetCode-Style Interview Prep
 
-## What's Missing (User Perspective Analysis)
-
-After a thorough audit of every page, here are the gaps and enhancements needed:
-
----
-
-## 1. Landing Page -- Missing Sections & Polish
-
-**Missing:**
-- No live demo / video walkthrough section (users want to SEE the tool before signing up)
-- No "How We're Different" comparison vs competitors (Zety, Novoresume, etc.)
-- No real-time visitor/user counter ("127 people building resumes right now")
-- Feature cards lack gradient borders and deeper hover effects
-- Hero headline could be bigger (text-5xl to text-8xl on desktop)
-- No "As Seen On" media logos with actual styling (currently just text)
-
-**Enhancements:**
-- Add animated "Live Activity" ticker showing real-time actions ("Priya just scored 94% ATS...")
-- Add "ProfileX vs Others" comparison table section
-- Upgrade feature cards with `border-shine` class and `shadow-gold` on hover
-- Add a "Watch Demo" video placeholder section with play button
-- Bigger benefit stat numbers (text-5xl) with gold glow
-- Brand logos styled as proper badges instead of plain text
+## Overview
+Three major upgrades: (1) Replace the static video placeholder on the Landing Page with a dynamic, auto-scrolling resume template showcase, (2) Add more classy/attractive resume templates with enhanced customization, (3) Transform the Interview Prep into a LeetCode-inspired coding platform with problem cards, filters, and progress tracking.
 
 ---
 
-## 2. Dashboard -- Missing UX Features
+## 1. Landing Page -- Replace Video Section with Dynamic Template Showcase
 
-**Missing:**
-- No "Target Role" input field (user should specify which role they're applying for)
-- No skill auto-detection preview from uploaded resume
-- No "Resume Score Preview" before generating
-- Step navigation doesn't validate (user can skip to Generate without filling anything)
+**Current state:** A static "Watch Demo" section with a play button icon and no actual content.
 
-**Enhancements:**
-- Add "Target Role" field in Step 2 (used to customize interview prep questions later)
-- Add resume parsing preview showing detected skills/education after upload
-- Add step validation -- disable "Next" until required fields are filled
-- Add "What You'll Get" preview panel in the Generate step showing all deliverables
-- Enhanced generation with 10 stages (add "Matching industry keywords...", "Generating interview questions...")
+**New design:** A horizontally auto-scrolling carousel of live resume template previews (mini-rendered versions of actual templates). Each template card slowly scrolls left-to-right in an infinite loop, creating a dynamic, premium "showroom" feel.
 
----
-
-## 3. Results Page -- Missing Analytics
-
-**Missing:**
-- No "Keyword Density Map" showing where keywords are placed in the resume
-- No "Resume Readability Score" (Flesch-Kincaid style)
-- No "Download Report Card" visual (a mini summary card users can screenshot/share)
-- No "Next Steps" action checklist after viewing results
-
-**Enhancements:**
-- Add Keyword Density visualization (bar chart showing keyword frequency)
-- Add Readability Score with grade level indicator
-- Add shareable "Report Card" component with key metrics
-- Add "Your Action Plan" checklist (Download Resume, Prepare for Interviews, Apply to Jobs)
-- Add "Share Your Score" social sharing buttons
+**Implementation:**
+- Remove the play button / video placeholder
+- Render 6-8 mini resume template cards (scaled down to ~200px wide) in a horizontally scrolling row
+- Use CSS `@keyframes` for infinite smooth left-to-right scrolling (ticker-style, like a conveyor belt)
+- Two rows scrolling in opposite directions for visual depth
+- Each card shows a tiny but real preview of a template style (name, colored header, bullet points, skills section)
+- Hovering a card pauses the animation and scales it up slightly
+- Label each card with the template name (e.g., "The Executive", "The Minimalist")
 
 ---
 
-## 4. Resume Builder -- Critical Missing Features
+## 2. More Resume Templates + Enhanced Customization
 
-**Missing:**
-- No DOCX download option (only PDF mentioned)
-- No "Watermark" on free preview (critical for freemium conversion)
-- No real-time ATS score mini-widget in sidebar
-- No "AI Suggestion Tooltips" on resume sections
-- No section reorder capability
-- No line spacing / margin controls
-- No "Compare Templates" side-by-side view
+**New templates to add (2 more):**
+- **"The Elegant"** -- Inspired by classic luxury brands. Serif-heavy, thin gold lines, sophisticated spacing. Think Hermes/Chanel aesthetic.
+- **"The Bold"** -- High contrast, large name, colored header block, modern sans-serif. Inspired by Elon Musk's one-page resume style.
 
-**Enhancements:**
-- Add real-time ATS Score widget in the customizer sidebar (animated gauge)
-- Add "AI Tips" tooltips on each resume section (hover to see improvement suggestions)
-- Add line spacing slider (1.0 - 2.0)
-- Add margin control (Narrow / Normal / Wide)
-- Add watermark overlay on free tier preview ("PROFILEX WATERMARK -- Upgrade to Remove")
-- Add DOCX export button alongside PDF
-- Add "Compare Templates" toggle for side-by-side view
+**Template enhancements:**
+- Update `TemplateName` type to include `"elegant"` and `"bold"`
+- Add template cards to `TemplateSelector` with new icons (Gem for Elegant, Rocket for Bold)
+- Create `ElegantTemplate.tsx` and `BoldTemplate.tsx` component files
+
+**Customizer enhancements:**
+- Add **Font Family selector** (3 options: Serif/Sans-Serif/Monospace)
+- Add **Font Color control** (6 options: White, Light Gray, Cream, Silver, Warm White, Cool White)
+- Add **Header Style** toggle (Centered / Left-aligned / Two-column)
+- Expand accent color palette with 3 more options (Teal, Coral, Navy)
 
 ---
 
-## 5. Interview Prep -- Missing Features
+## 3. Interview Prep -- LeetCode-Style Transformation
 
-**Missing:**
-- No "Mock Interview Mode" (full simulated interview flow question by question)
-- No "Bookmark" or "Save for Later" on individual questions
-- No "Difficulty Filter" to filter questions by Easy/Medium/Hard
-- No "Progress Save" -- if user leaves and comes back, progress is lost
-- No "Share Results" after completing all rounds
+**Current state:** Round-based tabs with expandable question cards. Functional but doesn't feel like a coding platform.
 
-**Enhancements:**
-- Add "Mock Interview" mode -- sequential questions with timer, auto-advance
-- Add bookmark/save functionality for favorite questions
-- Add difficulty filter dropdown
-- Add "Overall Readiness Score" dashboard after completing all 5 rounds
-- Add "Interview Report Card" showing strengths and weaknesses across rounds
+**LeetCode-inspired enhancements:**
 
----
+### Problem List View (default):
+- Table/card grid showing ALL questions across rounds with columns:
+  - Status icon (solved/unsolved/attempted)
+  - Question title
+  - Difficulty badge (Easy=green, Medium=yellow, Hard=red)
+  - Category/Topic tags (DSA, System Design, HR, etc.)
+  - Acceptance/frequency rate (e.g., "99% asked")
+  - Round number
+- **Filter bar** at top: Filter by Difficulty (Easy/Medium/Hard), Topic (DSA, System Design, HR, Behavioral, Coding), Status (All/Solved/Unsolved)
+- **Search bar** to find specific questions
+- **Sort options**: By difficulty, by frequency, by round
+- Click a question to open the detailed practice view (existing AnswerRater)
 
-## 6. Pricing Page -- Missing Conversion Elements
+### Problem Detail View:
+- Split-pane layout: Left side = question + ideal answer + tips, Right side = user's answer textarea + rating
+- "Next Question" and "Previous Question" navigation
+- Bookmark/star questions for later review
+- Track solved/attempted status per question using local state
 
-**Missing:**
-- No "Most Popular" animation/glow effect (static badge only)
-- No countdown timer for the limited offer
-- No "Student Discount" option
-- No annual vs monthly toggle for Elite plan
+### Progress Dashboard (top of page):
+- Total solved / total questions progress bar
+- Difficulty breakdown: X Easy / Y Medium / Z Hard solved
+- Streak counter (days practiced)
+- "Daily Challenge" -- randomly highlighted question of the day
 
-**Enhancements:**
-- Add animated countdown timer for "First 100 users" offer
-- Add "Student Discount" badge with 30% off
-- Add billing toggle (Monthly vs Annual with savings shown)
-- Add "Recommended For You" dynamic tag based on typical user
-- Animate the "Most Popular" badge with pulse effect
-
----
-
-## 7. About Page -- Needs Major Upgrade
-
-**Missing (most neglected page):**
-- No team/founder section
-- No company mission/vision statement
-- No success metrics dashboard
-- No case studies with detailed before/after
-- No "Our Technology" section explaining the AI pipeline in detail
-- Very minimal content compared to other pages
-
-**Enhancements:**
-- Add "Our Mission" hero section with compelling narrative
-- Add "By The Numbers" stats dashboard (resumes created, interviews landed, etc.)
-- Add detailed case studies (3 real-world transformation stories)
-- Add "Our AI Technology" section with pipeline visualization
-- Add "Why Trust Us" section with team credentials
-- Expand FAQ with 4 more questions
-
----
-
-## 8. Global Enhancements
-
-**Visual Polish:**
-- All page hero headings upgraded to `text-5xl md:text-7xl lg:text-8xl`
-- Section headings to `text-3xl md:text-5xl`
-- Add `border-shine` effect to all premium cards
-- Deeper glassmorphism with `backdrop-blur-[30px]`
-- Gold text shadows on all gradient headings
-- Card hover lift effects (`translateY(-6px)`) with gold shadow
-
-**New Components:**
-- `LiveActivityTicker` -- scrolling banner showing recent user actions
-- `ReportCard` -- shareable mini summary card for Results page
-- `ATSMiniWidget` -- small real-time ATS score gauge for Resume Builder sidebar
-- `CountdownTimer` -- animated countdown for Pricing urgency
-
-**Accessibility & UX:**
-- Add page transition animations between routes
-- Add scroll-to-top on route change
-- Add loading skeletons for heavy components
+### Visual styling:
+- Question cards with left border color-coded by difficulty
+- Solved questions get a green checkmark and subtle green tint
+- Attempted (but not solved) get yellow indicator
+- Hovering shows question preview tooltip
 
 ---
 
 ## Technical Details
 
 ### Files to Create:
-1. `src/components/LiveActivityTicker.tsx` -- Real-time activity banner
-2. `src/components/results/ReportCard.tsx` -- Shareable results summary
-3. `src/components/results/KeywordDensity.tsx` -- Keyword frequency visualization
-4. `src/components/resume/ATSMiniWidget.tsx` -- Real-time ATS score for sidebar
-5. `src/components/CountdownTimer.tsx` -- Urgency countdown for pricing
+1. `src/components/resume/templates/ElegantTemplate.tsx` -- Luxury serif template
+2. `src/components/resume/templates/BoldTemplate.tsx` -- High-contrast modern template
 
 ### Files to Modify:
-1. `src/pages/LandingPage.tsx` -- Live activity ticker, competitor comparison, video section, visual upgrades
-2. `src/pages/Dashboard.tsx` -- Target role field, step validation, enhanced generation stages
-3. `src/pages/Results.tsx` -- Report card, keyword density, readability score, action plan
-4. `src/pages/ResumeBuilder.tsx` -- ATS mini widget, AI tooltips, line spacing, margins, watermark
-5. `src/pages/InterviewPrep.tsx` -- Mock interview mode, bookmarks, difficulty filter, readiness dashboard
-6. `src/pages/Pricing.tsx` -- Countdown timer, student discount, billing toggle
-7. `src/pages/About.tsx` -- Major expansion with mission, case studies, technology section, stats
-8. `src/index.css` -- New animations (ticker-scroll, countdown-pulse)
-9. `tailwind.config.ts` -- New animation definitions
-10. `src/App.tsx` -- Add scroll-to-top on route change
+1. **`src/pages/LandingPage.tsx`** -- Replace video section with dynamic template carousel (auto-scrolling mini template previews in two rows, opposite directions)
+2. **`src/pages/InterviewPrep.tsx`** -- Major rewrite: LeetCode-style problem list with filters, search, sort, split-pane detail view, progress dashboard, daily challenge, bookmark/star system
+3. **`src/pages/ResumeBuilder.tsx`** -- Register new templates ("elegant", "bold"), render them in switch statement
+4. **`src/components/resume/TemplateSelector.tsx`** -- Add 2 new template entries (Elegant, Bold) with icons
+5. **`src/components/resume/ResumeCustomizer.tsx`** -- Add font family selector (3 options), font color control (6 options), header style toggle, 3 more accent colors (Teal, Coral, Navy)
+6. **`src/index.css`** -- Add `@keyframes ticker-scroll` for the auto-scrolling carousel animation
 
 ### No new dependencies required
-All enhancements use existing packages (framer-motion, lucide-react, recharts, tailwind).
+All features built with existing packages (framer-motion, lucide-react, tailwind).
 
