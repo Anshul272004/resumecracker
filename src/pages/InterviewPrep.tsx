@@ -4,7 +4,8 @@ import {
   Brain, CheckCircle2, XCircle, ChevronDown, ChevronUp, Star, Target, Zap,
   Code, BookOpen, MessageSquare, TrendingUp, Shield, Lightbulb, Award, ThumbsUp, AlertTriangle,
   Timer, Play, Pause, RotateCcw, Users, Crown, Briefcase, Layout,
-  Search, Filter, Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Flame, ArrowUpDown, CircleDot
+  Search, Filter, Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Flame, ArrowUpDown, CircleDot,
+  UserSearch, Globe, Linkedin, Instagram, Facebook, ExternalLink, Loader2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -305,6 +306,39 @@ const InterviewPrep = () => {
   const [sortBy, setSortBy] = useState<"difficulty" | "frequency" | "round">("round");
   const [questionStatus, setQuestionStatus] = useState<Record<number, QuestionStatus>>({});
   const [bookmarks, setBookmarks] = useState<Set<number>>(new Set());
+  const [knowsInterviewer, setKnowsInterviewer] = useState<null | boolean>(null);
+  const [interviewerName, setInterviewerName] = useState("");
+  const [interviewerLinkedIn, setInterviewerLinkedIn] = useState("");
+  const [isResearching, setIsResearching] = useState(false);
+  const [interviewerInsights, setInterviewerInsights] = useState<null | {
+    name: string;
+    summary: string;
+    interests: string[];
+    tips: string[];
+    commonTopics: string[];
+  }>(null);
+
+  const handleResearchInterviewer = () => {
+    if (!interviewerName.trim()) return;
+    setIsResearching(true);
+    // Simulate research - in production this would use Perplexity/Firecrawl via Cloud
+    setTimeout(() => {
+      setInterviewerInsights({
+        name: interviewerName,
+        summary: `Based on social media analysis, ${interviewerName} appears to be a tech-focused professional who values clean code, system design thinking, and collaborative team dynamics.`,
+        interests: ["System Design", "Open Source", "Team Leadership", "AI/ML", "Clean Architecture"],
+        tips: [
+          `Mention open-source contributions — ${interviewerName} values community involvement`,
+          "Focus on system design decisions and trade-offs in your answers",
+          "Show collaborative problem-solving approach, not solo heroics",
+          "Discuss measurable impact with specific metrics",
+          "Ask thoughtful questions about team culture and engineering practices",
+        ],
+        commonTopics: ["Microservices vs Monolith", "Code Review Culture", "Technical Debt Management", "Scaling Challenges"],
+      });
+      setIsResearching(false);
+    }, 2500);
+  };
 
   const totalQuestions = allQuestions.length;
   const solvedCount = Object.values(questionStatus).filter(s => s === "solved").length;
@@ -446,6 +480,138 @@ const InterviewPrep = () => {
             </div>
             <DifficultyBadge difficulty={dailyChallenge.difficulty} />
           </div>
+        </motion.div>
+
+        {/* ═══ INTERVIEWER RESEARCH ═══ */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="glass-gold-deep rounded-2xl p-6 mb-8 border-shine">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+              <UserSearch className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h2 className="font-display text-lg font-bold text-foreground">Interviewer Intelligence</h2>
+              <p className="font-body text-xs text-muted-foreground">Know your interviewer? We'll research their profile for personalized prep.</p>
+            </div>
+          </div>
+
+          {knowsInterviewer === null && (
+            <div className="flex flex-col sm:flex-row gap-3">
+              <p className="font-body text-sm text-foreground self-center">Do you know who will interview you?</p>
+              <div className="flex gap-2">
+                <Button onClick={() => setKnowsInterviewer(true)} className="bg-gradient-gold text-primary-foreground font-body text-xs">
+                  <CheckCircle2 className="w-4 h-4 mr-1" /> Yes, I know
+                </Button>
+                <Button variant="outline" onClick={() => setKnowsInterviewer(false)} className="border-primary/30 text-primary hover:bg-primary/10 font-body text-xs">
+                  <XCircle className="w-4 h-4 mr-1" /> No idea
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {knowsInterviewer === true && !interviewerInsights && (
+            <div className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="font-body text-xs text-muted-foreground mb-1.5 block">Interviewer's Name</label>
+                  <Input value={interviewerName} onChange={(e) => setInterviewerName(e.target.value)}
+                    placeholder="e.g., Rajesh Kumar" className="bg-secondary border-border font-body text-sm" />
+                </div>
+                <div>
+                  <label className="font-body text-xs text-muted-foreground mb-1.5 block">LinkedIn / Social Profile URL (optional)</label>
+                  <Input value={interviewerLinkedIn} onChange={(e) => setInterviewerLinkedIn(e.target.value)}
+                    placeholder="https://linkedin.com/in/..." className="bg-secondary border-border font-body text-sm" />
+                </div>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap">
+                <Button onClick={handleResearchInterviewer} disabled={!interviewerName.trim() || isResearching}
+                  className="bg-gradient-gold text-primary-foreground font-body text-xs font-semibold shadow-gold">
+                  {isResearching ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Researching...</> : <><Globe className="w-4 h-4 mr-1" /> Research Profile</>}
+                </Button>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span className="font-body text-[10px]">We'll search:</span>
+                  <Linkedin className="w-3.5 h-3.5" />
+                  <Facebook className="w-3.5 h-3.5" />
+                  <Instagram className="w-3.5 h-3.5" />
+                  <Globe className="w-3.5 h-3.5" />
+                </div>
+                <button onClick={() => { setKnowsInterviewer(null); setInterviewerName(""); setInterviewerLinkedIn(""); }}
+                  className="font-body text-[10px] text-muted-foreground hover:text-foreground ml-auto">← Go back</button>
+              </div>
+            </div>
+          )}
+
+          {knowsInterviewer === true && interviewerInsights && (
+            <div className="space-y-4">
+              <div className="glass rounded-xl p-4">
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-body text-sm font-bold text-foreground flex items-center gap-2">
+                    <UserSearch className="w-4 h-4 text-primary" />
+                    Profile Analysis: {interviewerInsights.name}
+                  </h3>
+                  <button onClick={() => { setInterviewerInsights(null); setInterviewerName(""); setInterviewerLinkedIn(""); }}
+                    className="font-body text-[10px] text-muted-foreground hover:text-foreground">Research another</button>
+                </div>
+                <p className="font-body text-xs text-muted-foreground leading-relaxed mb-3">{interviewerInsights.summary}</p>
+
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">Their Interests</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {interviewerInsights.interests.map((interest) => (
+                        <span key={interest} className="font-body text-[10px] bg-primary/10 text-primary px-2.5 py-1 rounded-full">{interest}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">Likely Topics</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {interviewerInsights.commonTopics.map((topic) => (
+                        <span key={topic} className="font-body text-[10px] bg-secondary text-foreground px-2.5 py-1 rounded-full">{topic}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="glass-gold rounded-xl p-4">
+                <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-3">🎯 Personalized Tips for {interviewerInsights.name}'s Interview</p>
+                <div className="space-y-2">
+                  {interviewerInsights.tips.map((tip, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <Star className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                      <p className="font-body text-xs text-muted-foreground">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {knowsInterviewer === false && (
+            <div className="space-y-3">
+              <div className="glass rounded-xl p-4">
+                <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-3">🧠 Best Strategy When You Don't Know Your Interviewer</p>
+                <div className="space-y-2">
+                  {[
+                    "Research the company's engineering blog and recent tech talks on YouTube",
+                    "Check Glassdoor for common interview questions at this company",
+                    "Study the job description keywords — mirror them in your answers",
+                    "Prepare for all 5 rounds equally — you can't predict what they'll focus on",
+                    "Follow the company's LinkedIn page for recent posts and culture signals",
+                    "Look up the hiring manager on LinkedIn for team structure insights",
+                  ].map((tip, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <Lightbulb className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                      <p className="font-body text-xs text-muted-foreground">{tip}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <button onClick={() => setKnowsInterviewer(null)}
+                className="font-body text-[10px] text-muted-foreground hover:text-foreground">← Go back</button>
+            </div>
+          )}
         </motion.div>
 
         {/* View Toggle */}
