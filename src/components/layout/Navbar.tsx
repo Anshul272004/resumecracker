@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X } from "lucide-react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Menu, X, LogOut, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const navItems = [
   { label: "Features", href: "#features" },
@@ -16,6 +17,8 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, profile, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -24,6 +27,13 @@ const Navbar = () => {
   }, []);
 
   const isActive = (href: string) => location.pathname === href;
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate("/");
+  };
+
+  const displayName = profile?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "";
 
   return (
     <nav
@@ -64,11 +74,35 @@ const Navbar = () => {
               </Link>
             )
           )}
-          <Link to="/dashboard">
-            <Button className="bg-gradient-gold font-body font-semibold text-primary-foreground hover:opacity-90">
-              Start Free
-            </Button>
-          </Link>
+
+          {user ? (
+            <div className="flex items-center gap-3">
+              <span className="font-body text-sm text-foreground">
+                Hey, <span className="text-primary font-semibold">{displayName}</span>
+              </span>
+              <Link to="/dashboard">
+                <Button size="sm" className="bg-gradient-gold font-body font-semibold text-primary-foreground hover:opacity-90">
+                  Dashboard
+                </Button>
+              </Link>
+              <button onClick={handleSignOut} className="text-muted-foreground hover:text-primary transition-colors" title="Sign out">
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          ) : (
+            <div className="flex items-center gap-3">
+              <Link to="/auth">
+                <Button variant="ghost" className="font-body text-sm text-muted-foreground hover:text-primary">
+                  Sign In
+                </Button>
+              </Link>
+              <Link to="/auth">
+                <Button className="bg-gradient-gold font-body font-semibold text-primary-foreground hover:opacity-90">
+                  Start Free
+                </Button>
+              </Link>
+            </div>
+          )}
         </div>
 
         {/* Mobile toggle */}
@@ -102,11 +136,27 @@ const Navbar = () => {
                 </Link>
               )
             )}
-            <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full bg-gradient-gold font-body font-semibold text-primary-foreground">
-                Start Free
-              </Button>
-            </Link>
+            {user ? (
+              <>
+                <div className="font-body text-sm text-foreground pt-2 border-t border-border/50">
+                  Hey, <span className="text-primary font-semibold">{displayName}</span>
+                </div>
+                <Link to="/dashboard" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full bg-gradient-gold font-body font-semibold text-primary-foreground">Dashboard</Button>
+                </Link>
+                <Button variant="ghost" onClick={() => { handleSignOut(); setMobileOpen(false); }} className="w-full font-body text-muted-foreground">
+                  <LogOut className="w-4 h-4 mr-2" /> Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link to="/auth" onClick={() => setMobileOpen(false)}>
+                  <Button className="w-full bg-gradient-gold font-body font-semibold text-primary-foreground">
+                    Sign In / Start Free
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

@@ -1,1 +1,10 @@
 project_id = "tfiqamtyezkrhnfkdbuv"
+
+[functions.ai-optimize-resume]
+verify_jwt = false
+
+[functions.ai-rate-answer]
+verify_jwt = false
+
+[functions.ai-cover-letter]
+verify_jwt = false
