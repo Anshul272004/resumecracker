@@ -14,7 +14,180 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      interview_progress: {
+        Row: {
+          bookmarked: boolean
+          created_at: string
+          id: string
+          question_id: number
+          score: number | null
+          status: string
+          user_answer: string | null
+          user_id: string
+        }
+        Insert: {
+          bookmarked?: boolean
+          created_at?: string
+          id?: string
+          question_id: number
+          score?: number | null
+          status?: string
+          user_answer?: string | null
+          user_id: string
+        }
+        Update: {
+          bookmarked?: boolean
+          created_at?: string
+          id?: string
+          question_id?: number
+          score?: number | null
+          status?: string
+          user_answer?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "interview_progress_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      payments: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          id: string
+          plan: string
+          status: string
+          stripe_session_id: string | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          id?: string
+          plan: string
+          status?: string
+          stripe_session_id?: string | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          id?: string
+          plan?: string
+          status?: string
+          stripe_session_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          full_name: string | null
+          id: string
+          last_active: string | null
+          plan: string
+          streak_count: number
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id: string
+          last_active?: string | null
+          plan?: string
+          streak_count?: number
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          full_name?: string | null
+          id?: string
+          last_active?: string | null
+          plan?: string
+          streak_count?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      resumes: {
+        Row: {
+          accent_color: string | null
+          ats_score: number | null
+          created_at: string
+          font_family: string | null
+          font_size: number | null
+          id: string
+          job_description: string | null
+          resume_data: Json | null
+          target_company: string | null
+          target_role: string | null
+          template_name: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          accent_color?: string | null
+          ats_score?: number | null
+          created_at?: string
+          font_family?: string | null
+          font_size?: number | null
+          id?: string
+          job_description?: string | null
+          resume_data?: Json | null
+          target_company?: string | null
+          target_role?: string | null
+          template_name?: string | null
+          title?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          accent_color?: string | null
+          ats_score?: number | null
+          created_at?: string
+          font_family?: string | null
+          font_size?: number | null
+          id?: string
+          job_description?: string | null
+          resume_data?: Json | null
+          target_company?: string | null
+          target_role?: string | null
+          template_name?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "resumes_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

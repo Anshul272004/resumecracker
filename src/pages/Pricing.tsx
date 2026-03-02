@@ -186,7 +186,7 @@ const Pricing = () => {
                   </li>
                 ))}
               </ul>
-              <Link to="/dashboard">
+              <Link to={plan.price === "₹0" ? "/auth" : `/checkout?plan=${plan.name.toLowerCase()}`}>
                 <Button
                   className={`w-full font-body font-semibold text-sm py-5 ${
                     plan.popular
@@ -224,7 +224,7 @@ const Pricing = () => {
               <p className="font-body text-sm text-muted-foreground line-through">{lifetimeDeal.originalPrice}</p>
               <p className="font-display text-6xl font-bold text-primary text-shadow-gold-lg">{lifetimeDeal.price}</p>
               <p className="font-body text-xs text-primary font-semibold mb-4">One-time payment</p>
-              <Link to="/dashboard">
+              <Link to="/checkout?plan=lifetime">
                 <Button className="bg-gradient-gold text-primary-foreground font-body font-semibold px-8 py-5 animate-gold-pulse shadow-gold-lg">
                   Get Lifetime Access <ChevronRight className="w-4 h-4 ml-1" />
                 </Button>
