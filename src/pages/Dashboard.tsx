@@ -1,13 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target } from "lucide-react";
+import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target, Flame, Brain, BarChart3, ArrowRight, Trash2, Edit3, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import Navbar from "@/components/layout/Navbar";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { aiApi } from "@/lib/api/ai";
+import { toast } from "@/hooks/use-toast";
 
 const steps = [
   { icon: Upload, label: "Upload Resume" },
@@ -40,11 +44,31 @@ const generationStages = [
   "Final quality assurance...",
 ];
 
+interface SavedResume {
+  id: string;
+  title: string;
+  target_role: string | null;
+  target_company: string | null;
+  ats_score: number | null;
+  updated_at: string;
+  template_name: string | null;
+}
+
 const Dashboard = () => {
+  const { user, profile } = useAuth();
+  const navigate = useNavigate();
+
+  // Hub state
+  const [showHub, setShowHub] = useState(true);
+  const [savedResumes, setSavedResumes] = useState<SavedResume[]>([]);
+  const [interviewStats, setInterviewStats] = useState({ solved: 0, attempted: 0, total: 23 });
+  const [loadingResumes, setLoadingResumes] = useState(true);
+
+  // Wizard state
   const [currentStep, setCurrentStep] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const [fileName, setFileName] = useState("");
-  const [profile, setProfile] = useState({ type: "", experience: "", education: "", skills: "", certifications: "" });
+  const [profile2, setProfile2] = useState({ type: "", experience: "", education: "", skills: "", certifications: "" });
   const [targetRole, setTargetRole] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
   const [jobDesc, setJobDesc] = useState("");
@@ -52,34 +76,276 @@ const Dashboard = () => {
   const [generating, setGenerating] = useState(false);
   const [genStage, setGenStage] = useState(0);
   const [autoSaved, setAutoSaved] = useState(false);
-  const navigate = useNavigate();
+  const [editingResumeId, setEditingResumeId] = useState<string | null>(null);
 
   const progress = ((currentStep + 1) / steps.length) * 100;
 
-  const handleGenerate = () => {
-    setGenerating(true);
-    setGenStage(0);
-    const interval = setInterval(() => {
-      setGenStage((prev) => {
-        if (prev >= generationStages.length - 1) {
-          clearInterval(interval);
-          setTimeout(() => navigate("/results"), 800);
-          return prev;
-        }
-        return prev + 1;
-      });
-    }, 500);
+  // Load saved resumes and interview stats
+  useEffect(() => {
+    if (!user) {
+      setLoadingResumes(false);
+      setShowHub(false);
+      return;
+    }
+
+    const loadData = async () => {
+      const [resumeResult, progressResult] = await Promise.all([
+        supabase.from("resumes").select("id, title, target_role, target_company, ats_score, updated_at, template_name").eq("user_id", user.id).order("updated_at", { ascending: false }),
+        supabase.from("interview_progress").select("status").eq("user_id", user.id),
+      ]);
+
+      if (resumeResult.data) setSavedResumes(resumeResult.data);
+      if (progressResult.data) {
+        const solved = progressResult.data.filter(p => p.status === "solved").length;
+        const attempted = progressResult.data.filter(p => p.status === "attempted").length;
+        setInterviewStats({ solved, attempted, total: 23 });
+      }
+      setLoadingResumes(false);
+      setShowHub(resumeResult.data && resumeResult.data.length > 0);
+    };
+    loadData();
+  }, [user]);
+
+  // Auto-save resume to DB
+  const autoSaveResume = async () => {
+    if (!user) return;
+    const resumeData = { profile: profile2, projects, fileName };
+
+    if (editingResumeId) {
+      await supabase.from("resumes").update({
+        resume_data: resumeData as any,
+        target_role: targetRole || null,
+        target_company: targetCompany || null,
+        job_description: jobDesc || null,
+        title: targetRole ? `Resume for ${targetRole}` : "Untitled Resume",
+        updated_at: new Date().toISOString(),
+      }).eq("id", editingResumeId);
+    } else {
+      const { data } = await supabase.from("resumes").insert({
+        user_id: user.id,
+        resume_data: resumeData as any,
+        target_role: targetRole || null,
+        target_company: targetCompany || null,
+        job_description: jobDesc || null,
+        title: targetRole ? `Resume for ${targetRole}` : "Untitled Resume",
+      }).select("id").single();
+      if (data) setEditingResumeId(data.id);
+    }
   };
 
   const triggerAutoSave = () => {
     setAutoSaved(true);
     setTimeout(() => setAutoSaved(false), 2000);
+    autoSaveResume();
   };
 
+  // Real AI generation
+  const handleGenerate = async () => {
+    setGenerating(true);
+    setGenStage(0);
+
+    // Progress animation
+    const interval = setInterval(() => {
+      setGenStage(prev => {
+        if (prev >= generationStages.length - 2) return prev;
+        return prev + 1;
+      });
+    }, 800);
+
+    try {
+      const resumeData = { profile: profile2, projects, fileName };
+      const result = await aiApi.optimizeResume(resumeData, targetRole, jobDesc);
+
+      clearInterval(interval);
+      setGenStage(generationStages.length - 1);
+
+      // Save result to DB
+      if (user && editingResumeId) {
+        await supabase.from("resumes").update({
+          ats_score: result.ats_score,
+          resume_data: { ...resumeData, optimized: result } as any,
+          updated_at: new Date().toISOString(),
+        }).eq("id", editingResumeId);
+      }
+
+      // Update streak
+      if (user) {
+        await supabase.from("profiles").update({
+          last_active: new Date().toISOString(),
+          streak_count: (profile?.streak_count || 0) + 1,
+        }).eq("id", user.id);
+      }
+
+      setTimeout(() => navigate("/results"), 800);
+    } catch (err: any) {
+      clearInterval(interval);
+      setGenerating(false);
+
+      if (err.message?.includes("429") || err.message?.includes("Rate limit")) {
+        toast({ title: "Rate Limited", description: "Too many requests. Please wait a moment and try again.", variant: "destructive" });
+      } else if (err.message?.includes("402")) {
+        toast({ title: "Usage Limit", description: "AI usage limit reached. Please try again later.", variant: "destructive" });
+      } else {
+        toast({ title: "Generation Failed", description: err.message || "Something went wrong. Please try again.", variant: "destructive" });
+      }
+    }
+  };
+
+  const handleDeleteResume = async (id: string) => {
+    await supabase.from("resumes").delete().eq("id", id);
+    setSavedResumes(prev => prev.filter(r => r.id !== id));
+  };
+
+  const handleEditResume = async (resume: SavedResume) => {
+    setEditingResumeId(resume.id);
+    // Load resume data
+    const { data } = await supabase.from("resumes").select("*").eq("id", resume.id).single();
+    if (data) {
+      const rd = data.resume_data as any;
+      if (rd?.profile) setProfile2(rd.profile);
+      if (rd?.projects) setProjects(rd.projects);
+      if (rd?.fileName) setFileName(rd.fileName);
+      if (data.target_role) setTargetRole(data.target_role);
+      if (data.target_company) setTargetCompany(data.target_company);
+      if (data.job_description) setJobDesc(data.job_description);
+    }
+    setShowHub(false);
+    setCurrentStep(0);
+  };
+
+  const startNewResume = () => {
+    setEditingResumeId(null);
+    setProfile2({ type: "", experience: "", education: "", skills: "", certifications: "" });
+    setTargetRole("");
+    setTargetCompany("");
+    setJobDesc("");
+    setProjects([{ name: "", problem: "", action: "", impact: "" }]);
+    setFileName("");
+    setCurrentStep(0);
+    setShowHub(false);
+  };
+
+  const firstName = profile?.full_name?.split(" ")[0] || "there";
+
+  // ═══ PERSONALIZED HUB ═══
+  if (showHub && !loadingResumes) {
+    return (
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
+          {/* Greeting */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
+            <div className="flex items-center gap-3 mb-2">
+              <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground">
+                Hey, <span className="text-gradient-gold">{firstName}</span>
+              </h1>
+              {(profile?.streak_count || 0) > 0 && (
+                <div className="flex items-center gap-1.5 glass-gold rounded-full px-4 py-2">
+                  <Flame className="w-5 h-5 text-primary" />
+                  <span className="font-display text-lg font-bold text-primary">{profile?.streak_count}</span>
+                  <span className="font-body text-[10px] text-primary">day streak</span>
+                </div>
+              )}
+            </div>
+            <p className="font-body text-sm text-muted-foreground">Your personal career command center. Keep building, keep winning.</p>
+          </motion.div>
+
+          {/* Quick Actions */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+            <button onClick={startNewResume} className="glass-gold rounded-xl p-5 text-left lift-hover group">
+              <Plus className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
+              <p className="font-body text-sm font-bold text-foreground">New Resume</p>
+              <p className="font-body text-[10px] text-muted-foreground">Start from scratch</p>
+            </button>
+            <Link to="/interview-prep" className="glass-gold rounded-xl p-5 text-left lift-hover group">
+              <Brain className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
+              <p className="font-body text-sm font-bold text-foreground">Interview Prep</p>
+              <p className="font-body text-[10px] text-muted-foreground">{interviewStats.solved}/{interviewStats.total} solved</p>
+            </Link>
+            <Link to="/results" className="glass-gold rounded-xl p-5 text-left lift-hover group">
+              <BarChart3 className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
+              <p className="font-body text-sm font-bold text-foreground">View Results</p>
+              <p className="font-body text-[10px] text-muted-foreground">See your ATS score</p>
+            </Link>
+          </motion.div>
+
+          {/* Interview Stats */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+            className="glass-gold-deep rounded-2xl p-6 mb-8 border-shine">
+            <div className="flex items-center gap-2 mb-4">
+              <Brain className="w-5 h-5 text-primary" />
+              <h2 className="font-display text-lg font-bold text-foreground">Interview Progress</h2>
+            </div>
+            <div className="grid grid-cols-3 gap-4 mb-3">
+              <div className="text-center">
+                <p className="font-display text-2xl font-bold text-primary">{interviewStats.solved}</p>
+                <p className="font-body text-[10px] text-muted-foreground">Solved</p>
+              </div>
+              <div className="text-center">
+                <p className="font-display text-2xl font-bold text-yellow-400">{interviewStats.attempted}</p>
+                <p className="font-body text-[10px] text-muted-foreground">Attempted</p>
+              </div>
+              <div className="text-center">
+                <p className="font-display text-2xl font-bold text-muted-foreground">{interviewStats.total - interviewStats.solved - interviewStats.attempted}</p>
+                <p className="font-body text-[10px] text-muted-foreground">Remaining</p>
+              </div>
+            </div>
+            <Progress value={(interviewStats.solved / interviewStats.total) * 100} className="h-2 [&>div]:bg-gradient-gold" />
+          </motion.div>
+
+          {/* Saved Resumes */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="font-display text-lg font-bold text-foreground">Your Resumes</h2>
+              <Button onClick={startNewResume} size="sm" className="bg-gradient-gold text-primary-foreground font-body text-xs">
+                <Plus className="w-3 h-3 mr-1" /> New
+              </Button>
+            </div>
+            <div className="space-y-3">
+              {savedResumes.map((resume) => (
+                <div key={resume.id} className="glass rounded-xl p-5 flex items-center gap-4 lift-hover group">
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="font-body text-sm font-bold text-foreground truncate">{resume.title}</p>
+                    <div className="flex items-center gap-3 mt-1">
+                      {resume.target_role && <span className="font-body text-[10px] text-muted-foreground">{resume.target_role}</span>}
+                      {resume.ats_score && (
+                        <span className="font-body text-[10px] font-bold text-primary">{resume.ats_score}% ATS</span>
+                      )}
+                      <span className="font-body text-[10px] text-muted-foreground">{new Date(resume.updated_at).toLocaleDateString()}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <Button size="sm" variant="outline" onClick={() => handleEditResume(resume)} className="border-primary/30 text-primary text-xs h-8">
+                      <Edit3 className="w-3 h-3 mr-1" /> Edit
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => handleDeleteResume(resume.id)} className="border-destructive/30 text-destructive text-xs h-8">
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </div>
+    );
+  }
+
+  // ═══ WIZARD FLOW ═══
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
       <div className="container mx-auto px-6 pt-28 pb-16 max-w-3xl">
+        {/* Back to Hub */}
+        {user && savedResumes.length > 0 && (
+          <Button variant="ghost" onClick={() => setShowHub(true)} className="mb-4 text-muted-foreground hover:text-foreground font-body text-xs">
+            <ChevronLeft className="w-4 h-4 mr-1" /> Back to Dashboard
+          </Button>
+        )}
+
         {/* Progress */}
         <div className="mb-12">
           <div className="flex items-center justify-between mb-4">
@@ -182,9 +448,9 @@ const Dashboard = () => {
                       {["College Student", "Professional"].map((t) => (
                         <button
                           key={t}
-                          onClick={() => { setProfile({ ...profile, type: t }); triggerAutoSave(); }}
+                          onClick={() => { setProfile2({ ...profile2, type: t }); triggerAutoSave(); }}
                           className={`rounded-xl p-4 font-body text-sm font-medium transition-all ${
-                            profile.type === t ? "glass-gold border border-primary text-primary shadow-gold" : "glass text-muted-foreground hover:text-foreground"
+                            profile2.type === t ? "glass-gold border border-primary text-primary shadow-gold" : "glass text-muted-foreground hover:text-foreground"
                           }`}
                         >
                           {t}
@@ -194,19 +460,19 @@ const Dashboard = () => {
                   </div>
                   <div>
                     <Label className="font-body text-sm text-foreground">Years of Experience</Label>
-                    <Input value={profile.experience} onChange={(e) => { setProfile({ ...profile, experience: e.target.value }); triggerAutoSave(); }} placeholder="e.g. 2 years" className="mt-2 bg-secondary border-border" />
+                    <Input value={profile2.experience} onChange={(e) => { setProfile2({ ...profile2, experience: e.target.value }); triggerAutoSave(); }} placeholder="e.g. 2 years" className="mt-2 bg-secondary border-border" />
                   </div>
                   <div>
                     <Label className="font-body text-sm text-foreground">Education</Label>
-                    <Input value={profile.education} onChange={(e) => { setProfile({ ...profile, education: e.target.value }); triggerAutoSave(); }} placeholder="e.g. B.Tech Computer Science, XYZ University" className="mt-2 bg-secondary border-border" />
+                    <Input value={profile2.education} onChange={(e) => { setProfile2({ ...profile2, education: e.target.value }); triggerAutoSave(); }} placeholder="e.g. B.Tech Computer Science, XYZ University" className="mt-2 bg-secondary border-border" />
                   </div>
                   <div>
                     <Label className="font-body text-sm text-foreground">Key Skills (comma separated)</Label>
-                    <Input value={profile.skills} onChange={(e) => { setProfile({ ...profile, skills: e.target.value }); triggerAutoSave(); }} placeholder="e.g. Python, React, SQL, Machine Learning" className="mt-2 bg-secondary border-border" />
+                    <Input value={profile2.skills} onChange={(e) => { setProfile2({ ...profile2, skills: e.target.value }); triggerAutoSave(); }} placeholder="e.g. Python, React, SQL, Machine Learning" className="mt-2 bg-secondary border-border" />
                   </div>
                   <div>
                     <Label className="font-body text-sm text-foreground">Certifications (optional)</Label>
-                    <Input value={profile.certifications} onChange={(e) => { setProfile({ ...profile, certifications: e.target.value }); triggerAutoSave(); }} placeholder="e.g. AWS Certified, Google Analytics" className="mt-2 bg-secondary border-border" />
+                    <Input value={profile2.certifications} onChange={(e) => { setProfile2({ ...profile2, certifications: e.target.value }); triggerAutoSave(); }} placeholder="e.g. AWS Certified, Google Analytics" className="mt-2 bg-secondary border-border" />
                   </div>
                 </div>
               </div>
@@ -351,7 +617,7 @@ const Dashboard = () => {
                     </div>
                     <h2 className="font-display text-2xl font-bold text-foreground mb-2">AI is Working Its Magic...</h2>
                     <p className="font-body text-xs text-muted-foreground mb-6 flex items-center justify-center gap-1">
-                      <Clock className="w-3 h-3" /> Estimated time: ~{Math.max(1, Math.round((generationStages.length - genStage) * 0.5))}s remaining
+                      <Clock className="w-3 h-3" /> Estimated time: ~{Math.max(5, Math.round((generationStages.length - genStage) * 1.5))}s remaining
                     </p>
                     <div className="space-y-2 mt-6 max-w-sm mx-auto">
                       {generationStages.map((t, i) => (
@@ -365,7 +631,7 @@ const Dashboard = () => {
                           {i < genStage ? (
                             <CheckCircle2 className="w-3.5 h-3.5 text-primary shrink-0" />
                           ) : i === genStage ? (
-                            <div className="w-3.5 h-3.5 rounded-full border-2 border-primary border-t-transparent animate-spin shrink-0" />
+                            <Loader2 className="w-3.5 h-3.5 text-primary animate-spin shrink-0" />
                           ) : (
                             <div className="w-3.5 h-3.5 rounded-full bg-muted shrink-0" />
                           )}
