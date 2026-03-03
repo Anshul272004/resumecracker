@@ -14,6 +14,11 @@ import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { aiApi } from "@/lib/api/ai";
+import { firecrawlApi } from "@/lib/api/firecrawl";
+import { toast } from "@/hooks/use-toast";
 
 /* ─── Types ─── */
 type Difficulty = "Easy" | "Medium" | "Hard";
@@ -96,13 +101,19 @@ const allQuestions: Question[] = rounds.flatMap((r) =>
   r.questions.map((q) => ({ ...q, roundId: r.id, roundName: r.name, category: r.category }))
 );
 
-/* ─── Answer Rater ─── */
+/* ─── Answer Rater (AI-powered with regex fallback) ─── */
 const AnswerRater = ({ question }: { question: Question }) => {
   const [userAnswer, setUserAnswer] = useState("");
   const [showIdeal, setShowIdeal] = useState(false);
-  const [rating, setRating] = useState<null | { score: number; feedback: string[]; categories: { name: string; score: number }[] }>(null);
+  const [isRating, setIsRating] = useState(false);
+  const [rating, setRating] = useState<null | {
+    score: number;
+    feedback: string[];
+    categories: { name: string; score: number }[];
+    improvedAnswer?: string;
+  }>(null);
 
-  const rateAnswer = () => {
+  const regexFallback = () => {
     const words = userAnswer.trim().split(/\s+/).length;
     const hasNumbers = /\d/.test(userAnswer);
     const hasTechTerms = /api|database|react|sql|python|algorithm|optimiz|performance|architecture|deploy|cache|scale|latency|throughput/i.test(userAnswer);
@@ -133,17 +144,44 @@ const AnswerRater = ({ question }: { question: Question }) => {
     if (!hasImpact) feedback.push("Use impact verbs: 'engineered', 'optimized', 'reduced', 'achieved'.");
     if (!hasPsych) feedback.push("Apply psychology: lead with results, use 'three reasons', be specific.");
     if (feedback.length === 0) feedback.push("Excellent! Compare with the ideal answer for final refinement.");
-    setRating({ score: totalScore, feedback, categories });
+    return { score: totalScore, feedback, categories };
+  };
+
+  const rateAnswer = async () => {
+    if (userAnswer.trim().length < 10) return;
+    setIsRating(true);
+
+    try {
+      const aiResult = await aiApi.rateAnswer(question.question, userAnswer, question.idealAnswer);
+      setRating({
+        score: aiResult.score,
+        categories: [
+          { name: "Structure", score: aiResult.categories.structure },
+          { name: "Impact Language", score: aiResult.categories.impact_language },
+          { name: "Specificity", score: aiResult.categories.specificity },
+          { name: "Psychology", score: aiResult.categories.psychology },
+        ],
+        feedback: [aiResult.feedback],
+        improvedAnswer: aiResult.improved_answer,
+      });
+    } catch (err) {
+      console.error("AI rating failed, using fallback:", err);
+      const fallback = regexFallback();
+      setRating(fallback);
+      toast({ title: "Using instant analysis", description: "AI unavailable, used pattern-matching instead.", variant: "default" });
+    } finally {
+      setIsRating(false);
+    }
   };
 
   return (
     <div className="space-y-4">
       <Textarea value={userAnswer} onChange={(e) => setUserAnswer(e.target.value)}
-        placeholder="Type your answer here... We'll rate it using psychology & recruiter patterns"
+        placeholder="Type your answer here... AI will rate it using psychology & recruiter patterns"
         className="bg-secondary border-border font-body text-sm min-h-[120px]" />
       <div className="flex gap-3 flex-wrap">
-        <Button onClick={rateAnswer} disabled={userAnswer.trim().length < 10} className="bg-gradient-gold text-primary-foreground font-body font-semibold text-xs">
-          <Brain className="w-4 h-4 mr-1" /> Rate My Answer
+        <Button onClick={rateAnswer} disabled={userAnswer.trim().length < 10 || isRating} className="bg-gradient-gold text-primary-foreground font-body font-semibold text-xs">
+          {isRating ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> AI Analyzing...</> : <><Brain className="w-4 h-4 mr-1" /> Rate My Answer</>}
         </Button>
         <Button variant="outline" onClick={() => setShowIdeal(!showIdeal)} className="border-primary/30 text-primary hover:bg-primary/10 font-body text-xs">
           <BookOpen className="w-4 h-4 mr-1" /> {showIdeal ? "Hide" : "Show"} Ideal Answer
@@ -167,7 +205,7 @@ const AnswerRater = ({ question }: { question: Question }) => {
                 <p className="font-body text-sm font-semibold text-foreground">
                   {rating.score >= 80 ? "🔥 Excellent!" : rating.score >= 60 ? "👍 Good, Needs Polish" : rating.score >= 40 ? "⚠️ Average" : "🚨 Needs Work"}
                 </p>
-                <p className="font-body text-xs text-muted-foreground">Based on recruiter psychology & ATS patterns</p>
+                <p className="font-body text-xs text-muted-foreground">AI-powered analysis using recruiter psychology</p>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-3 mb-4">
@@ -192,6 +230,12 @@ const AnswerRater = ({ question }: { question: Question }) => {
                 </div>
               ))}
             </div>
+            {rating.improvedAnswer && (
+              <div className="mt-4 glass rounded-xl p-4">
+                <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">✨ AI-Improved Answer</p>
+                <p className="font-body text-xs text-foreground leading-relaxed">{rating.improvedAnswer}</p>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -297,6 +341,7 @@ const DifficultyBadge = ({ difficulty }: { difficulty: Difficulty }) => {
 
 /* ─── Main Page ─── */
 const InterviewPrep = () => {
+  const { user } = useAuth();
   const [view, setView] = useState<"list" | "detail">("list");
   const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -318,26 +363,96 @@ const InterviewPrep = () => {
     commonTopics: string[];
   }>(null);
 
-  const handleResearchInterviewer = () => {
+  // Load progress from database
+  useEffect(() => {
+    if (!user) return;
+    const loadProgress = async () => {
+      const { data } = await supabase
+        .from("interview_progress")
+        .select("question_id, status, bookmarked, score, user_answer")
+        .eq("user_id", user.id);
+
+      if (data) {
+        const statusMap: Record<number, QuestionStatus> = {};
+        const bookmarkSet = new Set<number>();
+        data.forEach((row) => {
+          statusMap[row.question_id] = row.status as QuestionStatus;
+          if (row.bookmarked) bookmarkSet.add(row.question_id);
+        });
+        setQuestionStatus(statusMap);
+        setBookmarks(bookmarkSet);
+      }
+    };
+    loadProgress();
+  }, [user]);
+
+  // Save progress to DB
+  const saveProgress = useCallback(async (questionId: number, status: QuestionStatus, bookmarked: boolean) => {
+    if (!user) return;
+    await supabase.from("interview_progress").upsert({
+      user_id: user.id,
+      question_id: questionId,
+      status,
+      bookmarked,
+    }, { onConflict: "user_id,question_id" });
+  }, [user]);
+
+  // Real Firecrawl interviewer research
+  const handleResearchInterviewer = async () => {
     if (!interviewerName.trim()) return;
     setIsResearching(true);
-    // Simulate research - in production this would use Perplexity/Firecrawl via Cloud
-    setTimeout(() => {
+
+    try {
+      // Step 1: Search for interviewer on social media
+      const searchResult = await firecrawlApi.search(
+        `${interviewerName} LinkedIn profile OR software engineer OR interviewer`,
+        { limit: 5, scrapeOptions: { formats: ['markdown'] } }
+      );
+
+      let scrapedData = searchResult.data || [];
+
+      // Step 2: If LinkedIn URL provided, scrape it directly
+      if (interviewerLinkedIn.trim()) {
+        try {
+          const scrapeResult = await firecrawlApi.scrape(interviewerLinkedIn, { formats: ['markdown'] });
+          if (scrapeResult.success) {
+            scrapedData = [{ url: interviewerLinkedIn, markdown: scrapeResult.data?.markdown || scrapeResult.data?.data?.markdown || '' }, ...scrapedData];
+          }
+        } catch (e) {
+          console.warn("LinkedIn scrape failed, using search results:", e);
+        }
+      }
+
+      // Step 3: Send to AI for analysis
+      const insights = await firecrawlApi.researchInterviewer(interviewerName, scrapedData);
+
       setInterviewerInsights({
         name: interviewerName,
-        summary: `Based on social media analysis, ${interviewerName} appears to be a tech-focused professional who values clean code, system design thinking, and collaborative team dynamics.`,
-        interests: ["System Design", "Open Source", "Team Leadership", "AI/ML", "Clean Architecture"],
-        tips: [
-          `Mention open-source contributions — ${interviewerName} values community involvement`,
-          "Focus on system design decisions and trade-offs in your answers",
-          "Show collaborative problem-solving approach, not solo heroics",
-          "Discuss measurable impact with specific metrics",
-          "Ask thoughtful questions about team culture and engineering practices",
-        ],
-        commonTopics: ["Microservices vs Monolith", "Code Review Culture", "Technical Debt Management", "Scaling Challenges"],
+        summary: insights.summary,
+        interests: insights.interests,
+        tips: insights.tips,
+        commonTopics: insights.commonTopics,
       });
+    } catch (err) {
+      console.error("Interviewer research failed:", err);
+      // Fallback to generic insights
+      setInterviewerInsights({
+        name: interviewerName,
+        summary: `We couldn't find detailed profile data for ${interviewerName}. Here are general tips based on common interviewer patterns.`,
+        interests: ["System Design", "Clean Code", "Team Collaboration", "Problem Solving", "Technical Leadership"],
+        tips: [
+          "Research the company's tech blog for their engineering values",
+          "Prepare specific examples with quantified metrics",
+          "Show collaborative problem-solving, not solo heroics",
+          "Ask thoughtful questions about team culture",
+          "Mention relevant open-source or side projects",
+        ],
+        commonTopics: ["System Design Trade-offs", "Code Quality", "Team Dynamics", "Scaling Challenges"],
+      });
+      toast({ title: "Using general insights", description: "Couldn't research this specific person. Showing general tips.", variant: "default" });
+    } finally {
       setIsResearching(false);
-    }, 2500);
+    }
   };
 
   const totalQuestions = allQuestions.length;
@@ -350,7 +465,6 @@ const InterviewPrep = () => {
   const medTotal = allQuestions.filter(q => q.difficulty === "Medium").length;
   const hardTotal = allQuestions.filter(q => q.difficulty === "Hard").length;
 
-  // Daily challenge - deterministic based on day
   const dailyChallenge = useMemo(() => {
     const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000);
     return allQuestions[dayOfYear % allQuestions.length];
@@ -360,17 +474,26 @@ const InterviewPrep = () => {
     setBookmarks(prev => {
       const next = new Set(prev);
       if (next.has(id)) next.delete(id); else next.add(id);
+      saveProgress(id, questionStatus[id] || "unsolved", next.has(id));
       return next;
     });
   };
 
   const markSolved = (id: number) => {
-    setQuestionStatus(prev => ({ ...prev, [id]: "solved" }));
+    setQuestionStatus(prev => {
+      const next = { ...prev, [id]: "solved" as QuestionStatus };
+      saveProgress(id, "solved", bookmarks.has(id));
+      return next;
+    });
   };
 
   const markAttempted = (id: number) => {
     if (questionStatus[id] !== "solved") {
-      setQuestionStatus(prev => ({ ...prev, [id]: "attempted" }));
+      setQuestionStatus(prev => {
+        const next = { ...prev, [id]: "attempted" as QuestionStatus };
+        saveProgress(id, "attempted", bookmarks.has(id));
+        return next;
+      });
     }
   };
 
@@ -395,7 +518,6 @@ const InterviewPrep = () => {
     } else if (sortBy === "frequency") {
       qs.sort((a, b) => parseInt(b.frequency) - parseInt(a.frequency));
     }
-    // round is default order
 
     return qs;
   }, [searchQuery, filterDifficulty, filterCategory, filterStatus, sortBy, questionStatus, bookmarks]);
@@ -526,7 +648,7 @@ const InterviewPrep = () => {
               <div className="flex items-center gap-3 flex-wrap">
                 <Button onClick={handleResearchInterviewer} disabled={!interviewerName.trim() || isResearching}
                   className="bg-gradient-gold text-primary-foreground font-body text-xs font-semibold shadow-gold">
-                  {isResearching ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Researching...</> : <><Globe className="w-4 h-4 mr-1" /> Research Profile</>}
+                  {isResearching ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Researching Social Media...</> : <><Globe className="w-4 h-4 mr-1" /> Research Profile</>}
                 </Button>
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <span className="font-body text-[10px]">We'll search:</span>

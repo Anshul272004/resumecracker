@@ -8,3 +8,12 @@ verify_jwt = false
 
 [functions.ai-cover-letter]
 verify_jwt = false
+
+[functions.firecrawl-search]
+verify_jwt = false
+
+[functions.firecrawl-scrape]
+verify_jwt = false
+
+[functions.ai-interviewer-research]
+verify_jwt = false
