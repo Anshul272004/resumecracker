@@ -30,4 +30,12 @@ export const firecrawlApi = {
     if (error) throw new Error(error.message || 'Failed to analyze interviewer');
     return data;
   },
+
+  async researchCompany(companyName: string, scrapedData: any): Promise<any> {
+    const { data, error } = await supabase.functions.invoke('ai-interviewer-research', {
+      body: { companyName, scrapedData, mode: 'company' },
+    });
+    if (error) throw new Error(error.message || 'Failed to analyze company');
+    return data;
+  },
 };
