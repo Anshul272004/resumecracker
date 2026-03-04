@@ -1,121 +1,120 @@
 
-# ProfileX Viral Upgrade -- Remaining Tasks Implementation
+
+# ProfileX Ultra Enhancement -- Interview Mastery & Personalization Upgrade
 
 ## What We're Building
 
-Three major changes to complete the remaining tasks from the approved plan:
-
-1. **Fix the hero typewriter text to stay on one line** (prevents layout shift / uncertainty)
-2. **Wire up real Firecrawl interviewer research** (connect Firecrawl, replace mock data)
-3. **Wire up AI edge functions to Dashboard and InterviewPrep** (replace fake timer and regex scoring)
-4. **Add data persistence** (save/load resumes and interview progress from database)
-5. **Personalized Dashboard hub** (streak, saved resumes, stats)
+A massive expansion of the Interview Prep system with new AI-powered coaching dimensions, plus deeper personalization across the platform. The goal: make every user feel like they have a personal career coach who knows everything about their interviewer, their industry, and what makes them stand out.
 
 ---
 
-## Task 1: Fix Hero Typewriter to Single Line
+## 1. Interviewer Personality Decoder (Enhanced Research Results)
 
-**Problem**: The typewriter text ("Stop Getting Rejected.", "Start Getting Shortlisted.", etc.) changes height as text length varies, causing layout shift -- which creates uncertainty.
+**Current state**: After Firecrawl research, we show: summary, interests, likely topics, tips.
 
-**Fix in `src/pages/LandingPage.tsx`**:
-- Set a fixed `min-height` on the h1 element so the container never shifts
-- Alternatively, use CSS to constrain to `white-space: nowrap` with a fixed container height
-- The h1 gets a fixed height matching the tallest text, so the layout stays rock-solid
+**Enhancement -- add 4 new insight sections to the research results:**
 
----
+- **Communication Style Analysis**: "This interviewer prefers concise, data-backed answers" / "They value storytelling and narrative" -- with a visual style indicator (Analytical / Conversational / Technical / Executive)
+- **Personality-Based Strategy**: Map interviewer to one of 4 archetypes (The Engineer, The People Leader, The Strategist, The Detail-Oriented) with tailored response strategies for each
+- **What to Wear Guide**: Based on interviewer's company culture (scraped from company pages) -- "Business Casual recommended" / "Smart Casual (tech startup vibe)" with specific examples
+- **Ice-Breaker Suggestions**: 3-4 personalized conversation starters based on interviewer's recent posts/interests ("I noticed you recently spoke about microservices at [conference]...")
 
-## Task 2: Connect Firecrawl for Real Interviewer Research
-
-**Step 1**: Use the Firecrawl connector to link it to the project (will prompt user to set up connection)
-
-**Step 2**: Create two edge functions:
-- `supabase/functions/firecrawl-search/index.ts` -- Web search for interviewer profiles (LinkedIn, social media)
-- `supabase/functions/firecrawl-scrape/index.ts` -- Scrape profile pages for content
-
-**Step 3**: Create `supabase/functions/ai-interviewer-research/index.ts`:
-- Takes scraped data from Firecrawl
-- Uses Lovable AI (gemini-3-flash-preview) to analyze and generate: personality insights, likely question patterns, communication style tips, topics they care about
-- Returns structured JSON via tool calling
-
-**Step 4**: Create `src/lib/api/firecrawl.ts` -- Frontend API wrapper
-
-**Step 5**: Update `src/pages/InterviewPrep.tsx`:
-- Replace `handleResearchInterviewer` mock setTimeout with real pipeline:
-  1. Search interviewer name via firecrawl-search
-  2. If LinkedIn URL provided, scrape it via firecrawl-scrape
-  3. Pass results to ai-interviewer-research for AI analysis
-  4. Display real insights instead of fake data
+**Implementation**: Update the `ai-interviewer-research` edge function prompt to also return `communicationStyle`, `personalityType`, `dressCode`, and `iceBreakers` fields. Update InterviewPrep UI to display these new sections with premium styling.
 
 ---
 
-## Task 3: Wire AI to Dashboard Generate Step
+## 2. "Don't Know Interviewer" Path -- Company Intelligence
 
-**Update `src/pages/Dashboard.tsx`**:
-- In `handleGenerate()`, replace the fake timer with a real call to `aiApi.optimizeResume()`
-- Collect all form data (profile, projects, target role, job description) and send to the edge function
-- Show real generation stages as the AI processes
-- On completion, save the result to the `resumes` table and navigate to `/results` with the resume ID
-- Handle errors (rate limit, payment required) with toast notifications
+**Current state**: Shows 6 generic static tips when user doesn't know interviewer.
 
----
+**Enhancement -- make it dynamic with real company research:**
 
-## Task 4: Wire AI Answer Rating to InterviewPrep
+- Add a "Company Name" input field when user selects "No idea"
+- Use Firecrawl to scrape company's careers page, engineering blog, and Glassdoor
+- AI analyzes: company culture, common interview patterns, dress code norms, values they emphasize
+- Show: Company Culture Card, Interview Style Prediction, Dress Code Recommendation, Values to Mirror in Answers
 
-**Update `src/pages/InterviewPrep.tsx` -- AnswerRater component**:
-- Replace the regex-based `rateAnswer()` function with a call to `aiApi.rateAnswer()`
-- Show a loading spinner while AI processes
-- Display the AI's structured feedback (score, categories, specific feedback, improved answer)
-- Keep the current regex as an instant fallback if AI fails
+**Implementation**: New handler `handleResearchCompany` that uses firecrawl search + AI analysis. New state for company insights. Update the `knowsInterviewer === false` section.
 
 ---
 
-## Task 5: Data Persistence -- Save/Load from Database
+## 3. Subject-Based Interview Strategy Cards
 
-**Dashboard (`src/pages/Dashboard.tsx`)**:
-- On component mount, check for existing resumes in the database
-- Show a "resume picker" if user has saved resumes (edit existing or create new)
-- Auto-save resume data to the `resumes` table on each step change
-- After AI generation, save the optimized result with ATS score
+**Add a new section below Interviewer Intelligence with subject-specific coaching:**
 
-**InterviewPrep (`src/pages/InterviewPrep.tsx`)**:
-- On mount, load question status and bookmarks from `interview_progress` table
-- On markSolved/markAttempted/toggleBookmark, save to database
-- Fallback to local state if user is not logged in
+- Based on the question's category (HR / Technical / DSA / System Design / Behavioral), show a contextual strategy card in the detail view sidebar
+- Each card contains: Body Language Tips, Voice Tone Guide, Key Phrases to Use, Things to Avoid
+- Example for System Design: "Stand up and use the whiteboard. Speak while drawing. Say 'Let me think about the trade-offs here...' to buy time. Avoid jumping to implementation."
+- Example for HR: "Maintain eye contact 60-70% of the time. Lean forward slightly. Use the interviewer's name once. Mirror their energy level."
+
+**Implementation**: Static data object mapping each round to its strategy card. Rendered in the detail view sidebar below PracticeTimer.
 
 ---
 
-## Task 6: Personalized Dashboard Hub
+## 4. "Impress Factor" -- Personality-Matched Answer Styles
 
-**Add a "home view" to Dashboard before the wizard**:
-- If user has saved resumes, show a personalized greeting + resume cards
-- Show interview prep stats (X/23 solved, difficulty breakdown)
-- Streak counter from `profiles.streak_count` and `last_active`
-- Quick action cards: "New Resume", "Continue Editing", "Interview Prep"
-- "Start New Resume" button enters the wizard flow
+**Add to AnswerRater results:**
+
+- After AI rates the answer, show an additional "Impress Factor" section
+- Based on interviewer personality (if researched) OR question type, suggest HOW to deliver the answer:
+  - Tone: "Confident but not arrogant -- use collaborative language"
+  - Pacing: "Slow down at key metrics. Pause after impact statements."
+  - Body Language: "Use hand gestures when listing points. Maintain open posture."
+  - Power Phrases: 3 specific phrases that impress for this type of question
+
+**Implementation**: Extend the AI rating response to include `impressTips` or add static mapping based on question category.
 
 ---
 
-## Technical Details
+## 5. Dress Code Intelligence Module
 
-### Files to Create (5 new):
-1. `supabase/functions/firecrawl-search/index.ts`
-2. `supabase/functions/firecrawl-scrape/index.ts`
-3. `supabase/functions/ai-interviewer-research/index.ts`
-4. `src/lib/api/firecrawl.ts`
+**New section on InterviewPrep page (below Interviewer Intelligence):**
 
-### Files to Modify (4 existing):
-1. `src/pages/LandingPage.tsx` -- Fix typewriter single-line
-2. `src/pages/Dashboard.tsx` -- AI generation + DB persistence + personalized hub
-3. `src/pages/InterviewPrep.tsx` -- AI answer rating + Firecrawl research + DB persistence
-4. `supabase/config.toml` -- Add new edge function entries
+- Visual dress code guide with 4 tiers: Formal, Business Casual, Smart Casual, Startup Casual
+- Each tier shows: what to wear (men/women), colors to choose, accessories, what to avoid
+- If interviewer/company was researched, auto-highlight the recommended tier
+- Include psychology insight: "Navy blue conveys trust. Black conveys authority. Avoid bright colors in first rounds."
 
-### Connector Required:
-- **Firecrawl** -- Will prompt user to connect (provides `FIRECRAWL_API_KEY` for edge functions)
+**Implementation**: New static component `DressCodeGuide` rendered conditionally. If company/interviewer research exists, highlight the recommended tier based on AI analysis.
+
+---
+
+## 6. Enhanced Benefits & Social Proof on InterviewPrep
+
+**Current state**: 3 benefit cards at bottom ("Neuroscience-Backed", "Data-Driven", "Common Mistakes Exposed").
+
+**Add 6 more benefit cards + testimonials:**
+
+- New cards: "Interviewer Psychology Decoder", "Dress Code Intelligence", "Body Language Coach", "AI Answer Improver", "Personalized Strategy", "Real-Time Confidence Score"
+- Add 3 interview-specific testimonials below benefits
+- Add a "Success Stories" counter: "4,200+ interviews cracked using this engine"
+
+---
+
+## 7. Quick Win Micro-Features
+
+- **Confidence Meter**: Visual indicator in AnswerRater that shows "Confidence Level" based on answer length, specificity, and structure -- gives instant gratification
+- **"Ask AI for Hint" button**: On each question detail, a button that gives a hint without revealing the full ideal answer
+- **Interview Day Checklist**: Expandable section with a checklist (documents to carry, mental prep, arrival time, phone silence, water bottle, etc.)
+
+---
+
+## Technical Implementation
+
+### Files to Modify (3):
+1. `src/pages/InterviewPrep.tsx` -- All UI enhancements (new sections, dress code, company research, strategy cards, enhanced benefits)
+2. `supabase/functions/ai-interviewer-research/index.ts` -- Extended prompt to return communicationStyle, personalityType, dressCode, iceBreakers
+3. `src/lib/api/firecrawl.ts` -- Add `researchCompany` method
+
+### No new edge functions needed -- we reuse existing Firecrawl search + AI interviewer research function with expanded prompts.
+
+### No database changes needed.
 
 ### Implementation Order:
-1. Fix typewriter (quick win, instant visual improvement)
-2. Connect Firecrawl connector
-3. Create Firecrawl edge functions + AI interviewer research function
-4. Wire AI to Dashboard and InterviewPrep
-5. Add database persistence
-6. Build personalized Dashboard hub
+1. Update AI edge function prompt for richer interviewer analysis
+2. Add company research flow (Don't Know path)
+3. Add subject-based strategy cards + dress code guide
+4. Enhance AnswerRater with Impress Factor
+5. Add benefits, testimonials, checklist, confidence meter
+6. Polish animations and micro-interactions
+
