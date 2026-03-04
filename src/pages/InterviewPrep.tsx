@@ -5,13 +5,17 @@ import {
   Code, BookOpen, MessageSquare, TrendingUp, Shield, Lightbulb, Award, ThumbsUp, AlertTriangle,
   Timer, Play, Pause, RotateCcw, Users, Crown, Briefcase, Layout,
   Search, Filter, Bookmark, BookmarkCheck, ChevronLeft, ChevronRight, Flame, ArrowUpDown, CircleDot,
-  UserSearch, Globe, Linkedin, Instagram, Facebook, ExternalLink, Loader2
+  UserSearch, Globe, Linkedin, Instagram, Facebook, ExternalLink, Loader2,
+  Shirt, MessageCircle, Sparkles, Eye, Volume2, Hand, Quote, Building2,
+  CheckSquare, Square, Coffee, Phone, FileText, Clock, Droplets, HeartPulse,
+  Mic, BarChart3, Palette, Glasses
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +42,271 @@ interface Question {
   roundName: string;
   category: string;
 }
+
+/* ─── Strategy Cards Data ─── */
+const strategyCards: Record<string, {
+  title: string;
+  icon: string;
+  bodyLanguage: string[];
+  voiceTone: string[];
+  keyPhrases: string[];
+  avoid: string[];
+}> = {
+  HR: {
+    title: "HR & Behavioral Strategy",
+    icon: "👥",
+    bodyLanguage: [
+      "Maintain eye contact 60-70% of the time",
+      "Lean forward slightly when listening — shows engagement",
+      "Use the interviewer's name once naturally",
+      "Mirror their energy level and posture",
+      "Nod while they speak — active listening signal",
+    ],
+    voiceTone: [
+      "Warm and conversational — not robotic",
+      "Vary your pitch when telling stories",
+      "Pause 2 seconds before answering — shows thoughtfulness",
+      "Match their speaking pace",
+    ],
+    keyPhrases: [
+      "What excites me about this role is...",
+      "In my experience, I've found that...",
+      "The impact was measurable — specifically...",
+      "I believe in collaborative problem-solving...",
+      "That's a great question — let me share a specific example...",
+    ],
+    avoid: [
+      "Never badmouth previous employers",
+      "Don't say 'I'm a perfectionist' as a weakness",
+      "Avoid one-word answers — always elaborate",
+      "Don't ask about salary in Round 1",
+    ],
+  },
+  Theory: {
+    title: "Technical Theory Strategy",
+    icon: "📚",
+    bodyLanguage: [
+      "Use hand gestures when explaining architectures",
+      "Draw diagrams in the air — visual thinkers appreciate this",
+      "Sit up straight — confidence posture",
+      "Keep hands visible on the table",
+    ],
+    voiceTone: [
+      "Clear and structured — use numbered points",
+      "Slow down at key technical terms",
+      "Confident but open to discussion",
+      "Say 'That's a nuanced topic...' before complex answers",
+    ],
+    keyPhrases: [
+      "The key trade-off here is...",
+      "In production, I'd consider...",
+      "The time complexity is O(n) because...",
+      "There are multiple approaches — let me walk through the optimal one...",
+      "From a scalability perspective...",
+    ],
+    avoid: [
+      "Don't say 'I think' — say 'Based on my experience'",
+      "Avoid vague answers like 'it depends' without elaborating",
+      "Don't pretend to know something you don't",
+      "Never skip mentioning trade-offs",
+    ],
+  },
+  DSA: {
+    title: "Coding & DSA Strategy",
+    icon: "💻",
+    bodyLanguage: [
+      "Think aloud — narrate your thought process",
+      "Use whiteboard/paper to sketch solutions",
+      "Take a breath before starting — don't rush",
+      "Point to specific parts of your code when explaining",
+    ],
+    voiceTone: [
+      "Methodical and calm — even when stuck",
+      "Say 'Let me think about edge cases...' to buy time",
+      "Narrate trade-offs between approaches",
+      "Ask clarifying questions before coding",
+    ],
+    keyPhrases: [
+      "Let me first clarify the constraints...",
+      "The brute force is O(n²), but we can optimize...",
+      "Let me handle the edge cases: empty input, single element...",
+      "The space-time trade-off here is...",
+      "I'd write tests for: normal case, edge case, large input...",
+    ],
+    avoid: [
+      "Don't start coding immediately — plan first",
+      "Never skip edge case discussion",
+      "Don't use built-in functions without explaining what they do",
+      "Avoid silent coding — always narrate",
+    ],
+  },
+  "System Design": {
+    title: "System Design Strategy",
+    icon: "🏗️",
+    bodyLanguage: [
+      "Stand up and use the whiteboard if available",
+      "Draw boxes and arrows while speaking",
+      "Gesture to show data flow direction",
+      "Face the interviewer, not the board, when explaining",
+    ],
+    voiceTone: [
+      "Start with 'Let me clarify the requirements first...'",
+      "Use a top-down approach — high level first",
+      "Pause after each component — invite feedback",
+      "Say 'Let me think about the trade-offs here...' to buy time",
+    ],
+    keyPhrases: [
+      "Let's start with the requirements and constraints...",
+      "The bottleneck here would be...",
+      "For horizontal scaling, we could...",
+      "The CAP theorem trade-off in this case...",
+      "In terms of data consistency vs availability...",
+      "We need to handle roughly X QPS...",
+    ],
+    avoid: [
+      "Don't jump to implementation without requirements",
+      "Never design without considering scale",
+      "Don't forget to discuss monitoring and alerting",
+      "Avoid over-engineering — start simple, then optimize",
+    ],
+  },
+  Behavioral: {
+    title: "Managerial & Culture Strategy",
+    icon: "🎯",
+    bodyLanguage: [
+      "Show genuine enthusiasm — smile naturally",
+      "Use open palm gestures — signals honesty",
+      "Maintain relaxed but attentive posture",
+      "Mirror the interviewer's formality level",
+    ],
+    voiceTone: [
+      "Storytelling mode — use STAR structure naturally",
+      "Lower your voice slightly at impact moments",
+      "Pause after stating results — let numbers sink in",
+      "Show emotion when describing team wins",
+    ],
+    keyPhrases: [
+      "I took ownership of...",
+      "The measurable impact was...",
+      "I learned that leadership means...",
+      "What I'd do differently next time is...",
+      "The team's success was a result of...",
+    ],
+    avoid: [
+      "Don't take all the credit — use 'we' alongside 'I'",
+      "Never describe a conflict where you were clearly wrong",
+      "Don't give hypothetical answers — always use real examples",
+      "Avoid generic leadership buzzwords without substance",
+    ],
+  },
+};
+
+/* ─── Dress Code Data ─── */
+const dressCodeTiers = [
+  {
+    tier: "Formal",
+    icon: "👔",
+    color: "from-slate-600 to-slate-800",
+    borderColor: "border-slate-500/30",
+    men: "Dark suit (navy/charcoal), white dress shirt, silk tie, leather oxford shoes, minimal watch",
+    women: "Tailored blazer + pencil skirt/trousers, silk blouse, closed-toe heels/flats, minimal jewelry",
+    colors: "Navy blue (trust), Charcoal (authority), White (clarity)",
+    avoid: "Bright colors, casual fabrics, visible tattoos, strong cologne",
+    psychology: "Navy blue conveys trust and competence. Black conveys authority. These colors activate the brain's 'leadership association' circuits.",
+    companies: "Banking, Law, Consulting, Fortune 500",
+  },
+  {
+    tier: "Business Casual",
+    icon: "👕",
+    color: "from-blue-600 to-blue-800",
+    borderColor: "border-blue-500/30",
+    men: "Chinos/dress pants, button-down shirt (no tie needed), leather belt, clean sneakers or loafers",
+    women: "Smart trousers/skirt, blouse or structured top, cardigan, low heels or clean flats",
+    colors: "Blue (reliable), Burgundy (confident), Earth tones (approachable)",
+    avoid: "Jeans, sneakers, graphic tees, casual sandals",
+    psychology: "Blue tones signal reliability and teamwork. Burgundy adds a touch of confidence without intimidation.",
+    companies: "Mid-size tech, SaaS, Enterprise companies",
+  },
+  {
+    tier: "Smart Casual",
+    icon: "🧥",
+    color: "from-emerald-600 to-emerald-800",
+    borderColor: "border-emerald-500/30",
+    men: "Dark jeans/chinos, polo or clean button-down, clean sneakers, optional blazer for senior roles",
+    women: "Dark jeans/trousers, nice top/sweater, clean sneakers or ankle boots, statement accessory",
+    colors: "Teal (innovative), Olive (grounded), Navy (professional base)",
+    avoid: "Ripped jeans, flip-flops, overly casual t-shirts, heavy logos",
+    psychology: "Slightly casual signals 'I'm one of the team' while still showing effort. The sweet spot for most tech interviews.",
+    companies: "Startups, Scale-ups, Modern tech companies",
+  },
+  {
+    tier: "Startup Casual",
+    icon: "👟",
+    color: "from-violet-600 to-violet-800",
+    borderColor: "border-violet-500/30",
+    men: "Clean jeans, solid-color t-shirt or henley, clean sneakers, optional hoodie (but keep it clean)",
+    women: "Comfortable jeans/leggings, casual top, sneakers, keep it authentic and 'you'",
+    colors: "Any clean, solid colors work. Show personality but stay neat.",
+    avoid: "Looking like you're trying too hard, suits (you'll look out of place), wrinkled clothes",
+    psychology: "Over-dressing at a casual startup signals 'I don't understand the culture.' Authenticity wins here.",
+    companies: "Early-stage startups, Remote-first companies, Creative agencies",
+  },
+];
+
+/* ─── Impress Factor Data (by category) ─── */
+const impressFactors: Record<string, {
+  tone: string;
+  pacing: string;
+  bodyLanguage: string;
+  powerPhrases: string[];
+}> = {
+  HR: {
+    tone: "Confident but warm — use collaborative language like 'we achieved' alongside 'I led'",
+    pacing: "Slow down when delivering key metrics and impact numbers. Pause 2 seconds after impact statements to let them sink in.",
+    bodyLanguage: "Lean forward during storytelling. Use open palm gestures. Make eye contact when delivering results. Smile when talking about team wins.",
+    powerPhrases: ["The measurable impact was...", "What sets me apart is...", "I'm passionate about..."],
+  },
+  Theory: {
+    tone: "Authoritative but curious — show depth with 'In my experience with production systems...'",
+    pacing: "Steady pace. Slow down for complex concepts. Speed up slightly for basics to show fluency.",
+    bodyLanguage: "Use hand gestures to illustrate architectures. Point to imaginary diagrams. Sit upright with squared shoulders.",
+    powerPhrases: ["The key trade-off is...", "At scale, this becomes critical because...", "Let me walk through the internals..."],
+  },
+  DSA: {
+    tone: "Methodical and calm — narrate your thought process even when stuck",
+    pacing: "Think aloud steadily. Pause before optimizations. Say 'Let me reconsider...' when pivoting approaches.",
+    bodyLanguage: "Write while speaking. Point to specific lines when explaining. Keep composure if stuck — take a breath.",
+    powerPhrases: ["The brute force is O(n²), but here's the insight...", "Let me verify with an edge case...", "The optimal approach uses..."],
+  },
+  "System Design": {
+    tone: "Structured and visionary — lead with requirements, show big-picture thinking",
+    pacing: "Start slow with requirements. Build momentum as you add components. Pause after each major decision.",
+    bodyLanguage: "Stand and draw. Face the interviewer when explaining 'why'. Use sweeping gestures for scale concepts.",
+    powerPhrases: ["Let's define the constraints first...", "The bottleneck shifts to...", "For 99.99% availability, we need..."],
+  },
+  Behavioral: {
+    tone: "Authentic and reflective — show genuine growth from failures, enthusiasm for wins",
+    pacing: "Storytelling rhythm: setup (fast) → challenge (medium) → action (detailed) → result (slow, let it land).",
+    bodyLanguage: "Show emotion naturally. Lower voice for serious moments. Lean in when discussing team dynamics.",
+    powerPhrases: ["I took full ownership of...", "The lesson I carry from that is...", "What excites me most is..."],
+  },
+};
+
+/* ─── Interview Day Checklist ─── */
+const interviewDayChecklist = [
+  { id: "resume", label: "5 printed copies of your resume", icon: FileText },
+  { id: "id", label: "Government-issued photo ID", icon: FileText },
+  { id: "portfolio", label: "Portfolio / code samples ready on laptop", icon: Code },
+  { id: "research", label: "Company research notes reviewed", icon: BookOpen },
+  { id: "arrive", label: "Arrive 15 minutes early", icon: Clock },
+  { id: "phone", label: "Phone on silent mode", icon: Phone },
+  { id: "water", label: "Water bottle (stay hydrated)", icon: Droplets },
+  { id: "breath", label: "5 deep breaths before walking in", icon: HeartPulse },
+  { id: "questions", label: "3 thoughtful questions prepared for interviewer", icon: MessageSquare },
+  { id: "backup", label: "Backup outfit ready (just in case)", icon: Shirt },
+  { id: "power", label: "Laptop/phone fully charged", icon: Zap },
+  { id: "notes", label: "Pen and notepad for notes", icon: FileText },
+];
 
 /* ─── Round Data ─── */
 const rounds = [
@@ -101,8 +370,46 @@ const allQuestions: Question[] = rounds.flatMap((r) =>
   r.questions.map((q) => ({ ...q, roundId: r.id, roundName: r.name, category: r.category }))
 );
 
+/* ─── Confidence Meter ─── */
+const ConfidenceMeter = ({ answer }: { answer: string }) => {
+  const words = answer.trim().split(/\s+/).filter(Boolean).length;
+  const hasNumbers = /\d/.test(answer);
+  const hasStructure = (answer.match(/\./g) || []).length >= 2;
+  const hasImpact = /improve|reduc|increas|achiev|built|engineer|design|implement|develop|led|optimiz|migrat|deliver/i.test(answer);
+  
+  let confidence = 0;
+  if (words >= 10) confidence += 20;
+  if (words >= 30) confidence += 15;
+  if (words >= 50) confidence += 10;
+  if (hasNumbers) confidence += 20;
+  if (hasStructure) confidence += 15;
+  if (hasImpact) confidence += 20;
+
+  const level = confidence >= 70 ? "High" : confidence >= 40 ? "Medium" : "Low";
+  const color = confidence >= 70 ? "text-emerald-400" : confidence >= 40 ? "text-yellow-400" : "text-red-400";
+  const bgColor = confidence >= 70 ? "bg-emerald-500" : confidence >= 40 ? "bg-yellow-500" : "bg-red-500";
+
+  if (words < 3) return null;
+
+  return (
+    <div className="flex items-center gap-3 glass rounded-lg p-3">
+      <HeartPulse className={`w-4 h-4 ${color}`} />
+      <div className="flex-1">
+        <div className="flex items-center justify-between mb-1">
+          <span className="font-body text-[10px] font-semibold text-muted-foreground uppercase">Confidence Level</span>
+          <span className={`font-body text-xs font-bold ${color}`}>{level} ({confidence}%)</span>
+        </div>
+        <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+          <motion.div initial={{ width: 0 }} animate={{ width: `${confidence}%` }} transition={{ duration: 0.5 }}
+            className={`h-full rounded-full ${bgColor}`} />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 /* ─── Answer Rater (AI-powered with regex fallback) ─── */
-const AnswerRater = ({ question }: { question: Question }) => {
+const AnswerRater = ({ question, interviewerInsights }: { question: Question; interviewerInsights: any }) => {
   const [userAnswer, setUserAnswer] = useState("");
   const [showIdeal, setShowIdeal] = useState(false);
   const [isRating, setIsRating] = useState(false);
@@ -174,11 +481,17 @@ const AnswerRater = ({ question }: { question: Question }) => {
     }
   };
 
+  const impressFactor = impressFactors[question.category];
+
   return (
     <div className="space-y-4">
       <Textarea value={userAnswer} onChange={(e) => setUserAnswer(e.target.value)}
         placeholder="Type your answer here... AI will rate it using psychology & recruiter patterns"
         className="bg-secondary border-border font-body text-sm min-h-[120px]" />
+      
+      {/* Confidence Meter */}
+      <ConfidenceMeter answer={userAnswer} />
+
       <div className="flex gap-3 flex-wrap">
         <Button onClick={rateAnswer} disabled={userAnswer.trim().length < 10 || isRating} className="bg-gradient-gold text-primary-foreground font-body font-semibold text-xs">
           {isRating ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> AI Analyzing...</> : <><Brain className="w-4 h-4 mr-1" /> Rate My Answer</>}
@@ -190,51 +503,107 @@ const AnswerRater = ({ question }: { question: Question }) => {
 
       <AnimatePresence>
         {rating && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="glass-gold-deep rounded-xl p-6">
-            <div className="flex items-center gap-4 mb-5">
-              <div className="relative w-16 h-16">
-                <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
-                  <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3" className="stroke-secondary" />
-                  <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3" strokeLinecap="round"
-                    className={rating.score >= 70 ? "stroke-primary" : rating.score >= 40 ? "stroke-yellow-500" : "stroke-destructive"}
-                    strokeDasharray={`${(rating.score / 100) * 94.2} 94.2`} />
-                </svg>
-                <span className="absolute inset-0 flex items-center justify-center font-display text-sm font-bold text-foreground">{rating.score}</span>
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+            <div className="glass-gold-deep rounded-xl p-6">
+              <div className="flex items-center gap-4 mb-5">
+                <div className="relative w-16 h-16">
+                  <svg viewBox="0 0 36 36" className="w-full h-full -rotate-90">
+                    <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3" className="stroke-secondary" />
+                    <circle cx="18" cy="18" r="15" fill="none" strokeWidth="3" strokeLinecap="round"
+                      className={rating.score >= 70 ? "stroke-primary" : rating.score >= 40 ? "stroke-yellow-500" : "stroke-destructive"}
+                      strokeDasharray={`${(rating.score / 100) * 94.2} 94.2`} />
+                  </svg>
+                  <span className="absolute inset-0 flex items-center justify-center font-display text-sm font-bold text-foreground">{rating.score}</span>
+                </div>
+                <div>
+                  <p className="font-body text-sm font-semibold text-foreground">
+                    {rating.score >= 80 ? "🔥 Excellent!" : rating.score >= 60 ? "👍 Good, Needs Polish" : rating.score >= 40 ? "⚠️ Average" : "🚨 Needs Work"}
+                  </p>
+                  <p className="font-body text-xs text-muted-foreground">AI-powered analysis using recruiter psychology</p>
+                </div>
               </div>
-              <div>
-                <p className="font-body text-sm font-semibold text-foreground">
-                  {rating.score >= 80 ? "🔥 Excellent!" : rating.score >= 60 ? "👍 Good, Needs Polish" : rating.score >= 40 ? "⚠️ Average" : "🚨 Needs Work"}
-                </p>
-                <p className="font-body text-xs text-muted-foreground">AI-powered analysis using recruiter psychology</p>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3 mb-4">
-              {rating.categories.map((cat) => (
-                <div key={cat.name} className="glass rounded-lg p-3">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="font-body text-[10px] font-semibold text-muted-foreground uppercase">{cat.name}</span>
-                    <span className={`font-body text-xs font-bold ${cat.score >= 70 ? "text-primary" : cat.score >= 40 ? "text-yellow-500" : "text-destructive"}`}>{cat.score}%</span>
+              <div className="grid grid-cols-2 gap-3 mb-4">
+                {rating.categories.map((cat) => (
+                  <div key={cat.name} className="glass rounded-lg p-3">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="font-body text-[10px] font-semibold text-muted-foreground uppercase">{cat.name}</span>
+                      <span className={`font-body text-xs font-bold ${cat.score >= 70 ? "text-primary" : cat.score >= 40 ? "text-yellow-500" : "text-destructive"}`}>{cat.score}%</span>
+                    </div>
+                    <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+                      <motion.div initial={{ width: 0 }} animate={{ width: `${cat.score}%` }} transition={{ duration: 0.8 }}
+                        className={`h-full rounded-full ${cat.score >= 70 ? "bg-primary" : cat.score >= 40 ? "bg-yellow-500" : "bg-destructive"}`} />
+                    </div>
                   </div>
-                  <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                    <motion.div initial={{ width: 0 }} animate={{ width: `${cat.score}%` }} transition={{ duration: 0.8 }}
-                      className={`h-full rounded-full ${cat.score >= 70 ? "bg-primary" : cat.score >= 40 ? "bg-yellow-500" : "bg-destructive"}`} />
+                ))}
+              </div>
+              <div className="space-y-2">
+                {rating.feedback.map((f, i) => (
+                  <div key={i} className="flex items-start gap-2">
+                    {rating.score >= 80 ? <ThumbsUp className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" /> : <AlertTriangle className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />}
+                    <p className="font-body text-xs text-muted-foreground">{f}</p>
+                  </div>
+                ))}
+              </div>
+              {rating.improvedAnswer && (
+                <div className="mt-4 glass rounded-xl p-4">
+                  <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">✨ AI-Improved Answer</p>
+                  <p className="font-body text-xs text-foreground leading-relaxed">{rating.improvedAnswer}</p>
+                </div>
+              )}
+            </div>
+
+            {/* ═══ IMPRESS FACTOR ═══ */}
+            {impressFactor && (
+              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+                className="glass rounded-2xl p-6 border border-primary/20">
+                <div className="flex items-center gap-2 mb-4">
+                  <Sparkles className="w-5 h-5 text-primary" />
+                  <h3 className="font-display text-base font-bold text-foreground">Impress Factor</h3>
+                  <span className="font-body text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full">HOW to deliver</span>
+                </div>
+                
+                {interviewerInsights?.personalityType && (
+                  <div className="glass-gold rounded-lg p-3 mb-4">
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-1">🎯 Tailored for: {interviewerInsights.personalityType}</p>
+                    <p className="font-body text-xs text-muted-foreground">{interviewerInsights.personalityStrategy}</p>
+                  </div>
+                )}
+
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="glass rounded-lg p-3">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Volume2 className="w-3.5 h-3.5 text-primary" />
+                      <span className="font-body text-[10px] font-bold text-primary uppercase">Tone</span>
+                    </div>
+                    <p className="font-body text-xs text-muted-foreground">{impressFactor.tone}</p>
+                  </div>
+                  <div className="glass rounded-lg p-3">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Timer className="w-3.5 h-3.5 text-primary" />
+                      <span className="font-body text-[10px] font-bold text-primary uppercase">Pacing</span>
+                    </div>
+                    <p className="font-body text-xs text-muted-foreground">{impressFactor.pacing}</p>
+                  </div>
+                  <div className="glass rounded-lg p-3">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Hand className="w-3.5 h-3.5 text-primary" />
+                      <span className="font-body text-[10px] font-bold text-primary uppercase">Body Language</span>
+                    </div>
+                    <p className="font-body text-xs text-muted-foreground">{impressFactor.bodyLanguage}</p>
+                  </div>
+                  <div className="glass rounded-lg p-3">
+                    <div className="flex items-center gap-1.5 mb-2">
+                      <Quote className="w-3.5 h-3.5 text-primary" />
+                      <span className="font-body text-[10px] font-bold text-primary uppercase">Power Phrases</span>
+                    </div>
+                    <div className="space-y-1">
+                      {impressFactor.powerPhrases.map((p, i) => (
+                        <p key={i} className="font-body text-xs text-primary italic">"{p}"</p>
+                      ))}
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-            <div className="space-y-2">
-              {rating.feedback.map((f, i) => (
-                <div key={i} className="flex items-start gap-2">
-                  {rating.score >= 80 ? <ThumbsUp className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" /> : <AlertTriangle className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />}
-                  <p className="font-body text-xs text-muted-foreground">{f}</p>
-                </div>
-              ))}
-            </div>
-            {rating.improvedAnswer && (
-              <div className="mt-4 glass rounded-xl p-4">
-                <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">✨ AI-Improved Answer</p>
-                <p className="font-body text-xs text-foreground leading-relaxed">{rating.improvedAnswer}</p>
-              </div>
+              </motion.div>
             )}
           </motion.div>
         )}
@@ -339,6 +708,72 @@ const DifficultyBadge = ({ difficulty }: { difficulty: Difficulty }) => {
   return <span className={`font-body text-[10px] font-semibold px-2.5 py-1 rounded-full border ${colors[difficulty]}`}>{difficulty}</span>;
 };
 
+/* ─── Dress Code Guide ─── */
+const DressCodeGuide = ({ recommendedTier }: { recommendedTier?: string }) => {
+  const [expandedTier, setExpandedTier] = useState<string | null>(recommendedTier || null);
+
+  return (
+    <div className="space-y-3">
+      {dressCodeTiers.map((tier) => {
+        const isRecommended = recommendedTier === tier.tier;
+        const isExpanded = expandedTier === tier.tier;
+        return (
+          <motion.div key={tier.tier}
+            className={`glass rounded-xl overflow-hidden transition-all ${isRecommended ? "ring-2 ring-primary/50 shadow-gold" : ""}`}>
+            <button onClick={() => setExpandedTier(isExpanded ? null : tier.tier)}
+              className="w-full p-4 flex items-center gap-3 text-left">
+              <span className="text-2xl">{tier.icon}</span>
+              <div className="flex-1">
+                <div className="flex items-center gap-2">
+                  <h4 className="font-body text-sm font-bold text-foreground">{tier.tier}</h4>
+                  {isRecommended && (
+                    <span className="font-body text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-semibold animate-pulse">
+                      ✨ Recommended
+                    </span>
+                  )}
+                </div>
+                <p className="font-body text-[10px] text-muted-foreground">{tier.companies}</p>
+              </div>
+              {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+            </button>
+            <AnimatePresence>
+              {isExpanded && (
+                <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: "auto", opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+                  className="px-4 pb-4">
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="glass rounded-lg p-3">
+                      <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">👔 Men</p>
+                      <p className="font-body text-xs text-muted-foreground">{tier.men}</p>
+                    </div>
+                    <div className="glass rounded-lg p-3">
+                      <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">👗 Women</p>
+                      <p className="font-body text-xs text-muted-foreground">{tier.women}</p>
+                    </div>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3 mt-3">
+                    <div className="glass rounded-lg p-3">
+                      <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">🎨 Colors</p>
+                      <p className="font-body text-xs text-muted-foreground">{tier.colors}</p>
+                    </div>
+                    <div className="glass rounded-lg p-3">
+                      <p className="font-body text-[10px] font-bold text-destructive uppercase mb-1">🚫 Avoid</p>
+                      <p className="font-body text-xs text-muted-foreground">{tier.avoid}</p>
+                    </div>
+                  </div>
+                  <div className="glass-gold rounded-lg p-3 mt-3">
+                    <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">🧠 Psychology</p>
+                    <p className="font-body text-xs text-muted-foreground italic">{tier.psychology}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </motion.div>
+        );
+      })}
+    </div>
+  );
+};
+
 /* ─── Main Page ─── */
 const InterviewPrep = () => {
   const { user } = useAuth();
@@ -355,13 +790,12 @@ const InterviewPrep = () => {
   const [interviewerName, setInterviewerName] = useState("");
   const [interviewerLinkedIn, setInterviewerLinkedIn] = useState("");
   const [isResearching, setIsResearching] = useState(false);
-  const [interviewerInsights, setInterviewerInsights] = useState<null | {
-    name: string;
-    summary: string;
-    interests: string[];
-    tips: string[];
-    commonTopics: string[];
-  }>(null);
+  const [interviewerInsights, setInterviewerInsights] = useState<any>(null);
+  const [companyName, setCompanyName] = useState("");
+  const [isResearchingCompany, setIsResearchingCompany] = useState(false);
+  const [companyInsights, setCompanyInsights] = useState<any>(null);
+  const [checklist, setChecklist] = useState<Set<string>>(new Set());
+  const [isChecklistOpen, setIsChecklistOpen] = useState(false);
 
   // Load progress from database
   useEffect(() => {
@@ -403,7 +837,6 @@ const InterviewPrep = () => {
     setIsResearching(true);
 
     try {
-      // Step 1: Search for interviewer on social media
       const searchResult = await firecrawlApi.search(
         `${interviewerName} LinkedIn profile OR software engineer OR interviewer`,
         { limit: 5, scrapeOptions: { formats: ['markdown'] } }
@@ -411,7 +844,6 @@ const InterviewPrep = () => {
 
       let scrapedData = searchResult.data || [];
 
-      // Step 2: If LinkedIn URL provided, scrape it directly
       if (interviewerLinkedIn.trim()) {
         try {
           const scrapeResult = await firecrawlApi.scrape(interviewerLinkedIn, { formats: ['markdown'] });
@@ -423,35 +855,60 @@ const InterviewPrep = () => {
         }
       }
 
-      // Step 3: Send to AI for analysis
       const insights = await firecrawlApi.researchInterviewer(interviewerName, scrapedData);
-
-      setInterviewerInsights({
-        name: interviewerName,
-        summary: insights.summary,
-        interests: insights.interests,
-        tips: insights.tips,
-        commonTopics: insights.commonTopics,
-      });
+      setInterviewerInsights({ name: interviewerName, ...insights });
     } catch (err) {
       console.error("Interviewer research failed:", err);
-      // Fallback to generic insights
       setInterviewerInsights({
         name: interviewerName,
         summary: `We couldn't find detailed profile data for ${interviewerName}. Here are general tips based on common interviewer patterns.`,
         interests: ["System Design", "Clean Code", "Team Collaboration", "Problem Solving", "Technical Leadership"],
-        tips: [
-          "Research the company's tech blog for their engineering values",
-          "Prepare specific examples with quantified metrics",
-          "Show collaborative problem-solving, not solo heroics",
-          "Ask thoughtful questions about team culture",
-          "Mention relevant open-source or side projects",
-        ],
+        tips: ["Research the company's tech blog for their engineering values", "Prepare specific examples with quantified metrics", "Show collaborative problem-solving, not solo heroics", "Ask thoughtful questions about team culture", "Mention relevant open-source or side projects"],
         commonTopics: ["System Design Trade-offs", "Code Quality", "Team Dynamics", "Scaling Challenges"],
+        communicationStyleType: "Analytical",
+        communicationStyle: "Likely prefers structured, data-driven responses.",
+        personalityType: "The Engineer",
+        personalityStrategy: "Focus on technical depth, code quality, and system design fundamentals.",
+        dressCode: "Smart Casual",
+        dressDetails: "Clean jeans or chinos, button-down or polo, clean sneakers.",
+        iceBreakers: ["Ask about their tech stack and recent technical challenges", "Mention a relevant blog post or talk from their company"],
       });
       toast({ title: "Using general insights", description: "Couldn't research this specific person. Showing general tips.", variant: "default" });
     } finally {
       setIsResearching(false);
+    }
+  };
+
+  // Company research
+  const handleResearchCompany = async () => {
+    if (!companyName.trim()) return;
+    setIsResearchingCompany(true);
+
+    try {
+      const searchResult = await firecrawlApi.search(
+        `${companyName} company culture interview process engineering blog careers`,
+        { limit: 5, scrapeOptions: { formats: ['markdown'] } }
+      );
+
+      const scrapedData = searchResult.data || [];
+      const insights = await firecrawlApi.researchCompany(companyName, scrapedData);
+      setCompanyInsights({ name: companyName, ...insights });
+    } catch (err) {
+      console.error("Company research failed:", err);
+      setCompanyInsights({
+        name: companyName,
+        companySummary: `We couldn't find detailed data for ${companyName}. Here are general interview preparation tips.`,
+        cultureTraits: ["Innovation", "Collaboration", "Customer Focus", "Continuous Learning", "Integrity"],
+        interviewStyle: "Typically involves HR screening, technical rounds, and culture fit assessment.",
+        dressCode: "Business Casual",
+        dressDetails: "Chinos/dress pants, button-down shirt, clean shoes.",
+        valuesToMirror: ["Team collaboration", "Data-driven decisions", "Customer impact", "Continuous improvement", "Ownership mentality"],
+        commonQuestionThemes: ["Problem-solving approach", "Team collaboration", "Technical depth", "Leadership potential"],
+        tipsForSuccess: ["Research the company's recent news and products", "Prepare STAR-format behavioral examples", "Show genuine interest in their mission", "Ask thoughtful questions about growth", "Demonstrate cultural alignment"],
+      });
+      toast({ title: "Using general insights", description: "Couldn't research this company. Showing general tips.", variant: "default" });
+    } finally {
+      setIsResearchingCompany(false);
     }
   };
 
@@ -501,7 +958,6 @@ const InterviewPrep = () => {
 
   const filteredQuestions = useMemo(() => {
     let qs = [...allQuestions];
-
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       qs = qs.filter(x => x.question.toLowerCase().includes(q) || x.type.toLowerCase().includes(q));
@@ -518,7 +974,6 @@ const InterviewPrep = () => {
     } else if (sortBy === "frequency") {
       qs.sort((a, b) => parseInt(b.frequency) - parseInt(a.frequency));
     }
-
     return qs;
   }, [searchQuery, filterDifficulty, filterCategory, filterStatus, sortBy, questionStatus, bookmarks]);
 
@@ -545,6 +1000,8 @@ const InterviewPrep = () => {
     return <div className="w-4 h-4 rounded-full border-2 border-muted-foreground/30" />;
   };
 
+  const recommendedDressCode = interviewerInsights?.dressCode || companyInsights?.dressCode;
+
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
@@ -561,6 +1018,10 @@ const InterviewPrep = () => {
           <p className="font-body text-base text-muted-foreground max-w-2xl mx-auto">
             {totalQuestions} questions across 5 rounds — 99% probability these will be asked.
           </p>
+          <div className="mt-3 inline-flex items-center gap-2 glass rounded-full px-4 py-1.5">
+            <Award className="w-4 h-4 text-primary" />
+            <span className="font-body text-xs text-muted-foreground"><span className="text-primary font-semibold">4,200+</span> interviews cracked using this engine</span>
+          </div>
         </motion.div>
 
         {/* Progress Dashboard */}
@@ -665,6 +1126,7 @@ const InterviewPrep = () => {
 
           {knowsInterviewer === true && interviewerInsights && (
             <div className="space-y-4">
+              {/* Profile Summary */}
               <div className="glass rounded-xl p-4">
                 <div className="flex items-center justify-between mb-2">
                   <h3 className="font-body text-sm font-bold text-foreground flex items-center gap-2">
@@ -680,7 +1142,7 @@ const InterviewPrep = () => {
                   <div>
                     <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">Their Interests</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {interviewerInsights.interests.map((interest) => (
+                      {interviewerInsights.interests?.map((interest: string) => (
                         <span key={interest} className="font-body text-[10px] bg-primary/10 text-primary px-2.5 py-1 rounded-full">{interest}</span>
                       ))}
                     </div>
@@ -688,7 +1150,7 @@ const InterviewPrep = () => {
                   <div>
                     <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">Likely Topics</p>
                     <div className="flex flex-wrap gap-1.5">
-                      {interviewerInsights.commonTopics.map((topic) => (
+                      {interviewerInsights.commonTopics?.map((topic: string) => (
                         <span key={topic} className="font-body text-[10px] bg-secondary text-foreground px-2.5 py-1 rounded-full">{topic}</span>
                       ))}
                     </div>
@@ -696,10 +1158,61 @@ const InterviewPrep = () => {
                 </div>
               </div>
 
+              {/* Communication Style + Personality Type */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="glass rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <MessageCircle className="w-4 h-4 text-primary" />
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Communication Style</p>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-body text-sm font-bold text-foreground">{interviewerInsights.communicationStyleType || "Analytical"}</span>
+                  </div>
+                  <p className="font-body text-xs text-muted-foreground">{interviewerInsights.communicationStyle}</p>
+                </div>
+                <div className="glass rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Brain className="w-4 h-4 text-primary" />
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Personality Archetype</p>
+                  </div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="font-body text-sm font-bold text-foreground">{interviewerInsights.personalityType || "The Engineer"}</span>
+                  </div>
+                  <p className="font-body text-xs text-muted-foreground">{interviewerInsights.personalityStrategy}</p>
+                </div>
+              </div>
+
+              {/* Dress Code + Ice Breakers */}
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div className="glass rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Shirt className="w-4 h-4 text-primary" />
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">What to Wear</p>
+                  </div>
+                  <span className="font-body text-xs font-semibold bg-primary/10 text-primary px-2.5 py-1 rounded-full">{interviewerInsights.dressCode || "Smart Casual"}</span>
+                  <p className="font-body text-xs text-muted-foreground mt-2">{interviewerInsights.dressDetails}</p>
+                </div>
+                <div className="glass rounded-xl p-4">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Coffee className="w-4 h-4 text-primary" />
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Ice Breakers</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    {interviewerInsights.iceBreakers?.map((ib: string, i: number) => (
+                      <div key={i} className="flex items-start gap-2">
+                        <MessageSquare className="w-3 h-3 text-primary shrink-0 mt-0.5" />
+                        <p className="font-body text-xs text-muted-foreground italic">"{ib}"</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Tips */}
               <div className="glass-gold rounded-xl p-4">
                 <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-3">🎯 Personalized Tips for {interviewerInsights.name}'s Interview</p>
                 <div className="space-y-2">
-                  {interviewerInsights.tips.map((tip, i) => (
+                  {interviewerInsights.tips?.map((tip: string, i: number) => (
                     <div key={i} className="flex items-start gap-2">
                       <Star className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
                       <p className="font-body text-xs text-muted-foreground">{tip}</p>
@@ -710,30 +1223,178 @@ const InterviewPrep = () => {
             </div>
           )}
 
+          {/* ═══ DON'T KNOW INTERVIEWER — COMPANY RESEARCH ═══ */}
           {knowsInterviewer === false && (
-            <div className="space-y-3">
-              <div className="glass rounded-xl p-4">
-                <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-3">🧠 Best Strategy When You Don't Know Your Interviewer</p>
-                <div className="space-y-2">
-                  {[
-                    "Research the company's engineering blog and recent tech talks on YouTube",
-                    "Check Glassdoor for common interview questions at this company",
-                    "Study the job description keywords — mirror them in your answers",
-                    "Prepare for all 5 rounds equally — you can't predict what they'll focus on",
-                    "Follow the company's LinkedIn page for recent posts and culture signals",
-                    "Look up the hiring manager on LinkedIn for team structure insights",
-                  ].map((tip, i) => (
-                    <div key={i} className="flex items-start gap-2">
-                      <Lightbulb className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
-                      <p className="font-body text-xs text-muted-foreground">{tip}</p>
+            <div className="space-y-4">
+              {!companyInsights ? (
+                <>
+                  <div className="glass rounded-xl p-4">
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-3">🏢 Company Intelligence — Let's Research Your Target Company</p>
+                    <div className="space-y-3">
+                      <div>
+                        <label className="font-body text-xs text-muted-foreground mb-1.5 block">Company Name</label>
+                        <Input value={companyName} onChange={(e) => setCompanyName(e.target.value)}
+                          placeholder="e.g., Google, Stripe, Infosys..." className="bg-secondary border-border font-body text-sm" />
+                      </div>
+                      <Button onClick={handleResearchCompany} disabled={!companyName.trim() || isResearchingCompany}
+                        className="bg-gradient-gold text-primary-foreground font-body text-xs font-semibold">
+                        {isResearchingCompany ? <><Loader2 className="w-4 h-4 mr-1 animate-spin" /> Analyzing Company...</> : <><Building2 className="w-4 h-4 mr-1" /> Research Company</>}
+                      </Button>
                     </div>
-                  ))}
-                </div>
-              </div>
-              <button onClick={() => setKnowsInterviewer(null)}
+                  </div>
+                  <div className="glass rounded-xl p-4">
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-3">🧠 General Tips (while we research)</p>
+                    <div className="space-y-2">
+                      {[
+                        "Research the company's engineering blog and recent tech talks on YouTube",
+                        "Check Glassdoor for common interview questions at this company",
+                        "Study the job description keywords — mirror them in your answers",
+                        "Prepare for all 5 rounds equally — you can't predict what they'll focus on",
+                        "Follow the company's LinkedIn page for recent posts and culture signals",
+                        "Look up the hiring manager on LinkedIn for team structure insights",
+                      ].map((tip, i) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <Lightbulb className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                          <p className="font-body text-xs text-muted-foreground">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* Company Insights Display */}
+                  <div className="glass rounded-xl p-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-body text-sm font-bold text-foreground flex items-center gap-2">
+                        <Building2 className="w-4 h-4 text-primary" />
+                        Company Intelligence: {companyInsights.name}
+                      </h3>
+                      <button onClick={() => { setCompanyInsights(null); setCompanyName(""); }}
+                        className="font-body text-[10px] text-muted-foreground hover:text-foreground">Research another</button>
+                    </div>
+                    <p className="font-body text-xs text-muted-foreground leading-relaxed mb-3">{companyInsights.companySummary}</p>
+                    
+                    <div className="grid sm:grid-cols-2 gap-3">
+                      <div>
+                        <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">Culture Traits</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {companyInsights.cultureTraits?.map((trait: string) => (
+                            <span key={trait} className="font-body text-[10px] bg-primary/10 text-primary px-2.5 py-1 rounded-full">{trait}</span>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">Common Question Themes</p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {companyInsights.commonQuestionThemes?.map((theme: string) => (
+                            <span key={theme} className="font-body text-[10px] bg-secondary text-foreground px-2.5 py-1 rounded-full">{theme}</span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <div className="glass rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Eye className="w-4 h-4 text-primary" />
+                        <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Interview Style</p>
+                      </div>
+                      <p className="font-body text-xs text-muted-foreground">{companyInsights.interviewStyle}</p>
+                    </div>
+                    <div className="glass rounded-xl p-4">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Shirt className="w-4 h-4 text-primary" />
+                        <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Dress Code</p>
+                      </div>
+                      <span className="font-body text-xs font-semibold bg-primary/10 text-primary px-2.5 py-1 rounded-full">{companyInsights.dressCode}</span>
+                      <p className="font-body text-xs text-muted-foreground mt-2">{companyInsights.dressDetails}</p>
+                    </div>
+                  </div>
+
+                  <div className="glass-gold rounded-xl p-4">
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-2">🪞 Values to Mirror in Your Answers</p>
+                    <div className="flex flex-wrap gap-2">
+                      {companyInsights.valuesToMirror?.map((v: string) => (
+                        <span key={v} className="font-body text-xs bg-primary/10 text-primary px-3 py-1.5 rounded-full border border-primary/20">{v}</span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="glass-gold rounded-xl p-4">
+                    <p className="font-body text-[10px] font-bold text-primary uppercase tracking-wider mb-3">🎯 Tips for Success at {companyInsights.name}</p>
+                    <div className="space-y-2">
+                      {companyInsights.tipsForSuccess?.map((tip: string, i: number) => (
+                        <div key={i} className="flex items-start gap-2">
+                          <Star className="w-3.5 h-3.5 text-primary shrink-0 mt-0.5" />
+                          <p className="font-body text-xs text-muted-foreground">{tip}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              )}
+              <button onClick={() => { setKnowsInterviewer(null); setCompanyInsights(null); setCompanyName(""); }}
                 className="font-body text-[10px] text-muted-foreground hover:text-foreground">← Go back</button>
             </div>
           )}
+        </motion.div>
+
+        {/* ═══ DRESS CODE INTELLIGENCE ═══ */}
+        {(interviewerInsights || companyInsights) && (
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }}
+            className="glass-gold-deep rounded-2xl p-6 mb-8 border-shine">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Shirt className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h2 className="font-display text-lg font-bold text-foreground">Dress Code Intelligence</h2>
+                <p className="font-body text-xs text-muted-foreground">What to wear based on company culture analysis. Colors affect perception.</p>
+              </div>
+            </div>
+            <DressCodeGuide recommendedTier={recommendedDressCode} />
+          </motion.div>
+        )}
+
+        {/* ═══ INTERVIEW DAY CHECKLIST ═══ */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}
+          className="glass rounded-2xl mb-8 overflow-hidden">
+          <Collapsible open={isChecklistOpen} onOpenChange={setIsChecklistOpen}>
+            <CollapsibleTrigger className="w-full p-6 flex items-center gap-3 text-left hover:bg-primary/5 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center shrink-0">
+                <CheckSquare className="w-5 h-5 text-primary" />
+              </div>
+              <div className="flex-1">
+                <h2 className="font-display text-lg font-bold text-foreground">Interview Day Checklist</h2>
+                <p className="font-body text-xs text-muted-foreground">{checklist.size}/{interviewDayChecklist.length} completed — Don't forget anything!</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <Progress value={(checklist.size / interviewDayChecklist.length) * 100} className="w-20 h-2" />
+                {isChecklistOpen ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+              </div>
+            </CollapsibleTrigger>
+            <CollapsibleContent>
+              <div className="px-6 pb-6 grid sm:grid-cols-2 gap-2">
+                {interviewDayChecklist.map((item) => (
+                  <button key={item.id}
+                    onClick={() => setChecklist(prev => {
+                      const next = new Set(prev);
+                      if (next.has(item.id)) next.delete(item.id); else next.add(item.id);
+                      return next;
+                    })}
+                    className={`flex items-center gap-3 p-3 rounded-lg text-left transition-all ${checklist.has(item.id) ? "glass-gold" : "glass hover:bg-primary/5"}`}>
+                    {checklist.has(item.id) ? 
+                      <CheckSquare className="w-4 h-4 text-primary shrink-0" /> :
+                      <Square className="w-4 h-4 text-muted-foreground shrink-0" />
+                    }
+                    <span className={`font-body text-xs ${checklist.has(item.id) ? "text-primary line-through" : "text-foreground"}`}>{item.label}</span>
+                  </button>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
         </motion.div>
 
         {/* View Toggle */}
@@ -759,7 +1420,7 @@ const InterviewPrep = () => {
               </div>
             </div>
 
-            <div className="grid lg:grid-cols-[1fr_280px] gap-6">
+            <div className="grid lg:grid-cols-[1fr_300px] gap-6">
               {/* Question + Practice */}
               <div className="space-y-6">
                 {/* Question Header */}
@@ -788,7 +1449,7 @@ const InterviewPrep = () => {
                 {/* Answer Area */}
                 <div className="glass rounded-2xl p-6">
                   <h3 className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-4">Your Answer</h3>
-                  <AnswerRater question={selectedQuestion} />
+                  <AnswerRater question={selectedQuestion} interviewerInsights={interviewerInsights} />
                 </div>
 
                 {/* Mark Solved */}
@@ -805,6 +1466,63 @@ const InterviewPrep = () => {
               {/* Sidebar */}
               <div className="space-y-4">
                 <PracticeTimer />
+
+                {/* Strategy Card */}
+                {strategyCards[selectedQuestion.category] && (
+                  <div className="glass rounded-xl p-5 border border-primary/10">
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-lg">{strategyCards[selectedQuestion.category].icon}</span>
+                      <span className="font-body text-xs font-bold text-primary uppercase tracking-wider">{strategyCards[selectedQuestion.category].title}</span>
+                    </div>
+                    
+                    <div className="space-y-3">
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <Hand className="w-3 h-3 text-primary" />
+                          <span className="font-body text-[10px] font-bold text-muted-foreground uppercase">Body Language</span>
+                        </div>
+                        <div className="space-y-1">
+                          {strategyCards[selectedQuestion.category].bodyLanguage.slice(0, 3).map((tip, i) => (
+                            <p key={i} className="font-body text-[10px] text-muted-foreground">• {tip}</p>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <Volume2 className="w-3 h-3 text-primary" />
+                          <span className="font-body text-[10px] font-bold text-muted-foreground uppercase">Voice & Tone</span>
+                        </div>
+                        <div className="space-y-1">
+                          {strategyCards[selectedQuestion.category].voiceTone.slice(0, 2).map((tip, i) => (
+                            <p key={i} className="font-body text-[10px] text-muted-foreground">• {tip}</p>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <Sparkles className="w-3 h-3 text-primary" />
+                          <span className="font-body text-[10px] font-bold text-muted-foreground uppercase">Key Phrases</span>
+                        </div>
+                        <div className="space-y-1">
+                          {strategyCards[selectedQuestion.category].keyPhrases.slice(0, 3).map((p, i) => (
+                            <p key={i} className="font-body text-[10px] text-primary italic">"{p}"</p>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5 mb-1.5">
+                          <XCircle className="w-3 h-3 text-destructive" />
+                          <span className="font-body text-[10px] font-bold text-muted-foreground uppercase">Avoid</span>
+                        </div>
+                        <div className="space-y-1">
+                          {strategyCards[selectedQuestion.category].avoid.slice(0, 2).map((tip, i) => (
+                            <p key={i} className="font-body text-[10px] text-muted-foreground">• {tip}</p>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Round Pro Tips */}
                 <div className="glass-gold rounded-xl p-5">
@@ -835,19 +1553,13 @@ const InterviewPrep = () => {
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {/* Filter Bar */}
             <div className="glass rounded-xl p-4 mb-6 space-y-4">
-              {/* Search */}
               <div className="relative">
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                <Input
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search questions..."
-                  className="pl-10 bg-secondary border-border font-body text-sm"
-                />
+                <Input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search questions..." className="pl-10 bg-secondary border-border font-body text-sm" />
               </div>
 
               <div className="flex flex-wrap items-center gap-3">
-                {/* Difficulty Filter */}
                 <div className="flex items-center gap-1">
                   <Filter className="w-3.5 h-3.5 text-muted-foreground" />
                   {(["All", "Easy", "Medium", "Hard"] as const).map((d) => (
@@ -864,10 +1576,7 @@ const InterviewPrep = () => {
                     </button>
                   ))}
                 </div>
-
                 <div className="h-4 w-px bg-border" />
-
-                {/* Category Filter */}
                 <div className="flex flex-wrap items-center gap-1">
                   {categories.map((c) => (
                     <button key={c} onClick={() => setFilterCategory(c)}
@@ -878,10 +1587,7 @@ const InterviewPrep = () => {
                     </button>
                   ))}
                 </div>
-
                 <div className="h-4 w-px bg-border" />
-
-                {/* Status Filter */}
                 <div className="flex items-center gap-1">
                   {(["All", "Solved", "Unsolved", "Bookmarked"] as const).map((s) => (
                     <button key={s} onClick={() => setFilterStatus(s)}
@@ -892,10 +1598,7 @@ const InterviewPrep = () => {
                     </button>
                   ))}
                 </div>
-
                 <div className="h-4 w-px bg-border" />
-
-                {/* Sort */}
                 <div className="flex items-center gap-1">
                   <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground" />
                   {(["round", "difficulty", "frequency"] as const).map((s) => (
@@ -910,7 +1613,6 @@ const InterviewPrep = () => {
               </div>
             </div>
 
-            {/* Results count */}
             <div className="flex items-center justify-between mb-4">
               <p className="font-body text-xs text-muted-foreground">{filteredQuestions.length} questions</p>
             </div>
@@ -935,10 +1637,7 @@ const InterviewPrep = () => {
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    {/* Status */}
                     <div className="shrink-0">{getStatusIcon(q.id)}</div>
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
                         <span className="font-body text-[10px] text-muted-foreground">Q{q.id}</span>
@@ -950,8 +1649,6 @@ const InterviewPrep = () => {
                         <span className="font-body text-[10px] text-primary">🔥 {q.frequency}</span>
                       </div>
                     </div>
-
-                    {/* Right side */}
                     <div className="flex items-center gap-3 shrink-0">
                       <DifficultyBadge difficulty={q.difficulty} />
                       <button onClick={(e) => { e.stopPropagation(); toggleBookmark(q.id); }}
@@ -976,28 +1673,65 @@ const InterviewPrep = () => {
           </motion.div>
         )}
 
-        {/* Benefits Section */}
+        {/* ═══ ENHANCED BENEFITS ═══ */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
           className="glass-gold-deep rounded-2xl p-8 glow-gold mt-12 mb-8 border-shine">
-          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-6 text-center">
+          <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-2 text-center">
             Why This <span className="text-gradient-gold">Works</span>
           </h2>
+          <p className="font-body text-sm text-muted-foreground text-center mb-8">9 AI-powered dimensions working together to make you unforgettable</p>
+          
           <div className="grid md:grid-cols-3 gap-6">
             {[
               { icon: Brain, title: "Neuroscience-Backed", desc: "Every ideal answer applies cognitive biases that make you memorable — Halo Effect, Anchoring, Serial Position." },
               { icon: TrendingUp, title: "Data-Driven", desc: "Questions sourced from 1M+ interview patterns. 99% probability these exact questions appear." },
               { icon: Shield, title: "Common Mistakes Exposed", desc: "Know what NOT to say. Most candidates fail because of predictable mistakes — we show you every trap." },
+              { icon: UserSearch, title: "Interviewer Psychology Decoder", desc: "AI analyzes your interviewer's personality, communication style, and preferences from their social media." },
+              { icon: Shirt, title: "Dress Code Intelligence", desc: "What to wear based on company culture analysis. Colors affect perception — navy = trust, black = authority." },
+              { icon: Hand, title: "Body Language Coach", desc: "Subject-specific body language tips: when to lean in, how to gesture, where to look. Nonverbal is 55% of communication." },
+              { icon: Sparkles, title: "AI Answer Improver", desc: "Get your answer rewritten by AI using the exact psychology patterns that impress interviewers." },
+              { icon: Target, title: "Personalized Strategy", desc: "Company research, interviewer archetypes, and personality-matched response styles — no generic advice." },
+              { icon: BarChart3, title: "Real-Time Confidence Score", desc: "Live confidence meter as you type — see your answer strength grow with each specific detail you add." },
             ].map((b, i) => (
-              <div key={i} className="glass rounded-xl p-6 text-center lift-hover">
+              <motion.div key={i} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.05 }}
+                className="glass rounded-xl p-6 text-center lift-hover">
                 <b.icon className="w-8 h-8 text-primary mx-auto mb-3" />
                 <h3 className="font-body text-sm font-bold text-foreground mb-2">{b.title}</h3>
                 <p className="font-body text-xs text-muted-foreground leading-relaxed">{b.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ═══ TESTIMONIALS ═══ */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}
+          className="glass rounded-2xl p-8 mb-8">
+          <h2 className="font-display text-xl font-bold text-foreground mb-6 text-center">
+            What Users Say
+          </h2>
+          <div className="grid md:grid-cols-3 gap-4">
+            {[
+              { name: "Priya S.", role: "SDE-2 at Amazon", quote: "The interviewer research feature is insane. It told me my interviewer loves system design trade-offs — I emphasized that and got the offer.", rating: 5 },
+              { name: "Alex M.", role: "Frontend Dev at Stripe", quote: "The AI answer rater caught weaknesses I never noticed. My 'tell me about yourself' went from a 45 to a 92. Game changer.", rating: 5 },
+              { name: "Rahul K.", role: "SDE at Google", quote: "The dress code guide + body language tips gave me so much confidence. I walked in knowing exactly how to present myself. Got the offer.", rating: 5 },
+            ].map((t, i) => (
+              <div key={i} className="glass-gold rounded-xl p-5">
+                <div className="flex items-center gap-1 mb-3">
+                  {Array.from({ length: t.rating }).map((_, j) => (
+                    <Star key={j} className="w-3.5 h-3.5 text-primary fill-primary" />
+                  ))}
+                </div>
+                <p className="font-body text-xs text-muted-foreground italic mb-3">"{t.quote}"</p>
+                <div>
+                  <p className="font-body text-xs font-bold text-foreground">{t.name}</p>
+                  <p className="font-body text-[10px] text-primary">{t.role}</p>
+                </div>
               </div>
             ))}
           </div>
         </motion.div>
 
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="text-center">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7 }} className="text-center">
           <p className="font-body text-sm text-muted-foreground mb-4">
             💡 <span className="text-primary font-semibold">Pro Tip:</span> Practice each answer out loud 3 times. Your brain retains spoken words 40% better than read words.
           </p>

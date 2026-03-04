@@ -9,7 +9,7 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { interviewerName, scrapedData } = await req.json();
+    const { interviewerName, scrapedData, mode, companyName } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -17,6 +17,67 @@ serve(async (req) => {
       ? scrapedData.map((d: any) => `Source: ${d.url || 'unknown'}\n${d.markdown || d.description || ''}`).join('\n\n---\n\n')
       : typeof scrapedData === 'string' ? scrapedData : JSON.stringify(scrapedData);
 
+    // Company research mode
+    if (mode === "company") {
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [
+            {
+              role: "system",
+              content: `You are an expert career coach. Analyze scraped company data and provide actionable interview preparation insights about the company's culture, interview style, dress code, and values.`,
+            },
+            {
+              role: "user",
+              content: `Company Name: ${companyName}\n\nScraped Company Data:\n${scrapedContent}\n\nAnalyze this company and provide interview preparation insights.`,
+            },
+          ],
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: "return_company_insights",
+                description: "Return company analysis insights for interview prep",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    companySummary: { type: "string", description: "2-3 sentence summary of the company culture and work environment" },
+                    cultureTraits: { type: "array", items: { type: "string" }, description: "5-6 key cultural traits/values the company emphasizes" },
+                    interviewStyle: { type: "string", description: "Description of their typical interview process and what they look for" },
+                    dressCode: { type: "string", enum: ["Formal", "Business Casual", "Smart Casual", "Startup Casual"], description: "Recommended dress code tier" },
+                    dressDetails: { type: "string", description: "Specific what-to-wear advice for this company" },
+                    valuesToMirror: { type: "array", items: { type: "string" }, description: "5-6 specific values/phrases to mirror in your answers" },
+                    commonQuestionThemes: { type: "array", items: { type: "string" }, description: "4-6 common interview question themes at this company" },
+                    tipsForSuccess: { type: "array", items: { type: "string" }, description: "5-7 actionable tips for interviewing at this company" },
+                  },
+                  required: ["companySummary", "cultureTraits", "interviewStyle", "dressCode", "dressDetails", "valuesToMirror", "commonQuestionThemes", "tipsForSuccess"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          ],
+          tool_choice: { type: "function", function: { name: "return_company_insights" } },
+        }),
+      });
+
+      if (!response.ok) {
+        const status = response.status;
+        if (status === 429) return new Response(JSON.stringify({ error: "Rate limit exceeded." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        if (status === 402) return new Response(JSON.stringify({ error: "Usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        throw new Error(`AI gateway error: ${status}`);
+      }
+
+      const aiData = await response.json();
+      const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+      const result = toolCall ? JSON.parse(toolCall.function.arguments) : null;
+      if (!result) throw new Error("No structured output from AI");
+
+      return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Interviewer research mode (default)
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -25,11 +86,11 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are an expert career coach and interview strategist. Analyze scraped social media/web data about an interviewer and extract actionable insights for interview preparation. Focus on: their professional interests, communication style, topics they care about, and personalized tips for the candidate.`,
+            content: `You are an expert career coach and interview strategist. Analyze scraped social media/web data about an interviewer and extract actionable insights for interview preparation. Provide deep personality analysis including their communication style, personality archetype, dress code recommendation based on their company culture, and personalized ice-breaker conversation starters.`,
           },
           {
             role: "user",
-            content: `Interviewer Name: ${interviewerName}\n\nScraped Profile Data:\n${scrapedContent}\n\nAnalyze this person's profile and provide personalized interview preparation insights.`,
+            content: `Interviewer Name: ${interviewerName}\n\nScraped Profile Data:\n${scrapedContent}\n\nAnalyze this person's profile and provide comprehensive interview preparation insights including personality type, communication style, dress code, and ice-breakers.`,
           },
         ],
         tools: [
@@ -46,8 +107,14 @@ serve(async (req) => {
                   tips: { type: "array", items: { type: "string" }, description: "5-7 specific actionable tips for the interview" },
                   commonTopics: { type: "array", items: { type: "string" }, description: "4-6 topics they're likely to ask about" },
                   communicationStyle: { type: "string", description: "Brief description of their communication style" },
+                  communicationStyleType: { type: "string", enum: ["Analytical", "Conversational", "Technical", "Executive"], description: "One of 4 communication style types" },
+                  personalityType: { type: "string", enum: ["The Engineer", "The People Leader", "The Strategist", "The Detail-Oriented"], description: "One of 4 personality archetypes" },
+                  personalityStrategy: { type: "string", description: "2-3 sentences on how to tailor your responses for this personality type" },
+                  dressCode: { type: "string", enum: ["Formal", "Business Casual", "Smart Casual", "Startup Casual"], description: "Recommended dress code based on their company culture" },
+                  dressDetails: { type: "string", description: "Specific what-to-wear advice" },
+                  iceBreakers: { type: "array", items: { type: "string" }, description: "3-4 personalized conversation starters based on their interests/posts" },
                 },
-                required: ["summary", "interests", "tips", "commonTopics", "communicationStyle"],
+                required: ["summary", "interests", "tips", "commonTopics", "communicationStyle", "communicationStyleType", "personalityType", "personalityStrategy", "dressCode", "dressDetails", "iceBreakers"],
                 additionalProperties: false,
               },
             },
