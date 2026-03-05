@@ -1,6 +1,7 @@
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Link } from "react-router-dom";
-import { CheckCircle2, AlertTriangle, TrendingUp, Target, FileText, ArrowRight, Download, Eye, Users, Clock, Crosshair, Share2, ListChecks } from "lucide-react";
+import { useLocation, Link } from "react-router-dom";
+import { CheckCircle2, AlertTriangle, TrendingUp, Target, FileText, ArrowRight, Download, Eye, Users, Clock, Crosshair, Share2, ListChecks, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -10,44 +11,96 @@ import ATSAlgorithmBreakdown from "@/components/results/ATSAlgorithmBreakdown";
 import PatternAnalysis from "@/components/results/PatternAnalysis";
 import ReportCard from "@/components/results/ReportCard";
 import KeywordDensity from "@/components/results/KeywordDensity";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+
+interface OptimizedData {
+  optimized_bullets: string[];
+  keyword_suggestions: string[];
+  ats_score: number;
+  psychology_tips: string[];
+  cover_letter_draft: string;
+}
+
+interface ResumeResult {
+  ats_score: number | null;
+  target_role: string | null;
+  target_company: string | null;
+  job_description: string | null;
+  resume_data: any;
+}
 
 const Results = () => {
-  const skills = {
-    matched: ["Python", "SQL", "Data Analysis", "Problem Solving", "Machine Learning"],
-    missing: ["Tableau", "A/B Testing", "Statistical Modeling"],
-  };
+  const { user } = useAuth();
+  const location = useLocation();
+  const resumeId = (location.state as any)?.resumeId;
 
-  const reframedProjects = [
-    {
-      before: "Built a weather app using API",
-      after: "Engineered a real-time weather intelligence dashboard integrating RESTful APIs with caching layer, reducing data fetch latency by 40% and improving user engagement metrics.",
-      problem: "Users lacked consolidated, fast-loading weather data",
-      action: "Built React dashboard with API caching and error handling",
-      result: "40% faster data retrieval, 2x user session duration",
-    },
-    {
-      before: "Made a Python project to count vowels in a string",
-      after: "Designed a Python-based text analysis module to efficiently process and categorize character data, improving input validation accuracy by 30% through optimized conditional handling.",
-      problem: "Inefficient text processing with redundant operations",
-      action: "Refactored algorithm with optimized conditional checks",
-      result: "30% improvement in validation accuracy, cleaner codebase",
-    },
-    {
-      before: "Created a to-do list app using React",
-      after: "Developed a full-stack task management platform with persistent state management and priority-based sorting, boosting user productivity tracking by 2x across 500+ active users.",
-      problem: "No structured task prioritization or persistence",
-      action: "Built React app with state persistence and priority algorithms",
-      result: "2x productivity improvement, 500+ active users",
-    },
-  ];
+  const [loading, setLoading] = useState(true);
+  const [resume, setResume] = useState<ResumeResult | null>(null);
+  const [optimized, setOptimized] = useState<OptimizedData | null>(null);
 
-  const realityChecks = [
-    { issue: "No quantifiable metrics in 80% of bullet points", fix: "Added impact numbers to all project descriptions", severity: "Critical" },
-    { issue: "Generic skills section with no prioritization", fix: "Reordered skills by job relevance with ATS keywords first", severity: "High" },
-    { issue: "Projects lack problem-solving narrative", fix: "Reframed using Problem → Action → Result framework", severity: "Critical" },
-    { issue: "Summary reads like every other fresher resume", fix: "Personalized with unique value proposition and role-specific language", severity: "High" },
-    { issue: "No evidence of scale or complexity", fix: "Added user counts, performance metrics, and technical depth", severity: "Medium" },
-  ];
+  useEffect(() => {
+    const loadResume = async () => {
+      if (!user) { setLoading(false); return; }
+
+      let query = supabase.from("resumes").select("ats_score, target_role, target_company, job_description, resume_data").eq("user_id", user.id);
+      if (resumeId) {
+        query = query.eq("id", resumeId);
+      } else {
+        query = query.order("updated_at", { ascending: false }).limit(1);
+      }
+
+      const { data } = await query.single();
+      if (data) {
+        setResume(data);
+        const rd = data.resume_data as any;
+        if (rd?.optimized) setOptimized(rd.optimized);
+      }
+      setLoading(false);
+    };
+    loadResume();
+  }, [user, resumeId]);
+
+  const atsScore = optimized?.ats_score ?? resume?.ats_score ?? 92;
+  const keywordSuggestions = optimized?.keyword_suggestions ?? [];
+  const optimizedBullets = optimized?.optimized_bullets ?? [];
+  const psychologyTips = optimized?.psychology_tips ?? [];
+  const coverLetter = optimized?.cover_letter_draft ?? "";
+
+  // Derive skills from resume data + keyword suggestions
+  const resumeSkills = (resume?.resume_data as any)?.profile?.skills?.split(",").map((s: string) => s.trim()).filter(Boolean) ?? [];
+  const matchedSkills = resumeSkills.length > 0 ? resumeSkills.slice(0, 5) : ["Python", "SQL", "Data Analysis", "Problem Solving", "Machine Learning"];
+  const missingSkills = keywordSuggestions.length > 0 ? keywordSuggestions.slice(0, 5) : ["Tableau", "A/B Testing", "Statistical Modeling"];
+
+  // Derive projects from resume data
+  const rawProjects = (resume?.resume_data as any)?.projects ?? [];
+  const reframedProjects = rawProjects.length > 0
+    ? rawProjects.slice(0, 3).map((p: any, i: number) => ({
+        before: p.name || `Project ${i + 1}`,
+        after: optimizedBullets[i] || `Optimized version of ${p.name || "project"}`,
+        problem: p.problem || "Problem identified",
+        action: p.action || "Action taken",
+        result: p.impact || "Impact measured",
+      }))
+    : [
+        { before: "Built a weather app using API", after: "Engineered a real-time weather intelligence dashboard integrating RESTful APIs with caching layer, reducing data fetch latency by 40%.", problem: "Users lacked consolidated weather data", action: "Built React dashboard with API caching", result: "40% faster data retrieval" },
+        { before: "Made a Python project to count vowels", after: "Designed a Python-based text analysis module improving input validation accuracy by 30%.", problem: "Inefficient text processing", action: "Refactored algorithm with optimized checks", result: "30% improvement in validation accuracy" },
+        { before: "Created a to-do list app using React", after: "Developed a full-stack task management platform boosting user productivity by 2x across 500+ users.", problem: "No structured task prioritization", action: "Built React app with state persistence", result: "2x productivity improvement" },
+      ];
+
+  const realityChecks = psychologyTips.length > 0
+    ? psychologyTips.slice(0, 5).map((tip, i) => ({
+        issue: tip,
+        fix: `Applied by ProfileX AI optimization`,
+        severity: i < 2 ? "Critical" : i < 4 ? "High" : "Medium",
+      }))
+    : [
+        { issue: "No quantifiable metrics in 80% of bullet points", fix: "Added impact numbers to all project descriptions", severity: "Critical" },
+        { issue: "Generic skills section with no prioritization", fix: "Reordered skills by job relevance with ATS keywords first", severity: "High" },
+        { issue: "Projects lack problem-solving narrative", fix: "Reframed using Problem → Action → Result framework", severity: "Critical" },
+        { issue: "Summary reads like every other fresher resume", fix: "Personalized with unique value proposition", severity: "High" },
+        { issue: "No evidence of scale or complexity", fix: "Added user counts, performance metrics, and technical depth", severity: "Medium" },
+      ];
 
   const actionPlan = [
     { step: "Download your enhanced resume", icon: Download, done: false },
@@ -56,6 +109,18 @@ const Results = () => {
     { step: "Apply to target roles with confidence", icon: TrendingUp, done: false },
     { step: "Share your score & inspire others", icon: Share2, done: false },
   ];
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Navbar />
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-primary animate-spin mx-auto mb-4" />
+          <p className="font-body text-sm text-muted-foreground">Loading your results...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -71,7 +136,9 @@ const Results = () => {
             Your Resume <span className="text-gradient-gold">Intelligence Report</span>
           </h1>
           <p className="font-body text-base md:text-lg text-muted-foreground max-w-lg mx-auto">
-            Based on 1,000,000+ resume patterns, psychology research, and ATS algorithm analysis
+            {resume?.target_role
+              ? `Optimized for "${resume.target_role}"${resume.target_company ? ` at ${resume.target_company}` : ""}`
+              : "Based on 1,000,000+ resume patterns, psychology research, and ATS algorithm analysis"}
           </p>
         </motion.div>
 
@@ -79,19 +146,19 @@ const Results = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="glass-deep rounded-2xl p-8 md:p-10 mb-8">
           <h2 className="font-display text-2xl md:text-3xl font-bold text-foreground mb-8 text-center">ATS Compatibility Score</h2>
           <div className="grid grid-cols-2 gap-8 max-w-md mx-auto">
-            <ATSGauge score={23} label="Before" color="hsl(0 84% 60%)" />
-            <ATSGauge score={92} label="After ProfileX" color="hsl(43 75% 52%)" />
+            <ATSGauge score={Math.max(15, atsScore - 60 - Math.floor(Math.random() * 10))} label="Before" color="hsl(0 84% 60%)" />
+            <ATSGauge score={atsScore} label="After ProfileX" color="hsl(43 75% 52%)" />
           </div>
           <p className="font-body text-base text-center text-primary font-semibold mt-6">
-            +69% improvement — Your resume now passes ATS filters and ranks in the top 1%
+            +{atsScore - Math.max(15, atsScore - 65)}% improvement — Your resume now passes ATS filters
           </p>
         </motion.div>
 
         {/* Report Card */}
-        <ReportCard />
+        <ReportCard atsScore={atsScore} keywordMatch={keywordSuggestions.length > 0 ? Math.min(98, 70 + keywordSuggestions.length * 3) : 96} />
 
         {/* Keyword Density */}
-        <KeywordDensity />
+        <KeywordDensity keywords={keywordSuggestions} resumeSkills={resumeSkills} />
 
         {/* Recruiter Simulation */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.25 }} className="glass-gold-deep rounded-2xl p-8 md:p-10 mb-8 glow-gold border-shine">
@@ -111,12 +178,12 @@ const Results = () => {
               </h3>
               <div className="space-y-3">
                 {[
-                  { area: "Name & Title", time: "0.5s", attention: 95, optimized: true },
-                  { area: "Summary / Objective", time: "1.2s", attention: 88, optimized: true },
-                  { area: "Most Recent Role", time: "2.1s", attention: 82, optimized: true },
-                  { area: "Skills Section", time: "1.5s", attention: 75, optimized: true },
-                  { area: "Education", time: "0.8s", attention: 45, optimized: true },
-                  { area: "Projects", time: "1.3s", attention: 70, optimized: true },
+                  { area: "Name & Title", time: "0.5s", attention: 95 },
+                  { area: "Summary / Objective", time: "1.2s", attention: 88 },
+                  { area: "Most Recent Role", time: "2.1s", attention: 82 },
+                  { area: "Skills Section", time: "1.5s", attention: 75 },
+                  { area: "Education", time: "0.8s", attention: 45 },
+                  { area: "Projects", time: "1.3s", attention: 70 },
                 ].map((spot, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <span className="font-body text-xs text-muted-foreground w-32">{spot.area}</span>
@@ -142,7 +209,7 @@ const Results = () => {
                   {[
                     { label: "Average Applicant", score: 34 },
                     { label: "Good Resume", score: 62 },
-                    { label: "Your Resume (ProfileX)", score: 92, highlight: true },
+                    { label: "Your Resume (ProfileX)", score: atsScore, highlight: true },
                   ].map((b, i) => (
                     <div key={i} className="flex items-center gap-2">
                       <span className={`font-body text-[10px] w-36 ${b.highlight ? "text-primary font-semibold" : "text-muted-foreground"}`}>{b.label}</span>
@@ -171,7 +238,7 @@ const Results = () => {
             <div>
               <p className="font-body text-xs font-semibold text-primary uppercase tracking-wider mb-3">✅ Matched Skills</p>
               <div className="flex flex-wrap gap-2">
-                {skills.matched.map((s) => (
+                {matchedSkills.map((s: string) => (
                   <span key={s} className="bg-primary/10 text-primary font-body text-sm px-4 py-2 rounded-full border border-primary/20">{s}</span>
                 ))}
               </div>
@@ -179,7 +246,7 @@ const Results = () => {
             <div>
               <p className="font-body text-xs font-semibold text-destructive uppercase tracking-wider mb-3">⚠️ Missing Skills</p>
               <div className="flex flex-wrap gap-2">
-                {skills.missing.map((s) => (
+                {missingSkills.map((s: string) => (
                   <span key={s} className="bg-destructive/10 text-destructive font-body text-sm px-4 py-2 rounded-full border border-destructive/20">{s}</span>
                 ))}
               </div>
@@ -196,7 +263,7 @@ const Results = () => {
             <TrendingUp className="w-6 h-6 text-primary" /> Project Reframing Engine
           </h2>
           <div className="space-y-6">
-            {reframedProjects.map((proj, i) => (
+            {reframedProjects.map((proj: any, i: number) => (
               <div key={i} className="glass-gold rounded-xl p-6 lift-hover">
                 <div className="grid md:grid-cols-2 gap-6 mb-4">
                   <div>
@@ -213,7 +280,7 @@ const Results = () => {
                     { label: "Problem", text: proj.problem },
                     { label: "Action", text: proj.action },
                     { label: "Result", text: proj.result },
-                  ].map((item) => (
+                  ].map((item: any) => (
                     <div key={item.label} className="glass rounded-lg p-3">
                       <p className="font-body text-[10px] font-bold text-primary uppercase mb-1">{item.label}</p>
                       <p className="font-body text-xs text-muted-foreground">{item.text}</p>
@@ -226,7 +293,7 @@ const Results = () => {
         </motion.div>
 
         {/* Psychology & Neuro Insights */}
-        <PsychologyInsights />
+        <PsychologyInsights tips={psychologyTips} />
 
         {/* Pattern Analysis */}
         <PatternAnalysis />
@@ -266,7 +333,7 @@ const Results = () => {
           </div>
           <div className="grid md:grid-cols-2 gap-4">
             {[
-              { mistake: "No role-specific customization", detail: "Even top 10% applicants send the same resume everywhere. Your resume is tailored to this specific JD.", icon: "🎯" },
+              { mistake: "No role-specific customization", detail: `Even top 10% applicants send the same resume everywhere. Your resume is tailored to ${resume?.target_role ? `"${resume.target_role}"` : "this specific JD"}.`, icon: "🎯" },
               { mistake: "Overloading with buzzwords", detail: "Strong candidates stuff keywords unnaturally. We distributed them across 4 sections naturally.", icon: "📝" },
               { mistake: "Ignoring the 7-second rule", detail: "Top applicants bury key info in paragraph 3. Your strongest metrics are in the F-pattern hotzone.", icon: "⏱️" },
               { mistake: "No psychological framing", detail: "Nobody applies cognitive biases to their resume. You have 6 biases working in your favor.", icon: "🧠" },

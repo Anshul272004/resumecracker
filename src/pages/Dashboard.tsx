@@ -1,6 +1,6 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target, Flame, Brain, BarChart3, ArrowRight, Trash2, Edit3, Loader2 } from "lucide-react";
+import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target, Flame, Brain, BarChart3, ArrowRight, Trash2, Edit3, Loader2, Link as LinkIcon, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -12,6 +12,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { aiApi } from "@/lib/api/ai";
 import { toast } from "@/hooks/use-toast";
+import { firecrawlApi } from "@/lib/api/firecrawl";
 
 const steps = [
   { icon: Upload, label: "Upload Resume" },
@@ -68,10 +69,14 @@ const Dashboard = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [dragOver, setDragOver] = useState(false);
   const [fileName, setFileName] = useState("");
-  const [profile2, setProfile2] = useState({ type: "", experience: "", education: "", skills: "", certifications: "" });
+  const [profile2, setProfile2] = useState({ type: "", experience: "", education: "", skills: "", certifications: "", linkedinUrl: "", portfolioUrl: "" });
   const [targetRole, setTargetRole] = useState("");
   const [targetCompany, setTargetCompany] = useState("");
   const [jobDesc, setJobDesc] = useState("");
+  const [jobUrl, setJobUrl] = useState("");
+  const [scrapingJd, setScrapingJd] = useState(false);
+  const [extractedKeywords, setExtractedKeywords] = useState<string[]>([]);
+  const [extractingKeywords, setExtractingKeywords] = useState(false);
   const [projects, setProjects] = useState([{ name: "", problem: "", action: "", impact: "" }]);
   const [generating, setGenerating] = useState(false);
   const [genStage, setGenStage] = useState(0);
@@ -176,7 +181,7 @@ const Dashboard = () => {
         }).eq("id", user.id);
       }
 
-      setTimeout(() => navigate("/results"), 800);
+      setTimeout(() => navigate("/results", { state: { resumeId: editingResumeId } }), 800);
     } catch (err: any) {
       clearInterval(interval);
       setGenerating(false);
@@ -215,10 +220,12 @@ const Dashboard = () => {
 
   const startNewResume = () => {
     setEditingResumeId(null);
-    setProfile2({ type: "", experience: "", education: "", skills: "", certifications: "" });
+    setProfile2({ type: "", experience: "", education: "", skills: "", certifications: "", linkedinUrl: "", portfolioUrl: "" });
     setTargetRole("");
     setTargetCompany("");
     setJobDesc("");
+    setJobUrl("");
+    setExtractedKeywords([]);
     setProjects([{ name: "", problem: "", action: "", impact: "" }]);
     setFileName("");
     setCurrentStep(0);
@@ -433,6 +440,32 @@ const Dashboard = () => {
                     </div>
                   </motion.div>
                 )}
+
+                {/* LinkedIn & Portfolio Inputs */}
+                <div className="mt-6 space-y-4">
+                  <div>
+                    <Label className="font-body text-sm text-foreground flex items-center gap-2">
+                      <LinkIcon className="w-4 h-4 text-primary" /> LinkedIn Profile URL (optional)
+                    </Label>
+                    <Input
+                      value={profile2.linkedinUrl}
+                      onChange={(e) => { setProfile2({ ...profile2, linkedinUrl: e.target.value }); triggerAutoSave(); }}
+                      placeholder="https://linkedin.com/in/your-profile"
+                      className="mt-2 bg-secondary border-border"
+                    />
+                  </div>
+                  <div>
+                    <Label className="font-body text-sm text-foreground flex items-center gap-2">
+                      <Globe className="w-4 h-4 text-primary" /> Portfolio / GitHub URL (optional)
+                    </Label>
+                    <Input
+                      value={profile2.portfolioUrl}
+                      onChange={(e) => { setProfile2({ ...profile2, portfolioUrl: e.target.value }); triggerAutoSave(); }}
+                      placeholder="https://github.com/your-username"
+                      className="mt-2 bg-secondary border-border"
+                    />
+                  </div>
+                </div>
               </div>
             )}
 
@@ -519,21 +552,90 @@ const Dashboard = () => {
             {currentStep === 3 && (
               <div>
                 <h2 className="font-display text-2xl md:text-4xl font-bold text-foreground mb-2">Target Job Description</h2>
-                <p className="font-body text-sm text-muted-foreground mb-8">Paste the job description — we'll extract keywords and optimize accordingly.</p>
-                <Textarea
-                  value={jobDesc}
-                  onChange={(e) => { setJobDesc(e.target.value); triggerAutoSave(); }}
-                  placeholder="Paste the complete job description here..."
-                  className="min-h-[250px] bg-secondary border-border font-body text-sm"
-                />
+                <p className="font-body text-sm text-muted-foreground mb-4">Paste the job description or a job URL — we'll extract keywords and optimize accordingly.</p>
+
+                {/* Job URL Scraper */}
+                <div className="mb-4">
+                  <Label className="font-body text-sm text-foreground flex items-center gap-2 mb-2">
+                    <LinkIcon className="w-4 h-4 text-primary" /> Paste Job URL (LinkedIn, Indeed, etc.)
+                  </Label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={jobUrl}
+                      onChange={(e) => setJobUrl(e.target.value)}
+                      placeholder="https://linkedin.com/jobs/view/..."
+                      className="bg-secondary border-border flex-1"
+                    />
+                    <Button
+                      variant="outline"
+                      disabled={!jobUrl || scrapingJd}
+                      className="border-primary/30 text-primary hover:bg-primary/10 font-body text-xs shrink-0"
+                      onClick={async () => {
+                        setScrapingJd(true);
+                        try {
+                          const result = await firecrawlApi.scrape(jobUrl, { formats: ["markdown"], onlyMainContent: true });
+                          if (result.success && (result.data?.markdown || result.data?.data?.markdown)) {
+                            const md = result.data?.markdown || result.data?.data?.markdown || "";
+                            setJobDesc(md.slice(0, 3000));
+                            toast({ title: "Job description extracted!", description: "We scraped the JD from the URL." });
+                          } else {
+                            toast({ title: "Scraping failed", description: result.error || "Could not extract content from this URL.", variant: "destructive" });
+                          }
+                        } catch {
+                          toast({ title: "Error", description: "Failed to scrape URL. Try pasting the JD manually.", variant: "destructive" });
+                        }
+                        setScrapingJd(false);
+                      }}
+                    >
+                      {scrapingJd ? <Loader2 className="w-4 h-4 animate-spin" /> : "Scrape JD"}
+                    </Button>
+                  </div>
+                </div>
+
+                <div className="relative">
+                  <Label className="font-body text-sm text-foreground mb-2 block">Or paste directly</Label>
+                  <Textarea
+                    value={jobDesc}
+                    onChange={(e) => { setJobDesc(e.target.value); triggerAutoSave(); setExtractedKeywords([]); }}
+                    placeholder="Paste the complete job description here..."
+                    className="min-h-[200px] bg-secondary border-border font-body text-sm"
+                  />
+                </div>
+
                 {jobDesc.length > 50 && (
                   <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mt-4 glass-gold rounded-xl p-4">
-                    <p className="font-body text-xs text-primary font-semibold mb-2">🔍 AI Keyword Preview</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-body text-xs text-primary font-semibold">🔍 AI Keyword Preview</p>
+                      {extractedKeywords.length === 0 && !extractingKeywords && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-primary font-body text-xs h-7"
+                          onClick={async () => {
+                            setExtractingKeywords(true);
+                            try {
+                              const { data, error } = await supabase.functions.invoke("ai-extract-keywords", { body: { jobDescription: jobDesc } });
+                              if (error) throw error;
+                              if (data?.keywords) setExtractedKeywords(data.keywords);
+                            } catch {
+                              toast({ title: "Extraction failed", description: "Could not extract keywords.", variant: "destructive" });
+                            }
+                            setExtractingKeywords(false);
+                          }}
+                        >
+                          <Sparkles className="w-3 h-3 mr-1" /> Extract with AI
+                        </Button>
+                      )}
+                      {extractingKeywords && <Loader2 className="w-4 h-4 text-primary animate-spin" />}
+                    </div>
                     <div className="flex flex-wrap gap-2">
-                      {["Python", "Machine Learning", "SQL", "Data Analysis", "Communication", "Problem Solving"].map((kw) => (
-                        <span key={kw} className="bg-primary/10 text-primary font-body text-xs px-3 py-1 rounded-full">{kw}</span>
+                      {(extractedKeywords.length > 0 ? extractedKeywords : ["Python", "Machine Learning", "SQL", "Data Analysis", "Communication", "Problem Solving"]).map((kw) => (
+                        <span key={kw} className={`font-body text-xs px-3 py-1 rounded-full ${extractedKeywords.length > 0 ? "bg-primary/20 text-primary border border-primary/30" : "bg-primary/10 text-primary"}`}>{kw}</span>
                       ))}
                     </div>
+                    {extractedKeywords.length > 0 && (
+                      <p className="font-body text-[10px] text-primary/70 mt-2">✨ AI-extracted from your job description</p>
+                    )}
                   </motion.div>
                 )}
               </div>

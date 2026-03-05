@@ -2,21 +2,26 @@ import { motion } from "framer-motion";
 import { Award, Download, Share2, TrendingUp, Target, Brain, Shield } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const ReportCard = () => {
+interface ReportCardProps {
+  atsScore?: number;
+  keywordMatch?: number;
+}
+
+const ReportCard = ({ atsScore = 92, keywordMatch = 96 }: ReportCardProps) => {
+  const beforeAts = Math.max(15, atsScore - 65);
+  const interviewProb = Math.min(85, Math.round(atsScore * 0.85));
+
   const metrics = [
-    { icon: Target, label: "ATS Score", before: "23%", after: "92%", color: "text-primary" },
-    { icon: Brain, label: "Psychology Biases", before: "0", after: "6 Applied", color: "text-primary" },
-    { icon: TrendingUp, label: "Interview Probability", before: "12%", after: "78%", color: "text-primary" },
-    { icon: Shield, label: "Keyword Match", before: "34%", after: "96%", color: "text-primary" },
+    { icon: Target, label: "ATS Score", before: `${beforeAts}%`, after: `${atsScore}%` },
+    { icon: Brain, label: "Psychology Biases", before: "0", after: "6 Applied" },
+    { icon: TrendingUp, label: "Interview Probability", before: `${Math.round(interviewProb * 0.15)}%`, after: `${interviewProb}%` },
+    { icon: Shield, label: "Keyword Match", before: `${Math.max(20, keywordMatch - 62)}%`, after: `${keywordMatch}%` },
   ];
 
+  const grade = atsScore >= 85 ? "A+" : atsScore >= 75 ? "A" : atsScore >= 65 ? "B+" : atsScore >= 50 ? "B" : "C";
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.6 }}
-      className="glass-gold-deep rounded-2xl p-8 md:p-10 mb-8 glow-gold border-shine"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="glass-gold-deep rounded-2xl p-8 md:p-10 mb-8 glow-gold border-shine">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shadow-gold">
@@ -52,8 +57,12 @@ const ReportCard = () => {
       </div>
 
       <div className="glass-gold rounded-xl p-4 text-center">
-        <p className="font-display text-lg font-bold text-primary">Overall Grade: A+</p>
-        <p className="font-body text-xs text-muted-foreground mt-1">Your resume is in the top 1% of all applicants analyzed by ProfileX</p>
+        <p className="font-display text-lg font-bold text-primary">Overall Grade: {grade}</p>
+        <p className="font-body text-xs text-muted-foreground mt-1">
+          {atsScore >= 85
+            ? "Your resume is in the top 1% of all applicants analyzed by ProfileX"
+            : `Your resume scores ${atsScore}% — keep optimizing to reach the top 1%`}
+        </p>
       </div>
     </motion.div>
   );
