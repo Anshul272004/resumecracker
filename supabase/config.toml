@@ -17,3 +17,6 @@ verify_jwt = false
 
 [functions.ai-interviewer-research]
 verify_jwt = false
+
+[functions.ai-extract-keywords]
+verify_jwt = false
