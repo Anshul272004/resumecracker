@@ -482,6 +482,21 @@ const AnswerRater = ({ question, interviewerInsights }: { question: Question; in
   };
 
   const impressFactor = impressFactors[question.category];
+  const [hintVisible, setHintVisible] = useState(false);
+
+  const generateHint = () => {
+    setHintVisible(true);
+  };
+
+  const getHintContent = () => {
+    const firstSentence = question.idealAnswer.split(/[.!?]/)[0]?.trim();
+    const hintDirection = firstSentence ? firstSentence.slice(0, Math.min(firstSentence.length, 80)) + (firstSentence.length > 80 ? "..." : "") : "";
+    return {
+      direction: hintDirection,
+      psychTip: question.psychTip,
+      biasTag: question.biasTag,
+    };
+  };
 
   return (
     <div className="space-y-4">
@@ -499,7 +514,43 @@ const AnswerRater = ({ question, interviewerInsights }: { question: Question; in
         <Button variant="outline" onClick={() => setShowIdeal(!showIdeal)} className="border-primary/30 text-primary hover:bg-primary/10 font-body text-xs">
           <BookOpen className="w-4 h-4 mr-1" /> {showIdeal ? "Hide" : "Show"} Ideal Answer
         </Button>
+        {!hintVisible && (
+          <Button variant="outline" onClick={generateHint} className="border-accent/30 text-accent-foreground hover:bg-accent/10 font-body text-xs">
+            <Lightbulb className="w-4 h-4 mr-1" /> Get Hint
+          </Button>
+        )}
       </div>
+
+      {/* Hint Card */}
+      <AnimatePresence>
+        {hintVisible && (() => {
+          const hint = getHintContent();
+          return (
+            <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="glass rounded-xl p-4 border border-primary/20">
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <Lightbulb className="w-4 h-4 text-primary" />
+                  <span className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">AI Hint</span>
+                </div>
+                <Button variant="ghost" size="sm" onClick={() => setHintVisible(false)} className="h-6 w-6 p-0 text-muted-foreground hover:text-foreground">
+                  <XCircle className="w-3.5 h-3.5" />
+                </Button>
+              </div>
+              <p className="font-body text-xs text-foreground leading-relaxed mb-2">
+                <span className="text-muted-foreground">Start with: </span>"{hint.direction}"
+              </p>
+              {hint.psychTip && (
+                <p className="font-body text-xs text-muted-foreground leading-relaxed">
+                  <span className="text-primary font-semibold">🧠 Psych Tip:</span> {hint.psychTip}
+                </p>
+              )}
+              {hint.biasTag && (
+                <Badge variant="outline" className="mt-2 text-[10px] border-primary/30 text-primary">{hint.biasTag}</Badge>
+              )}
+            </motion.div>
+          );
+        })()}
+      </AnimatePresence>
 
       <AnimatePresence>
         {rating && (
