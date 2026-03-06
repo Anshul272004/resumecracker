@@ -26,6 +26,7 @@ import Checkout from "./pages/Checkout";
 import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 import NotFound from "./pages/NotFound";
+import JobMatch from "./pages/JobMatch";
 
 const queryClient = new QueryClient();
 
@@ -50,6 +51,8 @@ const App = () => (
             <Route path="/payment-failed" element={<PaymentFailed />} />
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/resume-builder" element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
+            <Route path="/job-match" element={<ProtectedRoute><JobMatch /></ProtectedRoute>} />
+            <Route path="*" element={<NotFound />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

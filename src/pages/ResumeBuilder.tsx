@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Download, Mail, Eye, Pencil, FileText } from "lucide-react";
+import { Download, Mail, Eye, Pencil, FileText, Sparkles, Loader2, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import TemplateSelector, { type TemplateName } from "@/components/resume/TemplateSelector";
@@ -16,57 +17,37 @@ import CreativeTemplate from "@/components/resume/templates/CreativeTemplate";
 import ElegantTemplate from "@/components/resume/templates/ElegantTemplate";
 import BoldTemplate from "@/components/resume/templates/BoldTemplate";
 import ATSMiniWidget from "@/components/resume/ATSMiniWidget";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 
-const resumeData = {
+const defaultResumeData = {
   name: "Priya Sharma",
   title: "Software Developer",
   email: "priya.sharma@email.com",
   phone: "+91 98765 43210",
   location: "Bangalore, India",
-  summary: "Results-driven software developer with 2+ years of experience building scalable web applications. Proficient in Python, React, SQL, and Machine Learning with a proven track record of improving system performance and user engagement.",
-  experience: [
-    {
-      role: "Junior Software Developer",
-      company: "TechCorp Solutions",
-      period: "2024 – Present",
-      bullets: [
-        "Engineered RESTful APIs serving 10,000+ daily requests with 99.9% uptime",
-        "Optimized database queries reducing response time by 45% across 3 microservices",
-        "Led migration from monolithic to microservices architecture, improving deployment frequency by 3x",
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: "Weather Intelligence Dashboard",
-      bullets: [
-        "Engineered a real-time weather analytics platform integrating 5 RESTful APIs with intelligent caching",
-        "Reduced data fetch latency by 40% through optimized API call batching and error handling",
-        "Achieved 2x user session duration through intuitive UI design and real-time data visualization",
-      ],
-    },
-    {
-      name: "Text Analysis Module",
-      bullets: [
-        "Designed a Python-based text processing engine for character data categorization and validation",
-        "Improved input validation accuracy by 30% through optimized conditional handling algorithms",
-        "Reduced code complexity by 25% with refactored modular architecture",
-      ],
-    },
-    {
-      name: "Task Management Platform",
-      bullets: [
-        "Developed full-stack productivity app with persistent state management and priority-based sorting",
-        "Boosted user productivity tracking by 2x across 500+ active users",
-        "Implemented real-time sync with offline-first architecture for seamless mobile experience",
-      ],
-    },
-  ],
+  summary: "Results-driven software developer with 2+ years of experience building scalable web applications.",
+  experience: [{ role: "Junior Software Developer", company: "TechCorp Solutions", period: "2024 – Present", bullets: ["Engineered RESTful APIs serving 10,000+ daily requests with 99.9% uptime"] }],
+  projects: [{ name: "Weather Intelligence Dashboard", bullets: ["Engineered a real-time weather analytics platform integrating 5 RESTful APIs"] }],
   skills: ["Python", "React", "TypeScript", "SQL", "Machine Learning", "REST APIs", "Git", "Docker", "AWS"],
   education: "B.Tech Computer Science — XYZ University (2022)",
 };
 
+interface ResumeVersion {
+  type: string;
+  summary: string;
+  bullets: string[];
+  tone_note: string;
+}
+
 const ResumeBuilder = () => {
+  const { user } = useAuth();
+  const [resumeData, setResumeData] = useState(defaultResumeData);
+  const [atsScore, setAtsScore] = useState(92);
+  const [loadedFromDb, setLoadedFromDb] = useState(false);
+
+  // Customizer state
   const [showCoverLetter, setShowCoverLetter] = useState(false);
   const [activeTab, setActiveTab] = useState<"resume" | "cover">("resume");
   const [template, setTemplate] = useState<TemplateName>("executive");
@@ -79,6 +60,92 @@ const ResumeBuilder = () => {
   const [fontFamily, setFontFamily] = useState("'Inter', sans-serif");
   const [fontColor, setFontColor] = useState("hsl(0 0% 100%)");
   const [headerStyle, setHeaderStyle] = useState("left");
+
+  // AI features
+  const [versions, setVersions] = useState<ResumeVersion[]>([]);
+  const [generatingVersions, setGeneratingVersions] = useState(false);
+  const [improvingBullet, setImprovingBullet] = useState<number | null>(null);
+
+  // Load resume from DB
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      const { data } = await supabase.from("resumes").select("*")
+        .eq("user_id", user.id).order("updated_at", { ascending: false }).limit(1).single();
+      if (data) {
+        const rd = data.resume_data as any;
+        if (rd?.optimized) {
+          setResumeData(prev => ({
+            ...prev,
+            summary: rd.optimized.cover_letter_draft ? prev.summary : prev.summary,
+            experience: prev.experience.map((exp: any, i: number) => ({
+              ...exp,
+              bullets: rd.optimized.optimized_bullets?.slice(i * 3, (i + 1) * 3) || exp.bullets,
+            })),
+          }));
+        }
+        if (rd?.profile) {
+          setResumeData(prev => ({
+            ...prev,
+            name: rd.profile.full_name || prev.name,
+            skills: rd.profile.skills?.split(",").map((s: string) => s.trim()).filter(Boolean) || prev.skills,
+            education: rd.profile.education || prev.education,
+          }));
+        }
+        if (data.ats_score) setAtsScore(data.ats_score);
+        if (data.template_name) setTemplate(data.template_name as TemplateName);
+        if (data.accent_color) setAccentColor(data.accent_color);
+        if (data.font_size) setFontSize(data.font_size);
+        if (data.font_family) setFontFamily(data.font_family);
+        setLoadedFromDb(true);
+      }
+    };
+    load();
+  }, [user]);
+
+  const handleGenerateVersions = async () => {
+    setGeneratingVersions(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-resume-versions", {
+        body: { resumeData, targetRole: resumeData.title },
+      });
+      if (error) throw error;
+      if (data?.versions) setVersions(data.versions);
+      toast({ title: "Versions generated!", description: "4 resume variants ready to view." });
+    } catch {
+      toast({ title: "Failed", description: "Could not generate versions.", variant: "destructive" });
+    }
+    setGeneratingVersions(false);
+  };
+
+  const handleImproveBullet = async (bulletIndex: number) => {
+    setImprovingBullet(bulletIndex);
+    try {
+      const { data, error } = await supabase.functions.invoke("ai-optimize-resume", {
+        body: {
+          resumeData: { bullet: resumeData.experience[0]?.bullets[bulletIndex] },
+          targetRole: resumeData.title,
+          jobDescription: "Improve this single bullet point with quantified metrics and strong action verbs.",
+        },
+      });
+      if (error) throw error;
+      if (data?.optimized_bullets?.[0]) {
+        setResumeData(prev => {
+          const newExp = [...prev.experience];
+          if (newExp[0]) {
+            const newBullets = [...newExp[0].bullets];
+            newBullets[bulletIndex] = data.optimized_bullets[0];
+            newExp[0] = { ...newExp[0], bullets: newBullets };
+          }
+          return { ...prev, experience: newExp };
+        });
+        toast({ title: "Bullet improved!", description: "AI enhanced your bullet point." });
+      }
+    } catch {
+      toast({ title: "Failed", description: "Could not improve bullet.", variant: "destructive" });
+    }
+    setImprovingBullet(null);
+  };
 
   const templateProps = { data: resumeData, accentColor, fontSize, showSummary };
 
@@ -110,14 +177,44 @@ const ResumeBuilder = () => {
               <Switch checked={showCoverLetter} onCheckedChange={setShowCoverLetter} />
               <Label className="font-body text-sm text-muted-foreground">Cover Letter</Label>
             </div>
+            <Button onClick={handleGenerateVersions} disabled={generatingVersions} variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-body">
+              {generatingVersions ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Sparkles className="w-4 h-4 mr-2" />}
+              {generatingVersions ? "Generating..." : "Generate Versions"}
+            </Button>
             <Button className="bg-gradient-gold text-primary-foreground font-body font-semibold shadow-gold">
               <Download className="w-4 h-4 mr-2" /> Download PDF
             </Button>
-            <Button variant="outline" className="border-primary/30 text-primary hover:bg-primary/10 font-body">
-              <FileText className="w-4 h-4 mr-2" /> DOCX
-            </Button>
           </div>
         </motion.div>
+
+        {/* Resume Versions Tabs */}
+        {versions.length > 0 && (
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="glass-gold rounded-xl p-4 mb-6">
+            <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3">AI-Generated Versions</p>
+            <Tabs defaultValue={versions[0]?.type}>
+              <TabsList className="bg-secondary">
+                {versions.map(v => (
+                  <TabsTrigger key={v.type} value={v.type} className="font-body text-xs capitalize">{v.type}</TabsTrigger>
+                ))}
+              </TabsList>
+              {versions.map(v => (
+                <TabsContent key={v.type} value={v.type}>
+                  <div className="glass rounded-xl p-4 mt-2">
+                    <p className="font-body text-xs text-primary font-semibold mb-2">{v.tone_note}</p>
+                    <p className="font-body text-sm text-foreground mb-3">{v.summary}</p>
+                    <ul className="space-y-1">
+                      {v.bullets.map((b, i) => (
+                        <li key={i} className="font-body text-xs text-muted-foreground flex items-start gap-2">
+                          <span className="text-primary mt-0.5">•</span> {b}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </motion.div>
+        )}
 
         {/* Template Selector */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="mb-6">
@@ -155,7 +252,6 @@ const ResumeBuilder = () => {
                 <div className={`${marginSize === "narrow" ? "px-4" : marginSize === "wide" ? "px-16" : "px-8"}`}>
                   {renderTemplate()}
                 </div>
-                {/* Watermark overlay for free tier */}
                 <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-[0.08] rotate-[-30deg]">
                   <span className="font-display text-6xl md:text-8xl font-bold text-primary whitespace-nowrap">PROFILEX PREVIEW</span>
                 </div>
@@ -164,22 +260,8 @@ const ResumeBuilder = () => {
               <div className="bg-foreground rounded-2xl p-8 md:p-12 max-w-3xl mx-auto shadow-2xl">
                 <div className="font-body text-sm text-background/80 leading-relaxed space-y-4">
                   <p>Dear Hiring Manager,</p>
-                  <p>
-                    I am writing to express my strong interest in the Software Developer position at your organization. With 2+ years of hands-on experience in building scalable web applications and a solid foundation in Python, React, and Machine Learning, I am confident in my ability to contribute meaningfully to your team.
-                  </p>
-                  <p>
-                    In my current role at TechCorp Solutions, I have engineered RESTful APIs handling 10,000+ daily requests, optimized database performance by 45%, and led a successful migration to microservices architecture. These experiences have honed my ability to solve complex technical challenges while delivering measurable business impact.
-                  </p>
-                  <p>
-                    What excites me most about this opportunity is the chance to apply my problem-solving skills to real-world challenges at scale. I am particularly drawn to your team's focus on innovation and user-centric development.
-                  </p>
-                  <p>
-                    I would welcome the opportunity to discuss how my skills and experience align with your team's needs. Thank you for considering my application.
-                  </p>
-                  <p>
-                    Sincerely,<br />
-                    <span className="font-semibold text-background">{resumeData.name}</span>
-                  </p>
+                  <p>I am writing to express my strong interest in the {resumeData.title} position. With experience building scalable web applications and a solid foundation in {resumeData.skills.slice(0, 3).join(", ")}, I am confident in my ability to contribute meaningfully to your team.</p>
+                  <p>Sincerely,<br /><span className="font-semibold text-background">{resumeData.name}</span></p>
                 </div>
               </div>
             )}
@@ -188,8 +270,28 @@ const ResumeBuilder = () => {
           {/* Customizer Sidebar */}
           {activeTab === "resume" && (
             <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.3 }} className="space-y-4">
-              {/* ATS Mini Widget */}
-              <ATSMiniWidget score={92} />
+              <ATSMiniWidget score={atsScore} />
+
+              {/* AI Suggestions */}
+              <div className="glass-gold rounded-xl p-4">
+                <Label className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3 block">AI Suggestions</Label>
+                <div className="space-y-2">
+                  {resumeData.experience[0]?.bullets.map((bullet, i) => (
+                    <div key={i} className="flex items-start gap-2">
+                      <span className="font-body text-[10px] text-muted-foreground flex-1 line-clamp-2">{bullet}</span>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="shrink-0 h-6 w-6 p-0 text-primary hover:bg-primary/10"
+                        disabled={improvingBullet === i}
+                        onClick={() => handleImproveBullet(i)}
+                      >
+                        {improvingBullet === i ? <Loader2 className="w-3 h-3 animate-spin" /> : <Wand2 className="w-3 h-3" />}
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
               {/* Line Spacing */}
               <div className="glass rounded-xl p-4">
@@ -214,20 +316,13 @@ const ResumeBuilder = () => {
               </div>
 
               <ResumeCustomizer
-                fontSize={fontSize}
-                setFontSize={setFontSize}
-                showPhoto={showPhoto}
-                setShowPhoto={setShowPhoto}
-                showSummary={showSummary}
-                setShowSummary={setShowSummary}
-                accentColor={accentColor}
-                setAccentColor={setAccentColor}
-                fontFamily={fontFamily}
-                setFontFamily={setFontFamily}
-                fontColor={fontColor}
-                setFontColor={setFontColor}
-                headerStyle={headerStyle}
-                setHeaderStyle={setHeaderStyle}
+                fontSize={fontSize} setFontSize={setFontSize}
+                showPhoto={showPhoto} setShowPhoto={setShowPhoto}
+                showSummary={showSummary} setShowSummary={setShowSummary}
+                accentColor={accentColor} setAccentColor={setAccentColor}
+                fontFamily={fontFamily} setFontFamily={setFontFamily}
+                fontColor={fontColor} setFontColor={setFontColor}
+                headerStyle={headerStyle} setHeaderStyle={setHeaderStyle}
               />
             </motion.div>
           )}
