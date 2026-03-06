@@ -8,6 +8,7 @@ import Footer from "@/components/layout/Footer";
 import ATSGauge from "@/components/results/ATSGauge";
 import PsychologyInsights from "@/components/results/PsychologyInsights";
 import ATSAlgorithmBreakdown from "@/components/results/ATSAlgorithmBreakdown";
+import ATSSimulator from "@/components/results/ATSSimulator";
 import PatternAnalysis from "@/components/results/PatternAnalysis";
 import ReportCard from "@/components/results/ReportCard";
 import KeywordDensity from "@/components/results/KeywordDensity";
@@ -228,6 +229,9 @@ const Results = () => {
 
         {/* ATS Algorithm Breakdown */}
         <ATSAlgorithmBreakdown />
+
+        {/* ATS Simulator */}
+        <ATSSimulator atsScore={atsScore} keywords={keywordSuggestions} resumeSkills={resumeSkills} />
 
         {/* Skill Gap */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-deep rounded-2xl p-8 md:p-10 mb-8">

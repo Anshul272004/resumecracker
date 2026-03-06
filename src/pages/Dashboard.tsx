@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target, Flame, Brain, BarChart3, ArrowRight, Trash2, Edit3, Loader2, Link as LinkIcon, Globe } from "lucide-react";
+import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target, Flame, Brain, BarChart3, ArrowRight, Trash2, Edit3, Loader2, Link as LinkIcon, Globe, Briefcase } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -13,6 +13,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { aiApi } from "@/lib/api/ai";
 import { toast } from "@/hooks/use-toast";
 import { firecrawlApi } from "@/lib/api/firecrawl";
+import GamificationBadges from "@/components/results/GamificationBadges";
 
 const steps = [
   { icon: Upload, label: "Upload Resume" },
@@ -63,6 +64,7 @@ const Dashboard = () => {
   const [showHub, setShowHub] = useState(true);
   const [savedResumes, setSavedResumes] = useState<SavedResume[]>([]);
   const [interviewStats, setInterviewStats] = useState({ solved: 0, attempted: 0, total: 23 });
+  const [bestAtsScore, setBestAtsScore] = useState(0);
   const [loadingResumes, setLoadingResumes] = useState(true);
 
   // Wizard state
@@ -99,7 +101,11 @@ const Dashboard = () => {
         supabase.from("interview_progress").select("status").eq("user_id", user.id),
       ]);
 
-      if (resumeResult.data) setSavedResumes(resumeResult.data);
+      if (resumeResult.data) {
+        setSavedResumes(resumeResult.data);
+        const best = resumeResult.data.reduce((max, r) => Math.max(max, r.ats_score || 0), 0);
+        setBestAtsScore(best);
+      }
       if (progressResult.data) {
         const solved = progressResult.data.filter(p => p.status === "solved").length;
         const attempted = progressResult.data.filter(p => p.status === "attempted").length;
@@ -258,7 +264,7 @@ const Dashboard = () => {
           </motion.div>
 
           {/* Quick Actions */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <button onClick={startNewResume} className="glass-gold rounded-xl p-5 text-left lift-hover group">
               <Plus className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
               <p className="font-body text-sm font-bold text-foreground">New Resume</p>
@@ -274,7 +280,20 @@ const Dashboard = () => {
               <p className="font-body text-sm font-bold text-foreground">View Results</p>
               <p className="font-body text-[10px] text-muted-foreground">See your ATS score</p>
             </Link>
+            <Link to="/job-match" className="glass-gold rounded-xl p-5 text-left lift-hover group">
+              <Briefcase className="w-8 h-8 text-primary mb-3 group-hover:scale-110 transition-transform" />
+              <p className="font-body text-sm font-bold text-foreground">Job Match</p>
+              <p className="font-body text-[10px] text-muted-foreground">Find matching jobs</p>
+            </Link>
           </motion.div>
+
+          {/* Gamification Badges */}
+          <GamificationBadges
+            resumeCount={savedResumes.length}
+            interviewSolved={interviewStats.solved}
+            atsScore={bestAtsScore}
+            streakCount={profile?.streak_count || 0}
+          />
 
           {/* Interview Stats */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}

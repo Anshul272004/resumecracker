@@ -20,3 +20,9 @@ verify_jwt = false
 
 [functions.ai-extract-keywords]
 verify_jwt = false
+
+[functions.ai-resume-versions]
+verify_jwt = false
+
+[functions.ai-job-match]
+verify_jwt = false
