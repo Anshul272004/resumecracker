@@ -29,6 +29,15 @@ export default {
           light: "hsl(var(--gold-light))",
           dark: "hsl(var(--gold-dark))",
         },
+        "cyan-accent": {
+          DEFAULT: "hsl(var(--cyan-accent))",
+        },
+        "violet-accent": {
+          DEFAULT: "hsl(var(--violet-accent))",
+        },
+        "silver-accent": {
+          DEFAULT: "hsl(var(--silver-accent))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
