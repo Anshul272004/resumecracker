@@ -5,18 +5,18 @@ import * as THREE from "three";
 
 /* ─── Floating Resume Document ─── */
 const ResumeDocument = () => {
-  const meshRef = useRef<THREE.Mesh>(null!);
+  const groupRef = useRef<THREE.Group>(null!);
   const { pointer } = useThree();
 
   useFrame((_, delta) => {
-    if (!meshRef.current) return;
-    meshRef.current.rotation.y = THREE.MathUtils.lerp(
-      meshRef.current.rotation.y,
+    if (!groupRef.current) return;
+    groupRef.current.rotation.y = THREE.MathUtils.lerp(
+      groupRef.current.rotation.y,
       pointer.x * 0.15,
       2 * delta
     );
-    meshRef.current.rotation.x = THREE.MathUtils.lerp(
-      meshRef.current.rotation.x,
+    groupRef.current.rotation.x = THREE.MathUtils.lerp(
+      groupRef.current.rotation.x,
       -pointer.y * 0.1,
       2 * delta
     );
@@ -24,7 +24,7 @@ const ResumeDocument = () => {
 
   return (
     <Float speed={1.5} rotationIntensity={0.3} floatIntensity={0.8}>
-      <group ref={meshRef}>
+      <group ref={groupRef}>
         {/* Main document */}
         <RoundedBox args={[2.4, 3.2, 0.05]} radius={0.06} smoothness={4}>
           <meshStandardMaterial
