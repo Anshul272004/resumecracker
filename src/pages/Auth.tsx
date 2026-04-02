@@ -83,10 +83,10 @@ const Auth = () => {
         {/* Logo */}
         <Link to="/" className="flex items-center justify-center gap-2 mb-8">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-gold">
-            <span className="font-display text-xl font-bold text-primary-foreground">PX</span>
+            <span className="font-display text-xl font-bold text-primary-foreground">RC</span>
           </div>
           <span className="font-display text-2xl font-bold text-foreground">
-            Profile<span className="text-primary">X</span>
+            Resume<span className="text-primary">Cracker</span>
           </span>
         </Link>
 
