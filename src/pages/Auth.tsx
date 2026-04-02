@@ -93,14 +93,14 @@ const Auth = () => {
         <TiltCard tiltMax={5} glowColor="hsl(43 75% 52% / 0.2)">
         <div className="glass-gold-deep rounded-2xl p-8 border-shine glow-gold">
           <h1 className="font-display text-3xl font-bold text-foreground text-center mb-2">
-            {showForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Join ProfileX"}
+            {showForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Join ResumeCracker"}
           </h1>
           <p className="font-body text-sm text-muted-foreground text-center mb-8">
             {showForgot
               ? "Enter your email to receive a reset link"
               : isLogin
               ? "Sign in to your career command center"
-              : "15,000+ professionals trust ProfileX"}
+              : "15,000+ professionals trust ResumeCracker"}
           </p>
 
           <form onSubmit={handleSubmit} className="space-y-5">
