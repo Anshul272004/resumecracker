@@ -27,6 +27,7 @@ import PaymentSuccess from "./pages/PaymentSuccess";
 import PaymentFailed from "./pages/PaymentFailed";
 import NotFound from "./pages/NotFound";
 import JobMatch from "./pages/JobMatch";
+import Analysis from "./pages/Analysis";
 
 const queryClient = new QueryClient();
 
@@ -52,7 +53,7 @@ const App = () => (
             <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
             <Route path="/resume-builder" element={<ProtectedRoute><ResumeBuilder /></ProtectedRoute>} />
             <Route path="/job-match" element={<ProtectedRoute><JobMatch /></ProtectedRoute>} />
-            <Route path="*" element={<NotFound />} />
+            <Route path="/analysis" element={<ProtectedRoute><Analysis /></ProtectedRoute>} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

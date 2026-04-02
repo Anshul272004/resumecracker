@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import TiltCard from "@/components/3d/TiltCard";
 
 const Counter = ({ end, suffix = "", label }: { end: number; suffix?: string; label: string }) => {
   const ref = useRef<HTMLDivElement>(null);
@@ -55,14 +56,14 @@ const caseStudies = [
     role: "From Fresher → SDE at Amazon",
     before: { ats: 23, interviews: 0, months: 6 },
     after: { ats: 94, interviews: 5, weeks: 2 },
-    quote: "6 months of rejection. Then ProfileX rewrote my resume and I got 5 calls in 2 weeks. Amazon made an offer.",
+    quote: "6 months of rejection. Then ResumeCracker rewrote my resume and I got 5 calls in 2 weeks. Amazon made an offer.",
   },
   {
     name: "Rahul Verma",
     role: "From Generic → Data Analyst at Flipkart",
     before: { ats: 31, interviews: 1, months: 4 },
     after: { ats: 91, interviews: 7, weeks: 3 },
-    quote: "My projects looked 'faltu' on paper. ProfileX turned them into impact stories. Flipkart's recruiter was impressed.",
+    quote: "My projects looked 'faltu' on paper. ResumeCracker turned them into impact stories. Flipkart's recruiter was impressed.",
   },
   {
     name: "Sneha Reddy",
@@ -74,16 +75,16 @@ const caseStudies = [
 ];
 
 const faqs = [
-  { q: "How does ProfileX improve my resume?", a: "Our AI analyzes job descriptions to extract key requirements, then reframes your projects and experience using impact-driven language with quantifiable metrics. The result is an ATS-optimized resume that speaks directly to what hiring managers look for." },
+  { q: "How does ResumeCracker improve my resume?", a: "Our AI analyzes job descriptions to extract key requirements, then reframes your projects and experience using impact-driven language with quantifiable metrics. The result is an ATS-optimized resume that speaks directly to what hiring managers look for." },
   { q: "What is ATS and why does it matter?", a: "ATS (Applicant Tracking System) is software used by 90%+ companies to filter resumes before a human ever reads them. If your resume isn't optimized for ATS keywords and formatting, it gets automatically rejected — even if you're the perfect candidate." },
-  { q: "Can ProfileX help with \"faltu\" (generic) projects?", a: "Absolutely! That's our specialty. We take projects like 'built a weather app' and reframe them into impact-driven narratives: 'Engineered a real-time weather intelligence dashboard reducing data fetch latency by 40%.' Same project, completely different perception." },
+  { q: "Can ResumeCracker help with \"faltu\" (generic) projects?", a: "Absolutely! That's our specialty. We take projects like 'built a weather app' and reframe them into impact-driven narratives: 'Engineered a real-time weather intelligence dashboard reducing data fetch latency by 40%.' Same project, completely different perception." },
   { q: "Is my data safe?", a: "Yes. We use enterprise-grade encryption for all uploaded data. Your resume and personal information are never shared with third parties or used for training purposes." },
   { q: "Can I customize the resume for different jobs?", a: "Yes! With our Pro and Elite plans, you can generate multiple versions of your resume, each optimized for different job descriptions. The AI adjusts keywords, skill emphasis, and project framing for each target role." },
   { q: "What formats can I download?", a: "You can download your enhanced resume as a professionally formatted PDF or DOCX, ready to submit to any job portal or email directly to recruiters." },
   { q: "How accurate is the interview prep?", a: "Our questions are sourced from 1M+ interview patterns across major companies. Users report a 99% match rate with actual interview questions they faced." },
   { q: "Do you support non-tech roles?", a: "Yes! While our current templates are optimized for tech roles, the P-A-R framework and ATS optimization work for any industry including finance, marketing, consulting, and more." },
   { q: "How long does it take to generate a resume?", a: "Under 30 seconds. Our AI processes your profile, runs ATS checks, applies psychology optimizations, and generates your complete career package in real-time." },
-  { q: "What makes ProfileX different from other resume builders?", a: "Three things: 1) Psychology-based framing using 6 cognitive biases, 2) 1M+ pattern engine for data-driven optimization, 3) Full interview prep + ATS simulation. No other tool offers this combination." },
+  { q: "What makes ResumeCracker different from other resume builders?", a: "Three things: 1) Psychology-based framing using 6 cognitive biases, 2) 1M+ pattern engine for data-driven optimization, 3) Full interview prep + ATS simulation. No other tool offers this combination." },
 ];
 
 const About = () => (
@@ -97,14 +98,14 @@ const About = () => (
           No Resume Should <span className="text-gradient-gold">Hold You Back</span>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-          We believe talent should speak louder than formatting. ProfileX exists to ensure that no qualified candidate gets rejected because of a poorly written resume.
-        </p>
-        <div className="glass-gold rounded-2xl p-6 max-w-xl mx-auto border-shine">
-          <p className="font-body text-sm text-primary font-semibold italic">
-            "70% of resumes are rejected by ATS before a human sees them. We're on a mission to make that 0%."
-          </p>
-          <p className="font-body text-xs text-muted-foreground mt-2">— ProfileX Team</p>
-        </div>
+           We believe talent should speak louder than formatting. ResumeCracker exists to ensure that no qualified candidate gets rejected because of a poorly written resume.
+         </p>
+         <div className="glass-gold rounded-2xl p-6 max-w-xl mx-auto border-shine">
+           <p className="font-body text-sm text-primary font-semibold italic">
+             "70% of resumes are rejected by ATS before a human sees them. We're on a mission to make that 0%."
+           </p>
+           <p className="font-body text-xs text-muted-foreground mt-2">— ResumeCracker Team</p>
+         </div>
       </motion.div>
 
       {/* By The Numbers */}
@@ -135,18 +136,21 @@ const About = () => (
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {aiPipeline.map((stage, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className="glass-gold rounded-2xl p-6 lift-hover border-shine">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <stage.icon className="w-5 h-5 text-primary" />
-                </div>
-                <div className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Stage {i + 1}</div>
-              </div>
-              <h3 className="font-display text-lg font-bold text-foreground mb-2">{stage.title}</h3>
-              <p className="font-body text-xs text-muted-foreground leading-relaxed">{stage.desc}</p>
-            </motion.div>
+           {aiPipeline.map((stage, i) => (
+             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+               <TiltCard tiltMax={5}>
+               <div className="glass-gold rounded-2xl p-6 border-shine h-full">
+                 <div className="flex items-center gap-3 mb-3">
+                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                     <stage.icon className="w-5 h-5 text-primary" />
+                   </div>
+                   <div className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Stage {i + 1}</div>
+                 </div>
+                 <h3 className="font-display text-lg font-bold text-foreground mb-2">{stage.title}</h3>
+                 <p className="font-body text-xs text-muted-foreground leading-relaxed">{stage.desc}</p>
+               </div>
+               </TiltCard>
+             </motion.div>
           ))}
         </div>
       </motion.div>
@@ -273,7 +277,7 @@ const About = () => (
             </div>
           </div>
           <div className="glass-gold rounded-xl p-6 border border-primary/20">
-            <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3">What ProfileX Writes</p>
+            <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3">What ResumeCracker Writes</p>
             <p className="font-body text-sm text-foreground">"Designed a Python-based text analysis module to efficiently process and categorize character data, improving input validation accuracy by 30% through optimized conditional handling."</p>
             <div className="mt-4 space-y-2">
               <p className="font-body text-xs text-primary flex items-center gap-2"><CheckCircle2 className="w-3 h-3" /> Problem-solving narrative</p>

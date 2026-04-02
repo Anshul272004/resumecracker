@@ -7,7 +7,7 @@ import { useAuth } from "@/contexts/AuthContext";
 const navItems = [
   { label: "Features", href: "#features" },
   { label: "How It Works", href: "#how-it-works" },
-  { label: "Results", href: "/results" },
+  { label: "Analysis", href: "/analysis" },
   { label: "Interview Prep", href: "/interview-prep" },
   { label: "Pricing", href: "/pricing" },
   { label: "About", href: "/about" },
@@ -44,10 +44,10 @@ const Navbar = () => {
       <div className="container mx-auto flex items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2">
           <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-gold">
-            <span className="font-display text-lg font-bold text-primary-foreground">PX</span>
+            <span className="font-display text-lg font-bold text-primary-foreground">RC</span>
           </div>
           <span className="font-display text-xl font-bold text-foreground">
-            Profile<span className="text-primary">X</span>
+            Resume<span className="text-primary">Cracker</span>
           </span>
         </Link>
 

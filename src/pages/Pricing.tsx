@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CountdownTimer from "@/components/CountdownTimer";
+import TiltCard from "@/components/3d/TiltCard";
 
 const plans = [
   {
@@ -52,14 +53,14 @@ const lifetimeDeal = {
 };
 
 const faqs = [
-  { q: "Can I try ProfileX for free?", a: "Yes! Our Free plan lets you build and edit your full resume, preview it live, and get a basic ATS score — no credit card required." },
+  { q: "Can I try ResumeCracker for free?", a: "Yes! Our Free plan lets you build and edit your full resume, preview it live, and get a basic ATS score — no credit card required." },
   { q: "What happens after I pay?", a: "You get instant access to all features in your plan. Downloads are immediate. For Pro, you get 3 job-specific resumes, cover letter, and interview prep." },
   { q: "Is there a money-back guarantee?", a: "Absolutely. 30-day money-back guarantee on all paid plans. If you don't get more interview calls, we'll refund you — no questions asked." },
   { q: "Can I upgrade later?", a: "Yes. Start Free and upgrade anytime. Your work is saved." },
   { q: "What payment methods do you accept?", a: "All major credit/debit cards, UPI, net banking, and wallets. SSL-encrypted and secure." },
   { q: "How is the Lifetime deal different?", a: "Everything in Elite but one-time payment. Best value if you're actively job hunting." },
   { q: "Do you offer student discounts?", a: "Yes! Students with a valid .edu email get 30% off any paid plan. Use code STUDENT30 at checkout." },
-  { q: "Can I use ProfileX for multiple job applications?", a: "Starter supports 1 JD, Pro supports 3, and Elite offers unlimited. Each generates a unique optimized resume." },
+  { q: "Can I use ResumeCracker for multiple job applications?", a: "Starter supports 1 JD, Pro supports 3, and Elite offers unlimited. Each generates a unique optimized resume." },
 ];
 
 const Pricing = () => {
@@ -125,7 +126,7 @@ const Pricing = () => {
                 </div>
               ))}
               <div className="glass-gold rounded-lg p-4">
-                <p className="font-body text-sm text-primary font-bold">ProfileX Pro gives you ALL of this for just ₹499</p>
+                <p className="font-body text-sm text-primary font-bold">ResumeCracker Pro gives you ALL of this for just ₹499</p>
                 <p className="font-body text-xs text-muted-foreground mt-1">That's saving ₹10,000+ on average</p>
               </div>
             </motion.div>
@@ -135,12 +136,12 @@ const Pricing = () => {
         {/* Plans */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
           {plans.map((plan, i) => (
+            <TiltCard key={i} tiltMax={plan.popular ? 6 : 4} glowColor={plan.popular ? "hsl(43 75% 52% / 0.25)" : undefined}>
             <motion.div
-              key={i}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`relative rounded-2xl p-6 flex flex-col transition-all duration-500 lift-hover ${
+              className={`relative rounded-2xl p-6 flex flex-col transition-all duration-500 ${
                 plan.popular ? "glass-gold-deep glow-gold-xl lg:scale-105 border-shine" : "glass hover:glass-gold"
               }`}
             >
@@ -198,6 +199,7 @@ const Pricing = () => {
                 </Button>
               </Link>
             </motion.div>
+            </TiltCard>
           ))}
         </div>
 
