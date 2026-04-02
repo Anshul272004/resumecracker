@@ -98,14 +98,14 @@ const About = () => (
           No Resume Should <span className="text-gradient-gold">Hold You Back</span>
         </h1>
         <p className="font-body text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mb-8">
-          We believe talent should speak louder than formatting. ProfileX exists to ensure that no qualified candidate gets rejected because of a poorly written resume.
-        </p>
-        <div className="glass-gold rounded-2xl p-6 max-w-xl mx-auto border-shine">
-          <p className="font-body text-sm text-primary font-semibold italic">
-            "70% of resumes are rejected by ATS before a human sees them. We're on a mission to make that 0%."
-          </p>
-          <p className="font-body text-xs text-muted-foreground mt-2">— ProfileX Team</p>
-        </div>
+           We believe talent should speak louder than formatting. ResumeCracker exists to ensure that no qualified candidate gets rejected because of a poorly written resume.
+         </p>
+         <div className="glass-gold rounded-2xl p-6 max-w-xl mx-auto border-shine">
+           <p className="font-body text-sm text-primary font-semibold italic">
+             "70% of resumes are rejected by ATS before a human sees them. We're on a mission to make that 0%."
+           </p>
+           <p className="font-body text-xs text-muted-foreground mt-2">— ResumeCracker Team</p>
+         </div>
       </motion.div>
 
       {/* By The Numbers */}
