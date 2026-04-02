@@ -200,6 +200,7 @@ const Pricing = () => {
               </Link>
             </motion.div>
             </TiltCard>
+          ))}
         </div>
 
         {/* Lifetime Deal */}
