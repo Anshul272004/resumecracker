@@ -204,6 +204,7 @@ const Auth = () => {
             )}
           </div>
         </div>
+        </TiltCard>
 
         {/* Social proof */}
         <div className="mt-6 flex items-center justify-center gap-6">
