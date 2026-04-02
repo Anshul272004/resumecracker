@@ -126,7 +126,7 @@ const Pricing = () => {
                 </div>
               ))}
               <div className="glass-gold rounded-lg p-4">
-                <p className="font-body text-sm text-primary font-bold">ProfileX Pro gives you ALL of this for just ₹499</p>
+                <p className="font-body text-sm text-primary font-bold">ResumeCracker Pro gives you ALL of this for just ₹499</p>
                 <p className="font-body text-xs text-muted-foreground mt-1">That's saving ₹10,000+ on average</p>
               </div>
             </motion.div>
