@@ -1,113 +1,76 @@
 
 
-# ResumeCracker Cinematic 3D Redesign -- Implementation Plan
+# Remaining RAPS Phases Implementation Plan
 
-## Overview
-Transform the current flat landing page into a cinematic, Apple-style 3D experience with floating resume elements, parallax depth, interactive hover effects, and premium motion design. The brand name shifts from "ProfileX" to "ResumeCracker" throughout the UI.
-
----
-
-## Step 1: Install 3D Dependencies
-
-Install `@react-three/fiber@^8.18`, `@react-three/drei@^9.122.0`, `three@^0.133`, and `@types/three` (dev).
-
----
-
-## Step 2: Create 3D Components
-
-### `src/components/3d/HeroScene.tsx`
-A React Three Fiber `<Canvas>` component with:
-- **Floating resume document**: A white rounded `RoundedBox` mesh with subtle rotation animation, mouse-parallax (useFrame + pointer tracking)
-- **Orbiting skill chips**: Small `Text` elements ("React", "Python", "AWS") orbiting around the resume using sin/cos rotation
-- **Glowing ATS score ring**: A `Torus` mesh with gold emissive material, slowly rotating
-- **Ambient particles**: `Stars` from drei for depth, plus `Float` wrapper for gentle bobbing
-- **Lighting**: `ambientLight` + `pointLight` with gold hue + `Environment` preset
-- Wrapped in `Suspense` with a glass-blur fallback
-
-### `src/components/3d/TiltCard.tsx`
-Reusable wrapper using CSS `perspective` + `framer-motion`:
-- Tracks mouse position over the card
-- Applies `rotateX` / `rotateY` transforms (max 8deg)
-- Adds subtle glow on hover via dynamic `boxShadow`
-- Used for feature cards, template cards, pricing cards
+## Status Check
+- Phase 1 (Real Data Pipeline): Done
+- Phase 2 (LinkedIn/Portfolio + AI Keywords): Done
+- **Phase 3 (ATS Simulator + Resume Versions): TODO**
+- **Phase 4 (Gamification + Progress): TODO**
+- **Phase 5 (Job Match Finder): TODO**
+- **Phase 6 (Live AI Suggestions in Editor): TODO**
 
 ---
 
-## Step 3: Redesign Landing Page (`src/pages/LandingPage.tsx`)
+## Phase 3: ATS Simulator + Resume Versions
 
-Complete rewrite with these cinematic sections:
+### ATS Simulator (add to Results.tsx)
+New section after `ATSAlgorithmBreakdown` simulating 3 ATS platforms:
+- **Greenhouse, Workday, Lever** -- each gets a pass/fail card with specific feedback
+- Data derived from existing `atsScore` + `keywordSuggestions` + static rules per platform (section header naming, keyword placement, formatting)
+- No new edge function needed -- pure client-side logic using existing AI data
 
-### Hero (Split Layout)
-- **Left**: Large serif headline "Your Resume. Reinvented.", gold gradient subheadline, two premium CTAs, trust badges row
-- **Right**: `<HeroScene />` 3D canvas with floating resume + score ring
-- Background: Animated gradient mesh (midnight blue + charcoal) with light streaks
+### Resume Version Generator (add to ResumeBuilder.tsx)
+- New edge function `ai-resume-versions` that takes resume data and generates 4 tonal variants (ATS, Creative, Startup, Corporate)
+- "Generate Versions" button in ResumeBuilder toolbar
+- Each version stored in state, selectable via tabs
+- Add to `supabase/config.toml`
 
-### Section 2: Why ResumeCracker
-- 4 feature cards wrapped in `<TiltCard>` for 3D hover tilt
-- Features: ATS Cracker, AI Bullet Rewriter, Cover Letter AI, Job Match Intelligence
-- Each card has a glowing icon, benefit headline, one-line description
-
-### Section 3: How It Works
-- 3-step horizontal timeline with scroll-triggered reveals
-- Connected by an animated gold line
-- Steps: Upload > AI Analyzes > Download & Win
-
-### Section 4: Template Gallery
-- Horizontal card stack with depth (front card large, back cards recede with `scale` + `blur`)
-- Each template card uses `<TiltCard>` with name, category, ATS readiness badge
-- Hover reveals more detail with a glow effect
-
-### Section 5: Before / After
-- Same concept as current but with `<TiltCard>` wrappers and animated ATS score counters
-
-### Section 6: Stats (Animated Counters)
-- Keep existing `Counter` component, add `<TiltCard>` wrappers
-
-### Section 7: Testimonials
-- Cards with `<TiltCard>` + subtle floating animation on scroll
-- Premium avatar styling with gold ring border
-
-### Section 8: Pricing (3D Perspective Cards)
-- 3 tiers: Free / Pro / Premium
-- Pro card uses `translateZ(40px)` to physically come forward
-- All cards use `<TiltCard>` with hover depth
-
-### Section 9: Email Capture + Final CTA
-- Keep existing structure, enhance with glassmorphism depth and animated background glow
+**Files**: `src/pages/Results.tsx`, `src/pages/ResumeBuilder.tsx`, new `supabase/functions/ai-resume-versions/index.ts`, `supabase/config.toml`
 
 ---
 
-## Step 4: Update CSS (`src/index.css`)
+## Phase 4: Gamification & Progress
 
-Add new CSS variables and animations:
-```css
---cyan-accent: 190 80% 55%;
---violet-accent: 270 70% 60%;
---silver-accent: 0 0% 75%;
-```
+All client-side calculation (no DB migration needed -- simpler than planned):
+- **Points** calculated from: wizard steps completed, resume generated, interview questions solved, ATS score achieved
+- **Resume Strength Meter** in Dashboard wizard -- real-time progress bar based on filled fields
+- **Badges** on Dashboard hub: "First Resume", "Interview Starter", "ATS Master", "Streak Champion" -- derived from existing DB data
+- **Urgency message**: "Your resume is stronger than X% of applicants" based on ATS score
 
-New keyframes:
-- `gradient-shift`: Animated background gradient for hero
-- `light-streak`: Diagonal sweeping light line
-- `float-gentle`: Subtle up/down floating for cards
+**Files**: `src/pages/Dashboard.tsx`
 
 ---
 
-## Step 5: Update Tailwind Config
+## Phase 5: Job Match Finder
 
-Add new color tokens (`cyan-accent`, `violet-accent`, `silver-accent`) and new animation utilities (`animate-gradient-shift`, `animate-light-streak`, `animate-float-gentle`).
+- New page `src/pages/JobMatch.tsx` (protected route)
+- User's skills extracted from their latest resume in DB
+- Uses `firecrawlApi.search()` to find matching jobs
+- New edge function `ai-job-match` ranks results by skill match %
+- Shows: job title, company, match score, missing skills, apply link
+- Add route to `src/App.tsx`, add CTA to Dashboard hub
+
+**Files**: new `src/pages/JobMatch.tsx`, `src/App.tsx`, new `supabase/functions/ai-job-match/index.ts`, `supabase/config.toml`
 
 ---
 
-## Files Summary
+## Phase 6: Live AI Suggestions in Resume Editor
 
-| File | Action |
-|------|--------|
-| `src/components/3d/HeroScene.tsx` | Create |
-| `src/components/3d/TiltCard.tsx` | Create |
-| `src/pages/LandingPage.tsx` | Full rewrite |
-| `src/index.css` | Add new vars + keyframes |
-| `tailwind.config.ts` | Add new colors + animations |
+- Load real resume data from DB instead of hardcoded `resumeData` in ResumeBuilder
+- Add AI suggestions sidebar: "Improve Bullet" per bullet, "Add Missing Keywords", "Rewrite Summary"
+- Uses existing `ai-optimize-resume` function for bullet improvements
+- Real-time ATS score recalculation as user edits
 
-No database changes. No edge functions. No new routes. Pure frontend visual upgrade.
+**Files**: `src/pages/ResumeBuilder.tsx`
+
+---
+
+## Implementation Order (this message)
+1. Phase 3: ATS Simulator in Results + Resume Versions edge function + UI
+2. Phase 4: Gamification badges/points/strength meter in Dashboard
+3. Phase 5: Job Match Finder page + edge function + route
+4. Phase 6: Live AI suggestions in ResumeBuilder
+
+This is a multi-message implementation. I'll start with Phases 3 and 4 in this message, then continue with 5 and 6.
 
