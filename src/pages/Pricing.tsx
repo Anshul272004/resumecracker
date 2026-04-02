@@ -9,6 +9,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import CountdownTimer from "@/components/CountdownTimer";
+import TiltCard from "@/components/3d/TiltCard";
 
 const plans = [
   {
