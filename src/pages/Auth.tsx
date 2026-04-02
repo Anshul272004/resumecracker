@@ -90,7 +90,7 @@ const Auth = () => {
           </span>
         </Link>
 
-        {/* Card */}
+        <TiltCard tiltMax={5} glowColor="hsl(43 75% 52% / 0.2)">
         <div className="glass-gold-deep rounded-2xl p-8 border-shine glow-gold">
           <h1 className="font-display text-3xl font-bold text-foreground text-center mb-2">
             {showForgot ? "Reset Password" : isLogin ? "Welcome Back" : "Join ProfileX"}
