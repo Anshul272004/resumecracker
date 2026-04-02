@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
+import TiltCard from "@/components/3d/TiltCard";
 
 const Counter = ({ end, suffix = "", label }: { end: number; suffix?: string; label: string }) => {
   const ref = useRef<HTMLDivElement>(null);
