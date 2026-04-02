@@ -53,14 +53,14 @@ const lifetimeDeal = {
 };
 
 const faqs = [
-  { q: "Can I try ProfileX for free?", a: "Yes! Our Free plan lets you build and edit your full resume, preview it live, and get a basic ATS score — no credit card required." },
+  { q: "Can I try ResumeCracker for free?", a: "Yes! Our Free plan lets you build and edit your full resume, preview it live, and get a basic ATS score — no credit card required." },
   { q: "What happens after I pay?", a: "You get instant access to all features in your plan. Downloads are immediate. For Pro, you get 3 job-specific resumes, cover letter, and interview prep." },
   { q: "Is there a money-back guarantee?", a: "Absolutely. 30-day money-back guarantee on all paid plans. If you don't get more interview calls, we'll refund you — no questions asked." },
   { q: "Can I upgrade later?", a: "Yes. Start Free and upgrade anytime. Your work is saved." },
   { q: "What payment methods do you accept?", a: "All major credit/debit cards, UPI, net banking, and wallets. SSL-encrypted and secure." },
   { q: "How is the Lifetime deal different?", a: "Everything in Elite but one-time payment. Best value if you're actively job hunting." },
   { q: "Do you offer student discounts?", a: "Yes! Students with a valid .edu email get 30% off any paid plan. Use code STUDENT30 at checkout." },
-  { q: "Can I use ProfileX for multiple job applications?", a: "Starter supports 1 JD, Pro supports 3, and Elite offers unlimited. Each generates a unique optimized resume." },
+  { q: "Can I use ResumeCracker for multiple job applications?", a: "Starter supports 1 JD, Pro supports 3, and Elite offers unlimited. Each generates a unique optimized resume." },
 ];
 
 const Pricing = () => {

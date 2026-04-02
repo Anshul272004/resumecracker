@@ -56,14 +56,14 @@ const caseStudies = [
     role: "From Fresher → SDE at Amazon",
     before: { ats: 23, interviews: 0, months: 6 },
     after: { ats: 94, interviews: 5, weeks: 2 },
-    quote: "6 months of rejection. Then ProfileX rewrote my resume and I got 5 calls in 2 weeks. Amazon made an offer.",
+    quote: "6 months of rejection. Then ResumeCracker rewrote my resume and I got 5 calls in 2 weeks. Amazon made an offer.",
   },
   {
     name: "Rahul Verma",
     role: "From Generic → Data Analyst at Flipkart",
     before: { ats: 31, interviews: 1, months: 4 },
     after: { ats: 91, interviews: 7, weeks: 3 },
-    quote: "My projects looked 'faltu' on paper. ProfileX turned them into impact stories. Flipkart's recruiter was impressed.",
+    quote: "My projects looked 'faltu' on paper. ResumeCracker turned them into impact stories. Flipkart's recruiter was impressed.",
   },
   {
     name: "Sneha Reddy",
@@ -75,16 +75,16 @@ const caseStudies = [
 ];
 
 const faqs = [
-  { q: "How does ProfileX improve my resume?", a: "Our AI analyzes job descriptions to extract key requirements, then reframes your projects and experience using impact-driven language with quantifiable metrics. The result is an ATS-optimized resume that speaks directly to what hiring managers look for." },
+  { q: "How does ResumeCracker improve my resume?", a: "Our AI analyzes job descriptions to extract key requirements, then reframes your projects and experience using impact-driven language with quantifiable metrics. The result is an ATS-optimized resume that speaks directly to what hiring managers look for." },
   { q: "What is ATS and why does it matter?", a: "ATS (Applicant Tracking System) is software used by 90%+ companies to filter resumes before a human ever reads them. If your resume isn't optimized for ATS keywords and formatting, it gets automatically rejected — even if you're the perfect candidate." },
-  { q: "Can ProfileX help with \"faltu\" (generic) projects?", a: "Absolutely! That's our specialty. We take projects like 'built a weather app' and reframe them into impact-driven narratives: 'Engineered a real-time weather intelligence dashboard reducing data fetch latency by 40%.' Same project, completely different perception." },
+  { q: "Can ResumeCracker help with \"faltu\" (generic) projects?", a: "Absolutely! That's our specialty. We take projects like 'built a weather app' and reframe them into impact-driven narratives: 'Engineered a real-time weather intelligence dashboard reducing data fetch latency by 40%.' Same project, completely different perception." },
   { q: "Is my data safe?", a: "Yes. We use enterprise-grade encryption for all uploaded data. Your resume and personal information are never shared with third parties or used for training purposes." },
   { q: "Can I customize the resume for different jobs?", a: "Yes! With our Pro and Elite plans, you can generate multiple versions of your resume, each optimized for different job descriptions. The AI adjusts keywords, skill emphasis, and project framing for each target role." },
   { q: "What formats can I download?", a: "You can download your enhanced resume as a professionally formatted PDF or DOCX, ready to submit to any job portal or email directly to recruiters." },
   { q: "How accurate is the interview prep?", a: "Our questions are sourced from 1M+ interview patterns across major companies. Users report a 99% match rate with actual interview questions they faced." },
   { q: "Do you support non-tech roles?", a: "Yes! While our current templates are optimized for tech roles, the P-A-R framework and ATS optimization work for any industry including finance, marketing, consulting, and more." },
   { q: "How long does it take to generate a resume?", a: "Under 30 seconds. Our AI processes your profile, runs ATS checks, applies psychology optimizations, and generates your complete career package in real-time." },
-  { q: "What makes ProfileX different from other resume builders?", a: "Three things: 1) Psychology-based framing using 6 cognitive biases, 2) 1M+ pattern engine for data-driven optimization, 3) Full interview prep + ATS simulation. No other tool offers this combination." },
+  { q: "What makes ResumeCracker different from other resume builders?", a: "Three things: 1) Psychology-based framing using 6 cognitive biases, 2) 1M+ pattern engine for data-driven optimization, 3) Full interview prep + ATS simulation. No other tool offers this combination." },
 ];
 
 const About = () => (
@@ -277,7 +277,7 @@ const About = () => (
             </div>
           </div>
           <div className="glass-gold rounded-xl p-6 border border-primary/20">
-            <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3">What ProfileX Writes</p>
+            <p className="font-body text-xs font-bold text-primary uppercase tracking-wider mb-3">What ResumeCracker Writes</p>
             <p className="font-body text-sm text-foreground">"Designed a Python-based text analysis module to efficiently process and categorize character data, improving input validation accuracy by 30% through optimized conditional handling."</p>
             <div className="mt-4 space-y-2">
               <p className="font-body text-xs text-primary flex items-center gap-2"><CheckCircle2 className="w-3 h-3" /> Problem-solving narrative</p>
