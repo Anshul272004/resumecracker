@@ -136,12 +136,12 @@ const Pricing = () => {
         {/* Plans */}
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-16">
           {plans.map((plan, i) => (
+            <TiltCard key={i} tiltMax={plan.popular ? 6 : 4} glowColor={plan.popular ? "hsl(43 75% 52% / 0.25)" : undefined}>
             <motion.div
-              key={i}
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.1 }}
-              className={`relative rounded-2xl p-6 flex flex-col transition-all duration-500 lift-hover ${
+              className={`relative rounded-2xl p-6 flex flex-col transition-all duration-500 ${
                 plan.popular ? "glass-gold-deep glow-gold-xl lg:scale-105 border-shine" : "glass hover:glass-gold"
               }`}
             >
