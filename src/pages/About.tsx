@@ -136,18 +136,21 @@ const About = () => (
           </p>
         </div>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-5xl mx-auto">
-          {aiPipeline.map((stage, i) => (
-            <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-              className="glass-gold rounded-2xl p-6 lift-hover border-shine">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <stage.icon className="w-5 h-5 text-primary" />
-                </div>
-                <div className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Stage {i + 1}</div>
-              </div>
-              <h3 className="font-display text-lg font-bold text-foreground mb-2">{stage.title}</h3>
-              <p className="font-body text-xs text-muted-foreground leading-relaxed">{stage.desc}</p>
-            </motion.div>
+           {aiPipeline.map((stage, i) => (
+             <motion.div key={i} initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}>
+               <TiltCard tiltMax={5}>
+               <div className="glass-gold rounded-2xl p-6 border-shine h-full">
+                 <div className="flex items-center gap-3 mb-3">
+                   <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+                     <stage.icon className="w-5 h-5 text-primary" />
+                   </div>
+                   <div className="font-body text-[10px] font-bold text-primary uppercase tracking-wider">Stage {i + 1}</div>
+                 </div>
+                 <h3 className="font-display text-lg font-bold text-foreground mb-2">{stage.title}</h3>
+                 <p className="font-body text-xs text-muted-foreground leading-relaxed">{stage.desc}</p>
+               </div>
+               </TiltCard>
+             </motion.div>
           ))}
         </div>
       </motion.div>
