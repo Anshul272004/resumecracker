@@ -253,6 +253,9 @@ const Dashboard = () => {
   if (showHub && !loadingResumes) {
     return (
       <div className="min-h-screen bg-background">
+        {showOnboarding && user && (
+          <OnboardingModal userId={user.id} userName={firstName} onComplete={() => setShowOnboarding(false)} />
+        )}
         <Navbar />
         <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
           {/* Greeting */}
