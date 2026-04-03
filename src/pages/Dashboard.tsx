@@ -67,6 +67,14 @@ const Dashboard = () => {
   const [interviewStats, setInterviewStats] = useState({ solved: 0, attempted: 0, total: 23 });
   const [bestAtsScore, setBestAtsScore] = useState(0);
   const [loadingResumes, setLoadingResumes] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check onboarding status
+  useEffect(() => {
+    if (user && profile && !(profile as any).onboarding_complete) {
+      setShowOnboarding(true);
+    }
+  }, [user, profile]);
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0);
