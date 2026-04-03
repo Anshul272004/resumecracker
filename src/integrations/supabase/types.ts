@@ -99,32 +99,50 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          career_goal: string | null
           created_at: string
           full_name: string | null
           id: string
           last_active: string | null
+          onboarding_complete: boolean | null
           plan: string
           streak_count: number
+          target_country: string | null
+          target_role: string | null
+          target_salary_max: number | null
+          target_salary_min: number | null
           updated_at: string
         }
         Insert: {
           avatar_url?: string | null
+          career_goal?: string | null
           created_at?: string
           full_name?: string | null
           id: string
           last_active?: string | null
+          onboarding_complete?: boolean | null
           plan?: string
           streak_count?: number
+          target_country?: string | null
+          target_role?: string | null
+          target_salary_max?: number | null
+          target_salary_min?: number | null
           updated_at?: string
         }
         Update: {
           avatar_url?: string | null
+          career_goal?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
           last_active?: string | null
+          onboarding_complete?: boolean | null
           plan?: string
           streak_count?: number
+          target_country?: string | null
+          target_role?: string | null
+          target_salary_max?: number | null
+          target_salary_min?: number | null
           updated_at?: string
         }
         Relationships: []
