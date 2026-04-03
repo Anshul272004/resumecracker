@@ -178,6 +178,12 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Cinematic Intro (one-time) */}
+      {showIntro && (
+        <Suspense fallback={null}>
+          <CinematicIntro onComplete={() => setShowIntro(false)} />
+        </Suspense>
+      )}
       <Navbar />
 
       {/* Live Activity Ticker */}

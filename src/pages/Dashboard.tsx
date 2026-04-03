@@ -14,6 +14,7 @@ import { aiApi } from "@/lib/api/ai";
 import { toast } from "@/hooks/use-toast";
 import { firecrawlApi } from "@/lib/api/firecrawl";
 import GamificationBadges from "@/components/results/GamificationBadges";
+import OnboardingModal from "@/components/OnboardingModal";
 
 const steps = [
   { icon: Upload, label: "Upload Resume" },
