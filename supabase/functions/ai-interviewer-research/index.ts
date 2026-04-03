@@ -27,11 +27,11 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are an expert career coach. Analyze scraped company data and provide actionable interview preparation insights about the company's culture, interview style, dress code, and values.`,
+              content: `You are an elite career strategist and interview coach with 20 years of experience. Analyze scraped company data and provide deeply actionable interview preparation insights. Go beyond surface-level advice — provide specific strategies to impress interviewers at this company.`,
             },
             {
               role: "user",
-              content: `Company Name: ${companyName}\n\nScraped Company Data:\n${scrapedContent}\n\nAnalyze this company and provide interview preparation insights.`,
+              content: `Company Name: ${companyName}\n\nScraped Company Data:\n${scrapedContent}\n\nProvide comprehensive company intelligence for interview preparation.`,
             },
           ],
           tools: [
@@ -39,7 +39,7 @@ serve(async (req) => {
               type: "function",
               function: {
                 name: "return_company_insights",
-                description: "Return company analysis insights for interview prep",
+                description: "Return deep company analysis insights for interview prep",
                 parameters: {
                   type: "object",
                   properties: {
@@ -51,8 +51,11 @@ serve(async (req) => {
                     valuesToMirror: { type: "array", items: { type: "string" }, description: "5-6 specific values/phrases to mirror in your answers" },
                     commonQuestionThemes: { type: "array", items: { type: "string" }, description: "4-6 common interview question themes at this company" },
                     tipsForSuccess: { type: "array", items: { type: "string" }, description: "5-7 actionable tips for interviewing at this company" },
+                    personalityArchetypes: { type: "array", items: { type: "object", properties: { type: { type: "string" }, description: { type: "string" }, strategy: { type: "string" } }, required: ["type", "description", "strategy"] }, description: "3-4 typical interviewer personality types at this company with specific strategies for each" },
+                    companyWeakPoints: { type: "array", items: { type: "string" }, description: "3-4 sensitive topics or weak points to avoid mentioning about the company" },
+                    impressStrategies: { type: "array", items: { type: "string" }, description: "5-6 specific strategies to instantly impress interviewers at this company" },
                   },
-                  required: ["companySummary", "cultureTraits", "interviewStyle", "dressCode", "dressDetails", "valuesToMirror", "commonQuestionThemes", "tipsForSuccess"],
+                  required: ["companySummary", "cultureTraits", "interviewStyle", "dressCode", "dressDetails", "valuesToMirror", "commonQuestionThemes", "tipsForSuccess", "personalityArchetypes", "companyWeakPoints", "impressStrategies"],
                   additionalProperties: false,
                 },
               },
@@ -77,7 +80,7 @@ serve(async (req) => {
       return new Response(JSON.stringify(result), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Interviewer research mode (default)
+    // Interviewer research mode (default) — ENHANCED with personality decoder
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -86,11 +89,11 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: `You are an expert career coach and interview strategist. Analyze scraped social media/web data about an interviewer and extract actionable insights for interview preparation. Provide deep personality analysis including their communication style, personality archetype, dress code recommendation based on their company culture, and personalized ice-breaker conversation starters.`,
+            content: `You are an elite interview strategist who profiles interviewers from their social media presence. Analyze scraped data from LinkedIn, Twitter, Instagram, Facebook, and other sources. Extract deep personality insights, communication preferences, likes/dislikes, weak points to avoid, and strategic recommendations to make the candidate instantly likeable and memorable. Think like a social psychologist.`,
           },
           {
             role: "user",
-            content: `Interviewer Name: ${interviewerName}\n\nScraped Profile Data:\n${scrapedContent}\n\nAnalyze this person's profile and provide comprehensive interview preparation insights including personality type, communication style, dress code, and ice-breakers.`,
+            content: `Interviewer Name: ${interviewerName}\n\nScraped Social Media Data:\n${scrapedContent}\n\nProvide a complete personality decoder and interview strategy.`,
           },
         ],
         tools: [
@@ -98,7 +101,7 @@ serve(async (req) => {
             type: "function",
             function: {
               name: "return_insights",
-              description: "Return interviewer analysis insights",
+              description: "Return deep interviewer personality analysis and strategy",
               parameters: {
                 type: "object",
                 properties: {
@@ -113,8 +116,14 @@ serve(async (req) => {
                   dressCode: { type: "string", enum: ["Formal", "Business Casual", "Smart Casual", "Startup Casual"], description: "Recommended dress code based on their company culture" },
                   dressDetails: { type: "string", description: "Specific what-to-wear advice" },
                   iceBreakers: { type: "array", items: { type: "string" }, description: "3-4 personalized conversation starters based on their interests/posts" },
+                  likes: { type: "array", items: { type: "string" }, description: "5-6 things the interviewer likes/values based on their social media activity" },
+                  dislikes: { type: "array", items: { type: "string" }, description: "4-5 things the interviewer dislikes/avoids or gets annoyed by" },
+                  weakPoints: { type: "array", items: { type: "string" }, description: "3-4 sensitive topics or trigger points to avoid during the interview" },
+                  instantLikeStrategies: { type: "array", items: { type: "string" }, description: "5-6 strategies to make the interviewer instantly like you (shared interests, compliments, mirroring techniques)" },
+                  openingLines: { type: "array", items: { type: "string" }, description: "3-4 personalized opening lines to start the interview on a positive note" },
+                  bodyLanguageTips: { type: "array", items: { type: "string" }, description: "4-5 body language recommendations specific to this interviewer's personality" },
                 },
-                required: ["summary", "interests", "tips", "commonTopics", "communicationStyle", "communicationStyleType", "personalityType", "personalityStrategy", "dressCode", "dressDetails", "iceBreakers"],
+                required: ["summary", "interests", "tips", "commonTopics", "communicationStyle", "communicationStyleType", "personalityType", "personalityStrategy", "dressCode", "dressDetails", "iceBreakers", "likes", "dislikes", "weakPoints", "instantLikeStrategies", "openingLines", "bodyLanguageTips"],
                 additionalProperties: false,
               },
             },

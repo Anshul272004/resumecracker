@@ -118,6 +118,8 @@ const templateShowcaseRow2 = [
 ];
 
 /* ─── Landing Page ─── */
+const CinematicIntro = lazy(() => import("@/components/CinematicIntro"));
+
 const LandingPage = () => {
   const typewriterText = useTypewriter([
     "Stop Getting Rejected.",
@@ -128,6 +130,7 @@ const LandingPage = () => {
 
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
+  const [showIntro, setShowIntro] = useState(() => !localStorage.getItem("rc_intro_seen"));
 
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
@@ -175,6 +178,12 @@ const LandingPage = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
+      {/* Cinematic Intro (one-time) */}
+      {showIntro && (
+        <Suspense fallback={null}>
+          <CinematicIntro onComplete={() => setShowIntro(false)} />
+        </Suspense>
+      )}
       <Navbar />
 
       {/* Live Activity Ticker */}

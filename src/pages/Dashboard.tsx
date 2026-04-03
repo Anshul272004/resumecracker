@@ -14,6 +14,7 @@ import { aiApi } from "@/lib/api/ai";
 import { toast } from "@/hooks/use-toast";
 import { firecrawlApi } from "@/lib/api/firecrawl";
 import GamificationBadges from "@/components/results/GamificationBadges";
+import OnboardingModal from "@/components/OnboardingModal";
 
 const steps = [
   { icon: Upload, label: "Upload Resume" },
@@ -66,6 +67,14 @@ const Dashboard = () => {
   const [interviewStats, setInterviewStats] = useState({ solved: 0, attempted: 0, total: 23 });
   const [bestAtsScore, setBestAtsScore] = useState(0);
   const [loadingResumes, setLoadingResumes] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+
+  // Check onboarding status
+  useEffect(() => {
+    if (user && profile && !(profile as any).onboarding_complete) {
+      setShowOnboarding(true);
+    }
+  }, [user, profile]);
 
   // Wizard state
   const [currentStep, setCurrentStep] = useState(0);
@@ -244,6 +253,9 @@ const Dashboard = () => {
   if (showHub && !loadingResumes) {
     return (
       <div className="min-h-screen bg-background">
+        {showOnboarding && user && (
+          <OnboardingModal userId={user.id} userName={firstName} onComplete={() => setShowOnboarding(false)} />
+        )}
         <Navbar />
         <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
           {/* Greeting */}
