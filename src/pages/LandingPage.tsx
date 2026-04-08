@@ -1,10 +1,11 @@
 import { useState, useEffect, useRef, lazy, Suspense } from "react";
 import { Link } from "react-router-dom";
-import { motion, useInView, useScroll, useTransform } from "framer-motion";
+import { motion, useInView, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import {
   ArrowRight, CheckCircle2, FileText, Target, Zap, Star, Shield, TrendingUp,
   ChevronRight, Brain, BarChart3, Crown, Eye, Lock, Sparkles, Users, Award,
-  MessageSquare, Mail, Timer, Gift, BadgeCheck, Flame, Heart, XCircle, Briefcase, Palette
+  MessageSquare, Mail, Timer, Gift, BadgeCheck, Flame, Heart, XCircle, Briefcase, Palette,
+  Cpu, LineChart, GraduationCap, Layers, Route, Rocket
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,6 +15,7 @@ import LiveActivityTicker from "@/components/LiveActivityTicker";
 import TiltCard from "@/components/3d/TiltCard";
 
 const HeroScene = lazy(() => import("@/components/3d/HeroScene"));
+const CinematicIntro = lazy(() => import("@/components/CinematicIntro"));
 
 /* ─── Typewriter Hook ─── */
 const useTypewriter = (texts: string[], speed = 80, pause = 2000) => {
@@ -47,8 +49,8 @@ const useTypewriter = (texts: string[], speed = 80, pause = 2000) => {
   return display;
 };
 
-/* ─── Animated Counter ─── */
-const Counter = ({ end, suffix = "", label }: { end: number; suffix?: string; label: string }) => {
+/* ─── Animated Counter with Glow ─── */
+const Counter = ({ end, suffix = "", label, prefix = "" }: { end: number; suffix?: string; label: string; prefix?: string }) => {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true });
   const [count, setCount] = useState(0);
@@ -66,12 +68,12 @@ const Counter = ({ end, suffix = "", label }: { end: number; suffix?: string; la
   }, [inView, end]);
 
   return (
-    <TiltCard className="h-full">
-      <div ref={ref} className="text-center glass-gold rounded-2xl p-8 h-full">
-        <div className="font-display text-5xl md:text-6xl font-bold text-primary text-shadow-gold">{count}{suffix}</div>
-        <p className="font-body text-sm text-muted-foreground mt-2">{label}</p>
+    <div ref={ref} className="text-center">
+      <div className="font-display text-5xl md:text-7xl font-bold text-primary number-glow">
+        {prefix}{count}{suffix}
       </div>
-    </TiltCard>
+      <p className="font-body text-xs md:text-sm text-muted-foreground mt-3 uppercase tracking-wider">{label}</p>
+    </div>
   );
 };
 
@@ -96,7 +98,6 @@ const Particles = () => (
         }}
       />
     ))}
-    {/* Light streaks */}
     <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-transparent via-primary/10 to-transparent animate-light-streak" />
     <div className="absolute top-0 right-1/3 w-px h-full bg-gradient-to-b from-transparent via-cyan-accent/10 to-transparent animate-light-streak" style={{ animationDelay: "2s" }} />
   </div>
@@ -117,9 +118,17 @@ const templateShowcaseRow2 = [
   { name: "The Modern Pro", subtitle: "Tech-Forward", color: "hsl(270 70% 55%)", skills: ["FastAPI", "Redis", "Kafka"] },
 ];
 
-/* ─── Landing Page ─── */
-const CinematicIntro = lazy(() => import("@/components/CinematicIntro"));
+/* ─── Power Features Data ─── */
+const powerFeatures = [
+  { icon: LineChart, title: "Salary Negotiation AI", desc: "AI analyzes market data to suggest your optimal salary range. Never underprice yourself again.", stat: "↑ 2.3x", statLabel: "Avg Salary Boost" },
+  { icon: Route, title: "Career Path Predictor", desc: "See your 5-year career trajectory. AI maps which skills unlock which roles and salary jumps.", stat: "5yr", statLabel: "Future Mapped" },
+  { icon: Cpu, title: "Skill Gap Analyzer", desc: "Compare your profile against top 10% candidates. Get a precise learning roadmap.", stat: "Top 10%", statLabel: "Target Level" },
+  { icon: Palette, title: "Portfolio Generator", desc: "One-click personal website from your resume. Shareable link for recruiters.", stat: "1-Click", statLabel: "Live Site" },
+  { icon: Layers, title: "Resume Version Control", desc: "Track every change. Compare versions side-by-side. Never lose a good version.", stat: "∞", statLabel: "Versions" },
+  { icon: GraduationCap, title: "Learning Roadmap", desc: "AI-curated courses and certifications based on your target role and gaps.", stat: "AI", statLabel: "Curated" },
+];
 
+/* ─── Landing Page ─── */
 const LandingPage = () => {
   const typewriterText = useTypewriter([
     "Stop Getting Rejected.",
@@ -131,11 +140,17 @@ const LandingPage = () => {
   const [email, setEmail] = useState("");
   const [emailSubmitted, setEmailSubmitted] = useState(false);
   const [showIntro, setShowIntro] = useState(() => !localStorage.getItem("rc_intro_seen"));
+  const [showAchievement, setShowAchievement] = useState(false);
 
   const heroRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
   const heroOpacity = useTransform(scrollYProgress, [0, 1], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 1], [1, 0.95]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setShowAchievement(true), 3500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const features = [
     { icon: Shield, title: "ATS Algorithm Cracker", desc: "We reverse-engineered 10+ ATS systems. Your resume passes every single check.", accent: "primary" },
@@ -149,20 +164,13 @@ const LandingPage = () => {
     { icon: FileText, title: "Cover Letter + LinkedIn", desc: "One-click AI cover letter and LinkedIn About section generation.", accent: "violet-accent" },
   ];
 
-  const benefits = [
-    { stat: "3x", desc: "More interview calls within 2 weeks" },
-    { stat: "92%", desc: "Average ATS score after optimization" },
-    { stat: "7.4s", desc: "We optimize for the 7.4-second first impression" },
-    { stat: "Top 1%", desc: "Your resume ranks in the top 1% of applicants" },
-  ];
-
   const reviews = [
-    { name: "Priya Sharma", role: "SDE at Amazon", quote: "ResumeCracker turned my generic resume into a shortlisting machine. Got 5 interview calls in 2 weeks!", avatar: "PS", rating: 5, date: "2 weeks ago" },
-    { name: "Rahul Verma", role: "Data Analyst at Flipkart", quote: "The project reframing blew my mind. Same projects, completely different perception.", avatar: "RV", rating: 5, date: "1 month ago" },
-    { name: "Ananya Patel", role: "PM at Razorpay", quote: "The psychology insights changed everything. My callbacks went from 2% to 34%.", avatar: "AP", rating: 5, date: "3 weeks ago" },
-    { name: "Vikram Singh", role: "SDE-2 at Google", quote: "Interview Prep Engine was a game-changer. Every question they predicted was actually asked.", avatar: "VS", rating: 5, date: "1 week ago" },
-    { name: "Sneha Reddy", role: "ML Engineer at Microsoft", quote: "From 23% ATS score to 95%. Got shortlisted at 4 FAANG companies.", avatar: "SR", rating: 5, date: "5 days ago" },
-    { name: "Arjun Kapoor", role: "Full Stack at Swiggy", quote: "The cover letter AI is insane. Recruiter literally told me it was the best they'd ever read.", avatar: "AK", rating: 5, date: "2 weeks ago" },
+    { name: "Priya Sharma", role: "SDE at Amazon", quote: "ResumeCracker turned my generic resume into a shortlisting machine. Got 5 interview calls in 2 weeks!", avatar: "PS", rating: 5, date: "2 weeks ago", result: "+340% Callbacks" },
+    { name: "Rahul Verma", role: "Data Analyst at Flipkart", quote: "The project reframing blew my mind. Same projects, completely different perception.", avatar: "RV", rating: 5, date: "1 month ago", result: "ATS: 23% → 94%" },
+    { name: "Ananya Patel", role: "PM at Razorpay", quote: "The psychology insights changed everything. My callbacks went from 2% to 34%.", avatar: "AP", rating: 5, date: "3 weeks ago", result: "17x More Calls" },
+    { name: "Vikram Singh", role: "SDE-2 at Google", quote: "Interview Prep Engine was a game-changer. Every question they predicted was actually asked.", avatar: "VS", rating: 5, date: "1 week ago", result: "5 FAANG Offers" },
+    { name: "Sneha Reddy", role: "ML Engineer at Microsoft", quote: "From 23% ATS score to 95%. Got shortlisted at 4 FAANG companies.", avatar: "SR", rating: 5, date: "5 days ago", result: "4 FAANG Shortlists" },
+    { name: "Arjun Kapoor", role: "Full Stack at Swiggy", quote: "The cover letter AI is insane. Recruiter literally told me it was the best they'd ever read.", avatar: "AK", rating: 5, date: "2 weeks ago", result: "Best Cover Letter" },
   ];
 
   const competitors = [
@@ -176,9 +184,14 @@ const LandingPage = () => {
     { feature: "1M+ Pattern Analysis", rc: true, zety: false, novoresume: false, canva: false },
   ];
 
+  const reviewGradients = [
+    "from-primary/5 to-transparent",
+    "from-cyan-accent/5 to-transparent",
+    "from-violet-accent/5 to-transparent",
+  ];
+
   return (
     <div className="min-h-screen bg-background overflow-x-hidden">
-      {/* Cinematic Intro (one-time) */}
       {showIntro && (
         <Suspense fallback={null}>
           <CinematicIntro onComplete={() => setShowIntro(false)} />
@@ -186,7 +199,6 @@ const LandingPage = () => {
       )}
       <Navbar />
 
-      {/* Live Activity Ticker */}
       <div className="pt-16">
         <LiveActivityTicker />
       </div>
@@ -199,14 +211,12 @@ const LandingPage = () => {
       >
         <Particles />
 
-        {/* Gradient mesh background */}
         <div className="absolute inset-0 animate-gradient-shift" style={{
           background: "radial-gradient(ellipse at 20% 50%, hsl(var(--primary) / 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, hsl(var(--cyan-accent) / 0.06) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, hsl(var(--violet-accent) / 0.05) 0%, transparent 50%)"
         }} />
 
         <div className="container relative z-10 mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Copy */}
             <div className="text-left">
               <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
                 <div className="inline-flex items-center gap-2 glass-gold rounded-full px-5 py-2 mb-8">
@@ -215,20 +225,14 @@ const LandingPage = () => {
                 </div>
               </motion.div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-display text-5xl sm:text-6xl md:text-7xl font-bold text-foreground leading-[1.1] mb-6"
-              >
+              <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
+                className="font-display text-5xl sm:text-6xl md:text-7xl font-bold text-foreground leading-[1.1] mb-6">
                 Your Resume.{" "}
                 <span className="text-gradient-gold">Reinvented.</span>
               </motion.h1>
 
-              <motion.div
-                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.3 }}
-                className="h-[1.6em] mb-4 overflow-hidden"
-              >
+              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
+                className="h-[1.6em] mb-4 overflow-hidden">
                 <span className="font-display text-2xl md:text-3xl text-primary/80">
                   {typewriterText}
                   <span className="inline-block w-[2px] h-[0.8em] bg-primary ml-1 animate-pulse" />
@@ -255,7 +259,6 @@ const LandingPage = () => {
                 </Link>
               </motion.div>
 
-              {/* Trust badges */}
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 1 }}
                 className="flex flex-wrap items-center gap-4 text-muted-foreground">
                 {[
@@ -279,6 +282,9 @@ const LandingPage = () => {
               transition={{ duration: 1.2, delay: 0.5 }}
               className="relative h-[500px] lg:h-[600px] hidden md:block"
             >
+              {/* Animated glow border around 3D scene */}
+              <div className="absolute -inset-1 rounded-3xl animate-glow-border opacity-30" />
+              
               <Suspense
                 fallback={
                   <div className="w-full h-full flex items-center justify-center">
@@ -289,7 +295,6 @@ const LandingPage = () => {
                 <HeroScene />
               </Suspense>
 
-              {/* Floating badge overlays */}
               <motion.div
                 animate={{ y: [-5, 5, -5] }}
                 transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
@@ -320,7 +325,178 @@ const LandingPage = () => {
             </motion.div>
           </div>
         </div>
+
+        {/* Achievement notification */}
+        <AnimatePresence>
+          {showAchievement && (
+            <motion.div
+              initial={{ x: "120%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: "120%", opacity: 0 }}
+              transition={{ type: "spring", stiffness: 200, damping: 20 }}
+              className="fixed bottom-6 right-6 z-50 glass-gold rounded-xl px-5 py-4 flex items-center gap-3 shadow-gold-lg cursor-pointer max-w-xs"
+              onClick={() => setShowAchievement(false)}
+            >
+              <div className="w-10 h-10 rounded-full bg-gradient-gold flex items-center justify-center shrink-0">
+                <Award className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <p className="font-body text-xs font-bold text-foreground">🏆 Achievement Unlocked</p>
+                <p className="font-body text-[10px] text-muted-foreground">Someone just landed a FAANG interview using ResumeCracker!</p>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </motion.section>
+
+      {/* ═══ LUXURY DIVIDER ═══ */}
+      <div className="luxury-divider mx-auto max-w-4xl" />
+
+      {/* ═══ CAREER INTELLIGENCE SPECS (Pagani Engine Specs Style) ═══ */}
+      <section className="py-28 relative blueprint-grid">
+        <div className="absolute inset-0" style={{
+          background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.04) 0%, transparent 70%)"
+        }} />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="text-center mb-16">
+            <span className="font-body text-[10px] font-semibold uppercase tracking-[0.3em] text-primary/60 mb-4 block">Performance Specifications</span>
+            <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground">
+              Engineered for <span className="text-gradient-gold">Results</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }}>
+              <Counter end={95} suffix="%" label="ATS Pass Rate" />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.15 }}>
+              <Counter end={47} prefix="+" suffix="pts" label="Avg Score Boost" />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
+              <Counter end={3} suffix=".2x" label="Interview Callback" />
+            </motion.div>
+            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.45 }}>
+              <Counter end={4} suffix=" min" label="Time to Build" />
+            </motion.div>
+          </div>
+
+          {/* Accent lines */}
+          <div className="flex justify-center mt-12 gap-2">
+            {[...Array(5)].map((_, i) => (
+              <motion.div key={i} initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
+                transition={{ delay: 0.6 + i * 0.1, duration: 0.6 }}
+                className="h-px bg-primary/30" style={{ width: `${60 - i * 10}px` }} />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="luxury-divider mx-auto max-w-4xl" />
+
+      {/* ═══ CAREER DNA (Racing DNA Inspired) ═══ */}
+      <section className="py-28 relative">
+        <div className="container mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="text-center mb-16">
+            <span className="font-body text-[10px] font-semibold uppercase tracking-[0.3em] text-primary/60 mb-4 block">Core Architecture</span>
+            <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-4">
+              Career <span className="text-gradient-gold">DNA</span>
+            </h2>
+            <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
+              Four pillars of intelligence, working in unison to decode your career potential.
+            </p>
+          </motion.div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            {[
+              { icon: "🧠", title: "AI Resume Engine", desc: "Deep NLP rewriting with action-result framework. Every word optimized.", color: "primary" },
+              { icon: "🎯", title: "Psychology Framework", desc: "6 cognitive biases engineered to trigger recruiter attention.", color: "cyan-accent" },
+              { icon: "🔓", title: "ATS Decoder", desc: "Reverse-engineered 10+ ATS algorithms. 95% pass guarantee.", color: "violet-accent" },
+              { icon: "🔮", title: "Interview Predictor", desc: "AI predicts exact questions. Practice with real-time psychology scoring.", color: "primary" },
+            ].map((item, i) => (
+              <TiltCard key={i} glowColor={`hsl(var(--${item.color}) / 0.15)`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.12, duration: 0.7 }}
+                  className="glass-gold rounded-2xl p-8 h-full border-shine group hover:scale-[1.02] transition-transform duration-500"
+                >
+                  <div className="text-5xl mb-6 group-hover:scale-110 transition-transform duration-300">{item.icon}</div>
+                  <h3 className="font-display text-xl font-bold text-foreground mb-3">{item.title}</h3>
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
+                </motion.div>
+              </TiltCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="luxury-divider mx-auto max-w-4xl" />
+
+      {/* ═══ CINEMATIC MANIFESTO QUOTE ═══ */}
+      <section className="py-32 relative overflow-hidden">
+        <div className="absolute inset-0" style={{
+          background: "radial-gradient(ellipse at 30% 50%, hsl(var(--primary) / 0.06) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, hsl(var(--violet-accent) / 0.04) 0%, transparent 60%)"
+        }} />
+        <Particles />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1.2 }}
+            className="text-center max-w-4xl mx-auto"
+          >
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+              className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gradient-gold text-shadow-gold-lg"
+            >
+              "Your career isn't just a resume.
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6, duration: 0.8 }}
+              className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-foreground/90 mt-2"
+            >
+              It's a declaration of who
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.9, duration: 0.8 }}
+              className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gradient-gold text-shadow-gold-lg mt-2"
+            >
+              you are becoming."
+            </motion.p>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1.2, duration: 0.8 }}
+              className="w-24 h-px bg-primary/50 mx-auto mt-10"
+            />
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1.5 }}
+              className="font-body text-xs uppercase tracking-[0.4em] text-muted-foreground mt-6"
+            >
+              — ResumeCracker Philosophy
+            </motion.p>
+          </motion.div>
+        </div>
+      </section>
+
+      <div className="luxury-divider mx-auto max-w-4xl" />
 
       {/* ═══ DYNAMIC TEMPLATE SHOWCASE ═══ */}
       <section className="py-20 border-y border-border/50 overflow-hidden relative">
@@ -335,7 +511,6 @@ const LandingPage = () => {
           </motion.div>
         </div>
 
-        {/* Row 1 - scrolls left */}
         <div className="relative mb-4">
           <div className="flex gap-4 animate-ticker-left">
             {[...templateShowcaseRow1, ...templateShowcaseRow1].map((t, i) => (
@@ -355,7 +530,6 @@ const LandingPage = () => {
           </div>
         </div>
 
-        {/* Row 2 - scrolls right */}
         <div className="relative">
           <div className="flex gap-4 animate-ticker-right">
             {[...templateShowcaseRow2, ...templateShowcaseRow2].map((t, i) => (
@@ -405,43 +579,7 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ═══ STATS ═══ */}
-      <section className="py-24 border-y border-border/50 relative">
-        <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.03) 0%, transparent 70%)"
-        }} />
-        <div className="container mx-auto px-6 relative z-10">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <Counter end={70} suffix="%" label="Resumes Fail ATS" />
-            <Counter end={15} suffix="K+" label="Resumes Created" />
-            <Counter end={3} suffix="x" label="More Interviews" />
-            <Counter end={2400} suffix="+" label="5-Star Reviews" />
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ BENEFITS ═══ */}
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Why ResumeCracker</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
-              Results That <span className="text-gradient-gold">Speak</span>
-            </h2>
-          </motion.div>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto">
-            {benefits.map((b, i) => (
-              <TiltCard key={i}>
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                  className="glass-gold rounded-2xl p-8 text-center h-full border-shine">
-                  <p className="font-display text-4xl md:text-5xl font-bold text-primary text-shadow-gold">{b.stat}</p>
-                  <p className="font-body text-xs text-muted-foreground mt-3">{b.desc}</p>
-                </motion.div>
-              </TiltCard>
-            ))}
-          </div>
-        </div>
-      </section>
+      <div className="luxury-divider mx-auto max-w-4xl" />
 
       {/* ═══ FEATURES ═══ */}
       <section id="features" className="py-24 relative">
@@ -472,6 +610,58 @@ const LandingPage = () => {
         </div>
       </section>
 
+      <div className="luxury-divider mx-auto max-w-4xl" />
+
+      {/* ═══ POWER FEATURES — COMING SOON TEASERS ═══ */}
+      <section className="py-28 relative">
+        <div className="absolute inset-0 blueprint-grid opacity-50" />
+        <div className="absolute inset-0" style={{
+          background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.03) 0%, transparent 60%)"
+        }} />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
+            className="text-center mb-16">
+            <span className="font-body text-[10px] font-semibold uppercase tracking-[0.3em] text-primary/60 mb-4 block">What's Next</span>
+            <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground mb-4">
+              Power <span className="text-gradient-gold">Features</span>
+            </h2>
+            <p className="font-body text-sm text-muted-foreground max-w-md mx-auto">
+              The future of career intelligence. Coming soon to your dashboard.
+            </p>
+          </motion.div>
+
+          {/* Horizontal scroll on mobile, grid on desktop */}
+          <div className="flex md:grid md:grid-cols-3 gap-6 overflow-x-auto snap-x-mandatory pb-4 md:pb-0 -mx-6 px-6 md:mx-0 md:px-0">
+            {powerFeatures.map((f, i) => (
+              <TiltCard key={i} className="shrink-0 w-[280px] md:w-auto snap-center">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="glass rounded-2xl p-8 h-full border border-border/50 hover:glass-gold hover:border-primary/20 transition-all duration-500 group"
+                >
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                      <f.icon className="w-6 h-6 text-primary" />
+                    </div>
+                    <span className="font-body text-[9px] uppercase tracking-widest text-primary/40 bg-primary/5 px-3 py-1 rounded-full">Coming Soon</span>
+                  </div>
+                  <h3 className="font-display text-lg font-bold text-foreground mb-2">{f.title}</h3>
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed mb-6">{f.desc}</p>
+                  <div className="border-t border-border/50 pt-4 flex items-baseline gap-2">
+                    <span className="font-display text-3xl font-bold text-primary number-glow">{f.stat}</span>
+                    <span className="font-body text-[10px] text-muted-foreground uppercase tracking-wider">{f.statLabel}</span>
+                  </div>
+                </motion.div>
+              </TiltCard>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <div className="luxury-divider mx-auto max-w-4xl" />
+
       {/* ═══ HOW IT WORKS ═══ */}
       <section id="how-it-works" className="py-24 relative">
         <div className="container mx-auto px-6">
@@ -483,7 +673,6 @@ const LandingPage = () => {
           </motion.div>
 
           <div className="grid md:grid-cols-3 gap-8 relative">
-            {/* Connecting line */}
             <div className="hidden md:block absolute top-1/2 left-[16.5%] right-[16.5%] h-px bg-gradient-to-r from-primary/50 via-cyan-accent/30 to-violet-accent/50" />
 
             {[
@@ -551,6 +740,119 @@ const LandingPage = () => {
         </div>
       </section>
 
+      {/* ═══ BEFORE / AFTER ═══ */}
+      <section id="before-after" className="py-24 relative">
+        <div className="absolute inset-0 bg-secondary/30" />
+        <div className="container mx-auto px-6 relative z-10">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
+            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">The Transformation</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
+              Same Project. <span className="text-gradient-gold">Different Impact.</span>
+            </h2>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <TiltCard glowColor="hsl(var(--destructive) / 0.15)">
+              <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                className="glass rounded-2xl p-8 h-full border border-destructive/10">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="h-2 w-2 rounded-full bg-destructive" />
+                  <span className="font-body text-xs font-bold text-destructive uppercase tracking-wider">Before</span>
+                </div>
+                <div className="space-y-4">
+                  {["\"Built a weather app using API\"", "\"Made a Python project to count vowels\"", "\"Created a to-do list app using React\""].map((t, i) => (
+                    <div key={i} className="glass rounded-lg p-4"><p className="font-body text-sm text-muted-foreground">{t}</p></div>
+                  ))}
+                </div>
+                <div className="mt-6 flex items-center gap-2 text-destructive">
+                  <span className="font-body text-xs font-semibold">ATS Score: 23%</span>
+                </div>
+              </motion.div>
+            </TiltCard>
+
+            <TiltCard>
+              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
+                className="glass-gold rounded-2xl p-8 h-full glow-gold border-shine">
+                <div className="flex items-center gap-2 mb-6">
+                  <div className="h-2 w-2 rounded-full bg-primary" />
+                  <span className="font-body text-xs font-bold text-primary uppercase tracking-wider">After ResumeCracker</span>
+                </div>
+                <div className="space-y-4">
+                  {[
+                    "\"Engineered a real-time weather dashboard integrating RESTful APIs, reducing latency by 40%\"",
+                    "\"Designed a text analysis module with optimized handling, improving accuracy by 30%\"",
+                    "\"Developed full-stack task platform with persistence, boosting productivity by 2x\"",
+                  ].map((t, i) => (
+                    <div key={i} className="glass-gold rounded-lg p-4"><p className="font-body text-sm text-foreground">{t}</p></div>
+                  ))}
+                </div>
+                <div className="mt-6 flex items-center gap-2 text-primary">
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span className="font-body text-xs font-semibold">ATS Score: 92%</span>
+                </div>
+              </motion.div>
+            </TiltCard>
+          </div>
+        </div>
+      </section>
+
+      <div className="luxury-divider mx-auto max-w-4xl" />
+
+      {/* ═══ REVIEWS (Enhanced with Result Tags) ═══ */}
+      <section className="py-24">
+        <div className="container mx-auto px-6">
+          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-4">
+            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Success Stories</span>
+            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-2">
+              What Our Users <span className="text-gradient-gold">Say</span>
+            </h2>
+            <div className="flex items-center justify-center gap-2 mb-2">
+              {Array(5).fill(0).map((_, i) => <Star key={i} className="w-5 h-5 fill-primary text-primary" />)}
+              <span className="font-body text-sm text-foreground font-semibold ml-2">4.9/5</span>
+              <span className="font-body text-xs text-muted-foreground">(2,400+ reviews)</span>
+            </div>
+          </motion.div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
+            {reviews.map((r, i) => (
+              <TiltCard key={i} glowColor={`hsl(var(--${i % 3 === 0 ? 'primary' : i % 3 === 1 ? 'cyan-accent' : 'violet-accent'}) / 0.12)`}>
+                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
+                  className={`glass rounded-2xl p-6 hover:glass-gold transition-all duration-500 group h-full bg-gradient-to-br ${reviewGradients[i % 3]}`}>
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-12 h-12 rounded-full bg-gradient-gold flex items-center justify-center shadow-gold ring-2 ring-primary/20">
+                      <span className="font-body text-xs font-bold text-primary-foreground">{r.avatar}</span>
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-body text-sm font-semibold text-foreground">{r.name}</p>
+                      <p className="font-body text-xs text-primary">{r.role}</p>
+                    </div>
+                    <BadgeCheck className="w-5 h-5 text-primary shrink-0" />
+                  </div>
+                  {/* Result tag */}
+                  <div className="inline-flex items-center gap-1.5 bg-primary/10 rounded-full px-3 py-1 mb-3">
+                    <Rocket className="w-3 h-3 text-primary" />
+                    <span className="font-body text-[10px] font-bold text-primary">{r.result}</span>
+                  </div>
+                  <div className="flex gap-1 mb-3">
+                    {Array(r.rating).fill(0).map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-primary text-primary" />)}
+                  </div>
+                  <p className="font-body text-sm text-muted-foreground leading-relaxed mb-3">"{r.quote}"</p>
+                  <p className="font-body text-[10px] text-muted-foreground/60">{r.date}</p>
+                </motion.div>
+              </TiltCard>
+            ))}
+          </div>
+
+          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+            className="flex flex-wrap items-center justify-center gap-6 mt-16 pt-8 border-t border-border">
+            <span className="font-body text-xs text-muted-foreground uppercase tracking-wider">Trusted by professionals at</span>
+            {["Google", "Amazon", "Microsoft", "Flipkart", "Razorpay", "Swiggy"].map((co) => (
+              <span key={co} className="glass-gold rounded-lg px-4 py-2 font-display text-sm font-bold text-primary/60 border border-primary/10">{co}</span>
+            ))}
+          </motion.div>
+        </div>
+      </section>
+
       {/* ═══ FREEMIUM PREVIEW ═══ */}
       <section className="py-24">
         <div className="container mx-auto px-6">
@@ -609,112 +911,6 @@ const LandingPage = () => {
               </motion.div>
             </TiltCard>
           </div>
-        </div>
-      </section>
-
-      {/* ═══ BEFORE / AFTER ═══ */}
-      <section id="before-after" className="py-24 relative">
-        <div className="absolute inset-0 bg-secondary/30" />
-        <div className="container mx-auto px-6 relative z-10">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-16">
-            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">The Transformation</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-4">
-              Same Project. <span className="text-gradient-gold">Different Impact.</span>
-            </h2>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <TiltCard glowColor="hsl(var(--destructive) / 0.15)">
-              <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
-                className="glass rounded-2xl p-8 h-full border border-destructive/10">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="h-2 w-2 rounded-full bg-destructive" />
-                  <span className="font-body text-xs font-bold text-destructive uppercase tracking-wider">Before</span>
-                </div>
-                <div className="space-y-4">
-                  {["\"Built a weather app using API\"", "\"Made a Python project to count vowels\"", "\"Created a to-do list app using React\""].map((t, i) => (
-                    <div key={i} className="glass rounded-lg p-4"><p className="font-body text-sm text-muted-foreground">{t}</p></div>
-                  ))}
-                </div>
-                <div className="mt-6 flex items-center gap-2 text-destructive">
-                  <span className="font-body text-xs font-semibold">ATS Score: 23%</span>
-                </div>
-              </motion.div>
-            </TiltCard>
-
-            <TiltCard>
-              <motion.div initial={{ opacity: 0, x: 30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}
-                className="glass-gold rounded-2xl p-8 h-full glow-gold border-shine">
-                <div className="flex items-center gap-2 mb-6">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
-                  <span className="font-body text-xs font-bold text-primary uppercase tracking-wider">After ResumeCracker</span>
-                </div>
-                <div className="space-y-4">
-                  {[
-                    "\"Engineered a real-time weather dashboard integrating RESTful APIs, reducing latency by 40%\"",
-                    "\"Designed a text analysis module with optimized handling, improving accuracy by 30%\"",
-                    "\"Developed full-stack task platform with persistence, boosting productivity by 2x\"",
-                  ].map((t, i) => (
-                    <div key={i} className="glass-gold rounded-lg p-4"><p className="font-body text-sm text-foreground">{t}</p></div>
-                  ))}
-                </div>
-                <div className="mt-6 flex items-center gap-2 text-primary">
-                  <CheckCircle2 className="w-4 h-4" />
-                  <span className="font-body text-xs font-semibold">ATS Score: 92%</span>
-                </div>
-              </motion.div>
-            </TiltCard>
-          </div>
-        </div>
-      </section>
-
-      {/* ═══ REVIEWS ═══ */}
-      <section className="py-24">
-        <div className="container mx-auto px-6">
-          <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-4">
-            <span className="font-body text-xs font-semibold uppercase tracking-widest text-primary mb-4 block">Success Stories</span>
-            <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-2">
-              What Our Users <span className="text-gradient-gold">Say</span>
-            </h2>
-            <div className="flex items-center justify-center gap-2 mb-2">
-              {Array(5).fill(0).map((_, i) => <Star key={i} className="w-5 h-5 fill-primary text-primary" />)}
-              <span className="font-body text-sm text-foreground font-semibold ml-2">4.9/5</span>
-              <span className="font-body text-xs text-muted-foreground">(2,400+ reviews)</span>
-            </div>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mt-12">
-            {reviews.map((r, i) => (
-              <TiltCard key={i} glowColor={`hsl(var(--${i % 3 === 0 ? 'primary' : i % 3 === 1 ? 'cyan-accent' : 'violet-accent'}) / 0.12)`}>
-                <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: i * 0.1 }}
-                  className="glass rounded-2xl p-6 hover:glass-gold transition-all duration-500 group h-full">
-                  <div className="flex items-center gap-3 mb-4">
-                    <div className="w-12 h-12 rounded-full bg-gradient-gold flex items-center justify-center shadow-gold ring-2 ring-primary/20">
-                      <span className="font-body text-xs font-bold text-primary-foreground">{r.avatar}</span>
-                    </div>
-                    <div>
-                      <p className="font-body text-sm font-semibold text-foreground">{r.name}</p>
-                      <p className="font-body text-xs text-primary">{r.role}</p>
-                    </div>
-                    <BadgeCheck className="w-5 h-5 text-primary ml-auto" />
-                  </div>
-                  <div className="flex gap-1 mb-3">
-                    {Array(r.rating).fill(0).map((_, j) => <Star key={j} className="w-3.5 h-3.5 fill-primary text-primary" />)}
-                  </div>
-                  <p className="font-body text-sm text-muted-foreground leading-relaxed mb-3">"{r.quote}"</p>
-                  <p className="font-body text-[10px] text-muted-foreground/60">{r.date}</p>
-                </motion.div>
-              </TiltCard>
-            ))}
-          </div>
-
-          <motion.div initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
-            className="flex flex-wrap items-center justify-center gap-6 mt-16 pt-8 border-t border-border">
-            <span className="font-body text-xs text-muted-foreground uppercase tracking-wider">Trusted by professionals at</span>
-            {["Google", "Amazon", "Microsoft", "Flipkart", "Razorpay", "Swiggy"].map((co) => (
-              <span key={co} className="glass-gold rounded-lg px-4 py-2 font-display text-sm font-bold text-primary/60 border border-primary/10">{co}</span>
-            ))}
-          </motion.div>
         </div>
       </section>
 
@@ -821,28 +1017,67 @@ const LandingPage = () => {
         </div>
       </section>
 
-      {/* ═══ FINAL CTA ═══ */}
-      <section className="py-24">
-        <div className="container mx-auto px-6 text-center">
-          <TiltCard tiltMax={3} className="max-w-3xl mx-auto">
-            <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }}
-              className="glass-gold rounded-3xl p-12 md:p-20 glow-gold-lg border-shine">
-              <h2 className="font-display text-3xl md:text-5xl font-bold text-foreground mb-6">
-                Ready to <span className="text-gradient-gold">Win</span>?
-              </h2>
-              <p className="font-body text-muted-foreground mb-4 max-w-lg mx-auto">
-                Join 15,000+ professionals who stopped getting rejected and started getting shortlisted.
-              </p>
-              <p className="font-body text-sm text-primary font-semibold mb-8">
-                ⏰ Start free — no credit card required. See results before you pay.
-              </p>
+      {/* ═══ CLAIM YOUR FUTURE — DRAMATIC FINAL CTA ═══ */}
+      <section className="py-32 relative overflow-hidden">
+        <Particles />
+        <div className="absolute inset-0" style={{
+          background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.06) 0%, transparent 50%)"
+        }} />
+        <div className="container mx-auto px-6 relative z-10 text-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1 }}
+          >
+            <motion.h2
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2, duration: 0.8 }}
+              className="font-display text-5xl sm:text-6xl md:text-8xl font-bold text-gradient-gold text-shadow-gold-lg mb-8 uppercase tracking-wide"
+            >
+              Claim Your Future
+            </motion.h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.6 }}
+              className="font-body text-muted-foreground max-w-lg mx-auto mb-4"
+            >
+              Join 15,000+ professionals who stopped getting rejected and started getting shortlisted.
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.8 }}
+              className="font-body text-sm text-primary font-semibold mb-12"
+            >
+              ⏰ Start free — no credit card required. See results before you pay.
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 1 }}
+            >
               <Link to="/dashboard">
-                <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-lg px-10 py-7 animate-gold-pulse shadow-gold-lg group">
-                  Start Free Resume Now <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-xl px-14 py-8 animate-gold-pulse shadow-gold-lg glow-gold-xl group">
+                  Start Free Resume Now <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
                 </Button>
               </Link>
             </motion.div>
-          </TiltCard>
+            {/* Decorative accent lines */}
+            <div className="flex justify-center mt-16 gap-3">
+              {[...Array(3)].map((_, i) => (
+                <motion.div key={i} initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
+                  transition={{ delay: 1.2 + i * 0.15, duration: 0.6 }}
+                  className="h-px bg-primary/30" style={{ width: `${40 - i * 10}px` }} />
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
