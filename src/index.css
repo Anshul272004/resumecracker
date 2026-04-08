@@ -275,7 +275,7 @@
 
 /* Scrollbar styling */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -283,10 +283,87 @@
 }
 
 ::-webkit-scrollbar-thumb {
-  background: hsl(43 75% 52% / 0.3);
-  border-radius: 3px;
+  background: linear-gradient(180deg, hsl(43 80% 65% / 0.4), hsl(43 75% 52% / 0.3));
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: hsl(43 75% 52% / 0.5);
+  background: linear-gradient(180deg, hsl(43 80% 65% / 0.6), hsl(43 75% 52% / 0.5));
+}
+
+/* Reveal animation */
+@keyframes reveal-up {
+  0% { opacity: 0; transform: translateY(40px) scale(0.97); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.animate-reveal-up {
+  animation: reveal-up 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glow border rotation */
+@keyframes glow-border-rotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-glow-border {
+  background: linear-gradient(270deg, hsl(43 80% 65% / 0.6), hsl(43 75% 52% / 0.1), hsl(43 80% 65% / 0.6));
+  background-size: 200% 200%;
+  animation: glow-border-rotate 3s ease infinite;
+}
+
+/* Luxury divider */
+.luxury-divider {
+  position: relative;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(43 75% 52% / 0.3), transparent);
+}
+
+.luxury-divider::after {
+  content: '◆';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: hsl(43 75% 52% / 0.5);
+  font-size: 8px;
+  background: hsl(0 0% 4%);
+  padding: 0 12px;
+}
+
+/* Blueprint grid background */
+.blueprint-grid {
+  background-image:
+    linear-gradient(hsl(43 75% 52% / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(43 75% 52% / 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+
+/* Horizontal scroll snap */
+.snap-x-mandatory {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
+
+/* Count-up number glow */
+.number-glow {
+  text-shadow: 0 0 30px hsl(43 75% 52% / 0.5), 0 0 60px hsl(43 75% 52% / 0.2);
+}
+
+/* Achievement notification slide */
+@keyframes slide-in-right-bounce {
+  0% { transform: translateX(120%); opacity: 0; }
+  60% { transform: translateX(-5%); opacity: 1; }
+  80% { transform: translateX(2%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right-bounce 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
