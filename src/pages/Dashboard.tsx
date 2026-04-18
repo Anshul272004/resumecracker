@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target, Flame, Brain, BarChart3, ArrowRight, Trash2, Edit3, Loader2, Link as LinkIcon, Globe, Briefcase } from "lucide-react";
+import { Upload, User, FileText, Lightbulb, Sparkles, ChevronLeft, ChevronRight, X, Plus, CheckCircle2, Clock, AlertTriangle, Target, Flame, Brain, BarChart3, ArrowRight, Trash2, Edit3, Loader2, Link as LinkIcon, Globe, Briefcase, Sunrise, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,6 +15,7 @@ import { toast } from "@/hooks/use-toast";
 import { firecrawlApi } from "@/lib/api/firecrawl";
 import GamificationBadges from "@/components/results/GamificationBadges";
 import OnboardingModal from "@/components/OnboardingModal";
+import AnimatedCounter from "@/components/ui/AnimatedCounter";
 
 const steps = [
   { icon: Upload, label: "Upload Resume" },
@@ -251,29 +252,87 @@ const Dashboard = () => {
 
   // ═══ PERSONALIZED HUB ═══
   if (showHub && !loadingResumes) {
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? "Good morning" : hour < 18 ? "Good afternoon" : "Good evening";
+    const GreetIcon = hour < 12 ? Sunrise : hour < 18 ? Sun : Moon;
+    const totalScore = bestAtsScore;
+    const dailyMission = totalScore < 70
+      ? { title: "Boost your ATS score", desc: "Edit your top resume — aim for 80+", path: "/resume-builder", cta: "Open Resume" }
+      : interviewStats.solved < 5
+      ? { title: "Practice 1 interview question", desc: "Build your confidence streak today", path: "/interview-prep", cta: "Start Practice" }
+      : { title: "Find a matching job", desc: "Your resume is ready — go land an interview", path: "/job-match", cta: "Find Jobs" };
+
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background ambient-dust animate-page-enter">
         {showOnboarding && user && (
           <OnboardingModal userId={user.id} userName={firstName} onComplete={() => setShowOnboarding(false)} />
         )}
         <Navbar />
-        <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl">
-          {/* Greeting */}
+        <div className="container mx-auto px-6 pt-28 pb-16 max-w-4xl relative z-10">
+          {/* Cinematic Greeting */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-2 mb-3">
+              <GreetIcon className="w-4 h-4 text-primary animate-float-gentle" />
+              <span className="font-body text-xs uppercase tracking-widest text-primary">{greeting}</span>
+            </div>
+            <div className="flex flex-wrap items-center gap-3 mb-2">
               <h1 className="font-display text-3xl md:text-5xl font-bold text-foreground">
                 Hey, <span className="text-gradient-gold">{firstName}</span>
               </h1>
               {(profile?.streak_count || 0) > 0 && (
-                <div className="flex items-center gap-1.5 glass-gold rounded-full px-4 py-2">
+                <div className="flex items-center gap-1.5 glass-gold rounded-full px-4 py-2 animate-glow-pulse">
                   <Flame className="w-5 h-5 text-primary" />
                   <span className="font-display text-lg font-bold text-primary">{profile?.streak_count}</span>
                   <span className="font-body text-[10px] text-primary">day streak</span>
                 </div>
               )}
             </div>
-            <p className="font-body text-sm text-muted-foreground">Your personal career command center. Keep building, keep winning.</p>
+            <p className="font-body text-sm text-muted-foreground">Your career command center. One small move today, one big leap tomorrow.</p>
           </motion.div>
+
+          {/* Career Command Stats */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+            className="grid grid-cols-3 gap-3 mb-6">
+            <div className="glass-gold-deep rounded-xl p-4 text-center border-shine">
+              <p className="font-display text-3xl md:text-4xl font-bold text-primary number-glow">
+                <AnimatedCounter to={savedResumes.length} />
+              </p>
+              <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Resumes</p>
+            </div>
+            <div className="glass-gold-deep rounded-xl p-4 text-center border-shine">
+              <p className="font-display text-3xl md:text-4xl font-bold text-primary number-glow">
+                <AnimatedCounter to={bestAtsScore} suffix="%" />
+              </p>
+              <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Top ATS</p>
+            </div>
+            <div className="glass-gold-deep rounded-xl p-4 text-center border-shine">
+              <p className="font-display text-3xl md:text-4xl font-bold text-primary number-glow">
+                <AnimatedCounter to={interviewStats.solved} />
+              </p>
+              <p className="font-body text-[10px] text-muted-foreground uppercase tracking-wider mt-1">Solved Q's</p>
+            </div>
+          </motion.div>
+
+          {/* Daily Mission */}
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+            className="glass-gold-deep rounded-2xl p-5 mb-8 border-shine flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl bg-gradient-gold flex items-center justify-center shrink-0 animate-pulse-gold">
+              <Target className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-body text-[10px] uppercase tracking-widest text-primary mb-0.5">Today's Mission</p>
+              <p className="font-display text-base md:text-lg font-bold text-foreground truncate">{dailyMission.title}</p>
+              <p className="font-body text-xs text-muted-foreground truncate">{dailyMission.desc}</p>
+            </div>
+            <Link to={dailyMission.path}>
+              <Button size="sm" className="bg-gradient-gold text-primary-foreground font-body text-xs shadow-gold shrink-0">
+                Go <ArrowRight className="w-3 h-3 ml-1" />
+              </Button>
+            </Link>
+          </motion.div>
+
+          <div className="luxury-divider mb-8" />
+
 
           {/* Quick Actions */}
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">

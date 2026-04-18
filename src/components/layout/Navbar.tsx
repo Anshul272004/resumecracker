@@ -1,8 +1,10 @@
 import { useState, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut, User } from "lucide-react";
+import { Menu, X, LogOut, Command } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import NotificationCenter from "@/components/NotificationCenter";
+import StreakCounter from "@/components/StreakCounter";
 
 const navItems = [
   { label: "Features", href: "#features" },
@@ -77,6 +79,15 @@ const Navbar = () => {
 
           {user ? (
             <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.dispatchEvent(new KeyboardEvent("keydown", { key: "k", metaKey: true }))}
+                className="hidden xl:flex items-center gap-1.5 glass rounded-md px-2.5 py-1.5 text-[10px] text-muted-foreground hover:text-primary transition-colors"
+                title="Open command palette (⌘K)"
+              >
+                <Command className="w-3 h-3" /> K
+              </button>
+              <StreakCounter />
+              <NotificationCenter />
               <span className="font-body text-sm text-foreground">
                 Hey, <span className="text-primary font-semibold">{displayName}</span>
               </span>
