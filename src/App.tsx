@@ -15,6 +15,8 @@ const ScrollToTop = () => {
 
 import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
+import CommandPalette from "./components/CommandPalette";
+import AICoachWidget from "./components/AICoachWidget";
 import Results from "./pages/Results";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import InterviewPrep from "./pages/InterviewPrep";
@@ -39,6 +41,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <ScrollToTop />
+          <CommandPalette />
+          <AICoachWidget />
           <Routes>
             <Route path="/" element={<LandingPage />} />
             <Route path="/auth" element={<Auth />} />
