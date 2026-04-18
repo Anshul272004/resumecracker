@@ -1,90 +1,105 @@
 
+The user wants me to enhance every aspect of ResumeCracker. Looking at current state: LandingPage got the cinematic treatment, but Dashboard, Analysis, InterviewPrep, ResumeBuilder, Results, JobMatch, Pricing, About, Auth all need the same ultra-premium polish. Plus add new high-value features. User is on 360px viewport so mobile-first matters.
 
-# Ultra-Premium Cinematic UI Overhaul -- Dynamic & Interactive
+Let me propose a comprehensive enhancement across UI + features + interactions.
 
-## Inspiration Analysis
-The referenced Pagani car website uses: scroll-triggered section reveals, full-screen cinematic sections, dramatic typography, spec grids with animated numbers, a bold "claim your legend" CTA, and an overall dark luxury aesthetic with high contrast accents. We'll apply these patterns to ResumeCracker.
+# Total Platform Enhancement — Every Page, Every Aspect
 
----
+## Pillar 1: Universal Cinematic Polish (Apply to ALL pages)
 
-## What We're Adding
+Bring the landing page's luxury treatment to every internal page so the whole product feels like one cinematic experience.
 
-### 1. Scroll-Triggered Cinematic Sections (LandingPage.tsx)
+**Apply across Dashboard, Analysis, InterviewPrep, ResumeBuilder, Results, JobMatch, Pricing, About, Auth, Checkout:**
+- Page entrance animation (fade + reveal-up on mount)
+- Blueprint grid background on hero sections
+- Luxury dividers between major sections
+- Glass-gold-deep cards replacing plain cards
+- Border-shine effect on key CTAs
+- Animated number counters wherever stats appear
+- Gold pulse on primary action buttons
+- Floating gentle motion on hero icons
+- Scroll-triggered reveals on cards (staggered)
+- Premium loading skeletons with gold shimmer
 
-**New "Career Intelligence Specs" Section** (inspired by Pagani's engine specs grid):
-- Full-width dark section with gold accent lines
-- Animated spec cards showing: "ATS Pass Rate: 95%", "Avg Score Boost: +47pts", "Interview Callback: 3.2x", "Time to Build: 4 min"
-- Each number counts up on scroll with a dramatic gold glow
-- Subtle grid lines in background like a technical blueprint
+## Pillar 2: Page-Specific Enhancements
 
-**New "Career DNA" Section** (inspired by "Racing DNA"):
-- 4 feature blocks with large emoji/icon headers
-- Features: "AI Resume Engine", "Psychology Framework", "ATS Decoder", "Interview Predictor"
-- Each block reveals on scroll with staggered slide-up animations
-- Glass-gold cards with border-shine effect
+**Dashboard.tsx** — Add a "Career Command Center" hero with: animated greeting based on time of day, current Career Score gauge, 3 quick-stat cards (resumes built, interview practice hours, jobs matched), recent activity timeline, "Daily Mission" card with a single actionable task.
 
-**New "Bloodline" Quote Section** (inspired by Pagani's manifesto):
-- Full-width cinematic quote section
-- Large serif text: "Your career isn't just a resume. It's a declaration of who you are becoming."
-- Gold gradient text with text-shadow glow
-- Subtle parallax background movement
+**Analysis.tsx** — Add live "Market Pulse" ticker (trending skills, hot roles), "Resume Evolution" before/after slider, "Peer Comparison" radar overlay, "Action Plan" prioritized checklist with estimated score impact per task.
 
-### 2. Enhanced Hero with Scroll-Based Parallax
-- Add a scroll-driven opacity/scale transition on hero elements (already partially exists, enhance depth)
-- Add floating "achievement unlocked" notification that slides in after 3 seconds
-- Add animated gradient border around the 3D scene container
+**InterviewPrep.tsx** — Add "Confidence Meter" tracking practice sessions, "Power Poses" tip cards, real-time speech analysis indicators (filler words, pace), "Mock Interview Replay" with AI scoring breakdown.
 
-### 3. New "Power Features" Horizontal Scroll Section
-- Full-width horizontal scrolling carousel of large feature cards
-- Each card is a full-height glass panel with: icon, title, 3-line description, animated stat
-- Cards: Salary Negotiation AI, Career Path Predictor, Skill Gap Analyzer, Portfolio Generator, Resume Version Control, Learning Roadmap
-- This adds the "future features" as visual teasers to build excitement
+**ResumeBuilder.tsx** — Add live ATS preview side panel that updates per keystroke, "Inspiration Drawer" with phrases from top resumes, "Tone Selector" (executive/creative/technical), keyboard shortcut palette.
 
-### 4. Enhanced Mobile Experience (360px viewport)
-- User is on 360px viewport -- ensure all new sections stack vertically
-- TiltCard disabled on touch (already works via mouse events)
-- Typography scales down gracefully
-- Horizontal scroll sections become vertical stacked cards on mobile
+**Results.tsx** — Add cinematic score reveal animation, share-to-social preview cards, downloadable "Career Report" PDF teaser, comparison vs last version.
 
-### 5. Luxurious Micro-Interactions (index.css)
-- New `animate-reveal` keyframe: slides up + fades in with slight scale
-- New `animate-glow-border` keyframe: rotating gold border gradient
-- New `.luxury-divider` class: thin gold line with centered diamond ornament
-- Enhanced scrollbar: wider, more prominent gold thumb
+**JobMatch.tsx** — Add "Match Heatmap" visualizing skill overlap, "Apply Strategy" personalized cover letter angles, "Salary Range" estimator per match.
 
-### 6. Enhanced Testimonials with Video-Style Cards
-- Add "verified" badges more prominently
-- Add role-specific gradient backgrounds (tech = blue tint, product = purple tint)
-- Add "Result" tag showing specific outcome: "+340% callbacks", "5 FAANG offers"
+**Pricing.tsx** — Add "Value Calculator" (estimated salary boost vs price), animated feature comparison, testimonial carousel per tier, FAQ accordion with luxury styling.
 
-### 7. New "Claim Your Future" Final CTA (inspired by Pagani "CLAIM YOUR LEGEND")
-- Replace current "Ready to Win?" with dramatic full-screen dark section
-- Large bold serif text: "CLAIM YOUR FUTURE"
-- Subtle particle effect in background
-- Single gold CTA button with pulse animation
-- Minimalist, high-impact design
+**About.tsx** — Add cinematic mission video placeholder, founder story timeline, press logos marquee, "Our Promise" manifesto section.
 
----
+**Auth.tsx** — Add split-screen with cinematic right panel (rotating success quotes), social proof counter ("Joined by 12,847 professionals"), micro-illustrations.
 
-## Files to Modify
+## Pillar 3: New Cross-Cutting Features
+
+**Global Command Palette (Cmd+K)** — Quick navigation, jump to any page, run AI actions (optimize, score, generate cover letter), search resumes — accessible from anywhere.
+
+**Notification Center** — Bell icon in navbar opens slide-over panel with: new job matches, score improvements, weekly insights, achievement unlocks.
+
+**Achievement & Streak System** — Daily login streak counter, milestone badges (first resume, 10 interview practices, 90+ ATS), confetti on unlocks.
+
+**AI Career Coach Chat Widget** — Floating bottom-right chat bubble, opens premium glass chat panel, contextual to current page, uses existing Lovable AI.
+
+**Theme Refinements** — Add subtle ambient gold particle layer to all authenticated pages, premium cursor trail on desktop, smoother route transitions.
+
+## Pillar 4: Micro-Interactions & Polish
+
+- Button hover: gold ripple effect
+- Card hover: tilt + glow lift
+- Input focus: gold underline grows from center
+- Tab switch: gold indicator slides
+- Toast notifications: glass-gold styling with slide-in-right-bounce
+- Form success: gold checkmark draw animation
+- Page transitions: subtle gold light streak
+
+## Files to Modify/Create
 
 | File | Action |
 |------|--------|
-| `src/pages/LandingPage.tsx` | Add 4 new sections, enhance hero, redesign final CTA |
-| `src/index.css` | Add new keyframes, luxury divider, enhanced animations |
-| `tailwind.config.ts` | Add new animation utilities |
+| `src/pages/Dashboard.tsx` | Add Command Center hero, daily mission, activity timeline |
+| `src/pages/Analysis.tsx` | Add Market Pulse, Resume Evolution, Peer Comparison, Action Plan |
+| `src/pages/InterviewPrep.tsx` | Add Confidence Meter, Mock Replay, Power Poses |
+| `src/pages/ResumeBuilder.tsx` | Add live ATS panel, Inspiration Drawer, Tone Selector |
+| `src/pages/Results.tsx` | Cinematic score reveal, share cards, comparison |
+| `src/pages/JobMatch.tsx` | Match Heatmap, Apply Strategy, Salary estimator |
+| `src/pages/Pricing.tsx` | Value Calculator, animated comparison, FAQ |
+| `src/pages/About.tsx` | Mission section, timeline, press marquee |
+| `src/pages/Auth.tsx` | Split-screen with rotating quotes |
+| `src/components/CommandPalette.tsx` | New — global Cmd+K palette |
+| `src/components/NotificationCenter.tsx` | New — slide-over notifications |
+| `src/components/AICoachWidget.tsx` | New — floating chat coach |
+| `src/components/StreakCounter.tsx` | New — daily streak badge |
+| `src/components/layout/Navbar.tsx` | Add bell + streak + Cmd+K hint |
+| `src/components/ui/AnimatedCounter.tsx` | New — reusable counter |
+| `src/components/ui/PageTransition.tsx` | New — route transition wrapper |
+| `src/index.css` | Add ripple, cursor trail, success draw, gold underline |
+| `src/App.tsx` | Mount CommandPalette + AICoachWidget globally |
 
-### No database changes. No edge functions. No new dependencies.
+## Database Changes
+Add `streaks` table (user_id, current_streak, longest_streak, last_active_date) and `notifications` table (user_id, type, title, body, read, created_at) with RLS policies.
 
----
+## Edge Functions
+New `ai-career-coach` for the floating chat widget, contextual to current page.
+
+## No new dependencies — all using existing stack (framer-motion, three, recharts, shadcn).
 
 ## Implementation Order
-1. Add new CSS animations and utility classes
-2. Add Career Specs section (animated number grid)
-3. Add Career DNA feature blocks
-4. Add cinematic quote/manifesto section
-5. Add Power Features horizontal scroll / mobile stack
-6. Redesign final CTA to "CLAIM YOUR FUTURE"
-7. Add luxury dividers between sections
-8. Enhance testimonial cards with result tags
-
+1. Database migration (streaks + notifications tables)
+2. Reusable components (AnimatedCounter, PageTransition, CSS micro-interactions)
+3. Global features (CommandPalette, NotificationCenter, AICoachWidget, StreakCounter, Navbar updates)
+4. Dashboard cinematic upgrade
+5. Analysis page enhancements
+6. InterviewPrep + ResumeBuilder + Results upgrades
+7. JobMatch + Pricing + About + Auth upgrades
+8. AI career coach edge function
