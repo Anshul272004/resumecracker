@@ -17,6 +17,8 @@ import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import CommandPalette from "./components/CommandPalette";
 import AICoachWidget from "./components/AICoachWidget";
+import CursorFollower from "./components/CursorFollower";
+import GrainOverlay from "./components/GrainOverlay";
 import Results from "./pages/Results";
 import ResumeBuilder from "./pages/ResumeBuilder";
 import InterviewPrep from "./pages/InterviewPrep";
@@ -41,6 +43,8 @@ const App = () => (
       <BrowserRouter>
         <AuthProvider>
           <ScrollToTop />
+          <GrainOverlay />
+          <CursorFollower />
           <CommandPalette />
           <AICoachWidget />
           <Routes>
