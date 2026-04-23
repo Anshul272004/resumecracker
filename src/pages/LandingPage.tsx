@@ -1048,66 +1048,50 @@ const LandingPage = () => {
       </section>
 
       {/* ═══ CLAIM YOUR FUTURE — DRAMATIC FINAL CTA ═══ */}
-      <section className="py-32 relative overflow-hidden">
+      <section className="relative surface-obsidian grain-overlay py-32 md:py-44 overflow-hidden">
         <Particles />
+        <div className="absolute -left-6 top-12 hidden md:block">
+          <ChapterNumber numeral="VII." />
+        </div>
         <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.06) 0%, transparent 50%)"
+          background: "radial-gradient(ellipse at center, hsl(var(--champagne) / 0.10) 0%, transparent 60%)"
         }} />
-        <div className="container mx-auto px-6 relative z-10 text-center">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 1 }}
-          >
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.8 }}
-              className="font-display text-5xl sm:text-6xl md:text-8xl font-bold text-gradient-gold text-shadow-gold-lg mb-8 uppercase tracking-wide"
-            >
-              Claim Your Future
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.6 }}
-              className="font-body text-muted-foreground max-w-lg mx-auto mb-4"
-            >
-              Join 15,000+ professionals who stopped getting rejected and started getting shortlisted.
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.8 }}
-              className="font-body text-sm text-primary font-semibold mb-12"
-            >
-              ⏰ Start free — no credit card required. See results before you pay.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 1 }}
-            >
-              <Link to="/dashboard">
-                <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-xl px-14 py-8 animate-gold-pulse shadow-gold-lg glow-gold-xl group">
-                  Start Free Resume Now <ArrowRight className="ml-3 w-6 h-6 group-hover:translate-x-2 transition-transform" />
-                </Button>
-              </Link>
-            </motion.div>
-            {/* Decorative accent lines */}
-            <div className="flex justify-center mt-16 gap-3">
-              {[...Array(3)].map((_, i) => (
-                <motion.div key={i} initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
-                  transition={{ delay: 1.2 + i * 0.15, duration: 0.6 }}
-                  className="h-px bg-primary/30" style={{ width: `${40 - i * 10}px` }} />
-              ))}
+        <div className="container mx-auto px-6 relative z-10">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-3">
+              <span className="hairline-solid w-12" />
+              <span className="text-eyebrow">Final Chapter — The Crossing</span>
+              <span className="hairline-solid w-12" />
             </div>
-          </motion.div>
+          </div>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.16,1,0.3,1] }}
+            className="text-editorial text-foreground text-center"
+          >
+            Claim your <em className="italic text-champagne">future.</em>
+          </motion.h2>
+          <HairlineRule className="my-10 mx-auto w-40" />
+          <p className="font-body text-base text-muted-foreground max-w-xl mx-auto text-center mb-12">
+            Fifteen thousand professionals have already crossed. The next page in your story is awaiting authorship.
+          </p>
+          <div className="flex justify-center">
+            <Link to="/dashboard">
+              <button className="group inline-flex items-center gap-4 bg-champagne text-bone-ink px-10 py-5 font-eyebrow tracking-[0.32em] uppercase text-[0.78rem] hover:bg-champagne-light transition-colors">
+                Begin · Free
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </button>
+            </Link>
+          </div>
+          <div className="mt-12 flex justify-center items-center gap-6 text-spec text-champagne/55">
+            <span>NO CARD</span>
+            <span>·</span>
+            <span>FREE PREVIEW</span>
+            <span>·</span>
+            <span>4 MIN BUILD</span>
+          </div>
         </div>
       </section>
 
