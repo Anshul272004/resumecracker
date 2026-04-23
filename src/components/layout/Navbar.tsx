@@ -95,7 +95,7 @@ const Navbar = () => {
                 Hey, <span className="text-primary font-semibold">{displayName}</span>
               </span>
               <Link to="/dashboard">
-                <Button size="sm" className="bg-gradient-gold font-body font-semibold text-primary-foreground hover:opacity-90">
+                <Button size="sm" className="bg-champagne text-bone-ink hover:bg-champagne-light font-eyebrow tracking-[0.25em] uppercase text-[0.7rem] rounded-none border border-champagne">
                   Dashboard
                 </Button>
               </Link>
@@ -106,13 +106,13 @@ const Navbar = () => {
           ) : (
             <div className="flex items-center gap-3">
               <Link to="/auth">
-                <Button variant="ghost" className="font-body text-sm text-muted-foreground hover:text-primary">
+                <Button variant="ghost" className="font-eyebrow tracking-[0.25em] uppercase text-[0.7rem] text-muted-foreground hover:text-champagne hover:bg-transparent">
                   Sign In
                 </Button>
               </Link>
               <Link to="/auth">
-                <Button className="bg-gradient-gold font-body font-semibold text-primary-foreground hover:opacity-90">
-                  Start Free
+                <Button className="bg-champagne text-bone-ink hover:bg-champagne-light font-eyebrow tracking-[0.25em] uppercase text-[0.7rem] rounded-none border border-champagne">
+                  Enter Maison
                 </Button>
               </Link>
             </div>
