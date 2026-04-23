@@ -7,12 +7,11 @@ import NotificationCenter from "@/components/NotificationCenter";
 import StreakCounter from "@/components/StreakCounter";
 
 const navItems = [
-  { label: "Features", href: "#features" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "Analysis", href: "/analysis" },
-  { label: "Interview Prep", href: "/interview-prep" },
-  { label: "Pricing", href: "/pricing" },
-  { label: "About", href: "/about" },
+  { label: "Atelier", href: "/resume-builder" },
+  { label: "Intelligence", href: "/analysis" },
+  { label: "Theatre", href: "/interview-prep" },
+  { label: "Editions", href: "/pricing" },
+  { label: "Maison", href: "/about" },
 ];
 
 const Navbar = () => {
@@ -40,27 +39,31 @@ const Navbar = () => {
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled ? "glass py-3" : "bg-transparent py-5"
+        scrolled ? "bg-obsidian/80 backdrop-blur-xl border-b border-champagne/15 py-3" : "bg-transparent py-5"
       }`}
     >
-      <div className="container mx-auto flex items-center justify-between px-6">
+      <div className="container mx-auto flex items-center justify-between px-6 gap-6">
         <Link to="/" className="flex items-center gap-2">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-gold">
-            <span className="font-display text-lg font-bold text-primary-foreground">RC</span>
+          <div className="relative flex h-9 w-9 items-center justify-center border border-champagne/60">
+            <span className="font-editorial text-base text-champagne italic">R</span>
+            <span className="absolute -top-0.5 -right-0.5 h-1 w-1 bg-champagne" />
           </div>
-          <span className="font-display text-xl font-bold text-foreground">
-            Resume<span className="text-primary">Cracker</span>
-          </span>
+          <div className="flex flex-col leading-none">
+            <span className="font-editorial text-[1.05rem] tracking-tight text-foreground">
+              Resume<span className="italic text-champagne">Cracker</span>
+            </span>
+            <span className="text-spec text-[0.55rem] text-champagne/60 mt-0.5">MAISON · EST. 2025</span>
+          </div>
         </Link>
 
         {/* Desktop */}
-        <div className="hidden items-center gap-6 lg:flex">
+        <div className="hidden items-center gap-7 lg:flex">
           {navItems.map((item) =>
             item.href.startsWith("#") ? (
               <a
                 key={item.label}
                 href={item.href}
-                className="font-body text-sm font-medium text-muted-foreground transition-colors hover:text-primary"
+                className="font-eyebrow text-[0.7rem] tracking-[0.28em] uppercase text-muted-foreground transition-colors hover:text-champagne"
               >
                 {item.label}
               </a>
@@ -68,8 +71,8 @@ const Navbar = () => {
               <Link
                 key={item.label}
                 to={item.href}
-                className={`font-body text-sm font-medium transition-colors hover:text-primary ${
-                  isActive(item.href) ? "text-primary" : "text-muted-foreground"
+                className={`font-eyebrow text-[0.7rem] tracking-[0.28em] uppercase transition-colors hover:text-champagne ${
+                  isActive(item.href) ? "text-champagne" : "text-muted-foreground"
                 }`}
               >
                 {item.label}
