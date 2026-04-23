@@ -166,6 +166,10 @@ export default {
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "hairline-draw": "hairline-draw 1.2s cubic-bezier(0.16,1,0.3,1) forwards",
+        "mask-rise": "mask-rise 0.9s cubic-bezier(0.22,1,0.36,1) forwards",
+        "marquee-x": "marquee-x 40s linear infinite",
+        "bracket-in": "bracket-in 0.5s cubic-bezier(0.16,1,0.3,1) forwards",
         "fade-in": "fade-in 0.6s ease-out forwards",
         "fade-in-left": "fade-in-left 0.6s ease-out forwards",
         "fade-in-right": "fade-in-right 0.6s ease-out forwards",
