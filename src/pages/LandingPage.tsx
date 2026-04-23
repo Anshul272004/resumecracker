@@ -380,44 +380,44 @@ const LandingPage = () => {
       </motion.section>
 
       {/* ═══ LUXURY DIVIDER ═══ */}
-      <div className="luxury-divider mx-auto max-w-4xl" />
+      <MarqueeRibbon
+        items={[
+          "Atelier",
+          "Intelligence",
+          "Psychology",
+          "Theatre",
+          "Maison Cracker",
+          "Édition · MMXXV",
+        ]}
+      />
 
       {/* ═══ CAREER INTELLIGENCE SPECS (Pagani Engine Specs Style) ═══ */}
-      <section className="py-28 relative blueprint-grid">
-        <div className="absolute inset-0" style={{
-          background: "radial-gradient(ellipse at center, hsl(var(--primary) / 0.04) 0%, transparent 70%)"
-        }} />
-        <div className="container mx-auto px-6 relative z-10">
-          <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }}
-            className="text-center mb-16">
-            <span className="font-body text-[10px] font-semibold uppercase tracking-[0.3em] text-primary/60 mb-4 block">Performance Specifications</span>
-            <h2 className="font-display text-4xl md:text-6xl font-bold text-foreground">
-              Engineered for <span className="text-gradient-gold">Results</span>
-            </h2>
-          </motion.div>
-
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
-            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0 }}>
-              <Counter end={95} suffix="%" label="ATS Pass Rate" />
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.15 }}>
-              <Counter end={47} prefix="+" suffix="pts" label="Avg Score Boost" />
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.3 }}>
-              <Counter end={3} suffix=".2x" label="Interview Callback" />
-            </motion.div>
-            <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.45 }}>
-              <Counter end={4} suffix=" min" label="Time to Build" />
-            </motion.div>
+      <section className="relative surface-obsidian grain-overlay py-28 overflow-hidden">
+        <div className="absolute -left-6 top-12 hidden md:block">
+          <ChapterNumber numeral="II." />
+        </div>
+        <div className="container relative z-10 mx-auto px-6">
+          <div className="grid lg:grid-cols-12 gap-10 mb-20">
+            <div className="lg:col-span-5">
+              <EditorialHeading
+                chapter="002 / 007"
+                eyebrow="Performance · Specifications"
+                title={<>Engineered for <em className="italic text-champagne">consequence.</em></>}
+                size="lg"
+              />
+            </div>
+            <div className="lg:col-span-6 lg:col-start-7 self-end">
+              <p className="font-body text-base text-muted-foreground leading-relaxed">
+                Every figure below is measured, audited, and reproducible. No marketing math — only the métrique that decides whether your name is read aloud in the next interview round.
+              </p>
+            </div>
           </div>
 
-          {/* Accent lines */}
-          <div className="flex justify-center mt-12 gap-2">
-            {[...Array(5)].map((_, i) => (
-              <motion.div key={i} initial={{ scaleX: 0 }} whileInView={{ scaleX: 1 }} viewport={{ once: true }}
-                transition={{ delay: 0.6 + i * 0.1, duration: 0.6 }}
-                className="h-px bg-primary/30" style={{ width: `${60 - i * 10}px` }} />
-            ))}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-x-10 gap-y-14">
+            <SpecNumeral index="01 / SCORE" value={95} suffix="%" label="ATS Pass Rate" unit="avg" />
+            <SpecNumeral index="02 / LIFT" value={47} prefix="+" label="Score Boost" unit="pts" />
+            <SpecNumeral index="03 / SIGNAL" value={3.2} decimals={1} suffix="×" label="Callback Multiple" />
+            <SpecNumeral index="04 / TIME" value={4} label="Minutes to Craft" unit="min" />
           </div>
         </div>
       </section>
