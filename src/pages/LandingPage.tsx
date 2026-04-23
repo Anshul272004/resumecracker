@@ -13,6 +13,12 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import LiveActivityTicker from "@/components/LiveActivityTicker";
 import TiltCard from "@/components/3d/TiltCard";
+import EditorialHeading from "@/components/editorial/EditorialHeading";
+import HairlineRule from "@/components/editorial/HairlineRule";
+import MarqueeRibbon from "@/components/editorial/MarqueeRibbon";
+import SpecNumeral from "@/components/editorial/SpecNumeral";
+import ChapterNumber from "@/components/editorial/ChapterNumber";
+import CornerBrackets from "@/components/editorial/CornerBrackets";
 
 const HeroScene = lazy(() => import("@/components/3d/HeroScene"));
 const CinematicIntro = lazy(() => import("@/components/CinematicIntro"));
@@ -207,69 +213,90 @@ const LandingPage = () => {
       <motion.section
         ref={heroRef}
         style={{ opacity: heroOpacity, scale: heroScale }}
-        className="relative min-h-screen flex items-center overflow-hidden"
+        className="relative min-h-screen flex items-center overflow-hidden surface-obsidian grain-overlay"
       >
         <Particles />
 
         <div className="absolute inset-0 animate-gradient-shift" style={{
-          background: "radial-gradient(ellipse at 20% 50%, hsl(var(--primary) / 0.08) 0%, transparent 50%), radial-gradient(ellipse at 80% 20%, hsl(var(--cyan-accent) / 0.06) 0%, transparent 50%), radial-gradient(ellipse at 60% 80%, hsl(var(--violet-accent) / 0.05) 0%, transparent 50%)"
+          background: "radial-gradient(ellipse at 15% 40%, hsl(var(--champagne) / 0.10) 0%, transparent 55%), radial-gradient(ellipse at 85% 70%, hsl(var(--champagne-deep) / 0.08) 0%, transparent 55%)"
         }} />
 
+        {/* Chapter numeral background */}
+        <div className="absolute -right-6 top-24 hidden md:block">
+          <ChapterNumber numeral="I." />
+        </div>
+
+        {/* Hero hairline frames */}
+        <div className="absolute top-24 left-6 right-6 hairline" />
+        <div className="absolute bottom-12 left-6 right-6 hairline" />
+
         <div className="container relative z-10 mx-auto px-6">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="text-left">
-              <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
-                <div className="inline-flex items-center gap-2 glass-gold rounded-full px-5 py-2 mb-8">
-                  <Zap className="w-4 h-4 text-primary" />
-                  <span className="font-body text-xs font-medium text-primary">AI-Powered ATS Resume Builder — Free Preview</span>
-                </div>
+          <div className="grid lg:grid-cols-12 gap-10 items-center">
+            <div className="lg:col-span-7 text-left">
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}
+                className="flex items-center gap-4 mb-10">
+                <span className="text-spec text-champagne/80">001 / 007</span>
+                <span className="hairline-solid w-12" />
+                <span className="text-eyebrow">Chapter One — The Cracker</span>
               </motion.div>
 
-              <motion.h1 initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.2 }}
-                className="font-display text-5xl sm:text-6xl md:text-7xl font-bold text-foreground leading-[1.1] mb-6">
-                Your Resume.{" "}
-                <span className="text-gradient-gold">Reinvented.</span>
+              <motion.h1
+                initial={{ opacity: 0, y: 24 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1.1, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+                className="text-editorial text-foreground"
+              >
+                Your Résumé,
+                <br />
+                <span className="italic text-champagne" style={{ fontVariationSettings: '"opsz" 144, "SOFT" 100' }}>
+                  rewritten as
+                </span>
+                <br />
+                <span className="text-foreground">a masterpiece.</span>
               </motion.h1>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}
-                className="h-[1.6em] mb-4 overflow-hidden">
-                <span className="font-display text-2xl md:text-3xl text-primary/80">
-                  {typewriterText}
-                  <span className="inline-block w-[2px] h-[0.8em] bg-primary ml-1 animate-pulse" />
-                </span>
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6, duration: 0.8 }}>
+                <HairlineRule className="my-8 w-full max-w-md" align="left" />
               </motion.div>
 
-              <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.4 }}
-                className="font-body text-lg text-muted-foreground max-w-lg mb-8">
-                70% of resumes get rejected by ATS before a human reads them.{" "}
-                <span className="text-primary font-semibold">Yours won't.</span> AI suggests wording that increases interview calls by 3x.
+              <motion.p
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.7 }}
+                className="font-body text-base md:text-lg text-muted-foreground max-w-lg mb-10 leading-relaxed"
+              >
+                70% of résumés are dismissed before a human reads them. Maison Cracker is the atelier where AI, psychology and craft conspire to put yours on the shortlist — every time.
               </motion.p>
 
-              <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.6 }}
-                className="flex flex-col sm:flex-row items-start gap-4 mb-8">
+              <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.85 }}
+                className="flex flex-col sm:flex-row items-start gap-5 mb-10">
                 <Link to="/dashboard">
-                  <Button size="lg" className="bg-gradient-gold text-primary-foreground font-body font-semibold text-lg px-10 py-7 animate-gold-pulse hover:opacity-90 transition-opacity shadow-gold-lg group">
-                    Build My Resume <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
+                  <button className="group relative inline-flex items-center gap-4 bg-champagne text-bone-ink px-8 py-4 font-eyebrow tracking-[0.3em] uppercase text-[0.72rem] hover:bg-champagne-light transition-colors">
+                    Begin the Cracker
+                    <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    <span className="absolute -top-px left-0 right-0 h-px bg-bone-ink/30" />
+                    <span className="absolute -bottom-px left-0 right-0 h-px bg-bone-ink/30" />
+                  </button>
                 </Link>
                 <Link to="/results">
-                  <Button variant="outline" size="lg" className="font-body border-primary/30 text-primary hover:bg-primary/10 px-8 py-7 text-base">
-                    See Template Preview
-                  </Button>
+                  <button className="group inline-flex items-center gap-3 border-b border-champagne/40 pb-2 font-eyebrow tracking-[0.3em] uppercase text-[0.72rem] text-champagne hover:text-champagne-light transition-colors">
+                    View the Edition
+                    <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+                  </button>
                 </Link>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1, duration: 1 }}
-                className="flex flex-wrap items-center gap-4 text-muted-foreground">
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2, duration: 1 }}
+                className="grid grid-cols-2 sm:grid-cols-4 gap-6 max-w-xl">
                 {[
-                  { icon: Users, text: "15,000+ Resumes" },
-                  { icon: Star, text: "4.9/5 Rating" },
-                  { icon: Lock, text: "100% Secure" },
-                  { icon: BadgeCheck, text: "Free Preview" },
-                ].map((item, i) => (
-                  <div key={i} className="flex items-center gap-1.5 glass rounded-full px-3 py-1.5">
-                    <item.icon className="w-3.5 h-3.5 text-primary" />
-                    <span className="font-body text-[10px] font-medium">{item.text}</span>
+                  { value: "15K+", label: "Crafted" },
+                  { value: "94%", label: "ATS Pass" },
+                  { value: "3.4×", label: "Callbacks" },
+                  { value: "4.9", label: "Rating" },
+                ].map((s, i) => (
+                  <div key={i} className="border-l border-champagne/25 pl-4">
+                    <div className="font-editorial text-2xl text-foreground">{s.value}</div>
+                    <div className="text-spec text-champagne/60 mt-1">{s.label}</div>
                   </div>
                 ))}
               </motion.div>
@@ -280,20 +307,23 @@ const LandingPage = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1.2, delay: 0.5 }}
-              className="relative h-[500px] lg:h-[600px] hidden md:block"
+              className="relative h-[500px] lg:h-[640px] hidden md:block lg:col-span-5"
             >
-              {/* Animated glow border around 3D scene */}
-              <div className="absolute -inset-1 rounded-3xl animate-glow-border opacity-30" />
-              
-              <Suspense
+              <CornerBrackets size={22} className="absolute inset-0">
+                <Suspense
                 fallback={
                   <div className="w-full h-full flex items-center justify-center">
-                    <div className="w-20 h-20 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
+                    <div className="w-16 h-16 rounded-full border border-champagne/30 border-t-champagne animate-spin" />
                   </div>
                 }
               >
                 <HeroScene />
-              </Suspense>
+                </Suspense>
+                <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-spec text-champagne/60">
+                  <span>RC · ATELIER 01</span>
+                  <span>ƒ/1.4 · 2025</span>
+                </div>
+              </CornerBrackets>
 
               <motion.div
                 animate={{ y: [-5, 5, -5] }}
