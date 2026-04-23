@@ -172,7 +172,6 @@
   .text-champagne {
     color: hsl(var(--champagne));
   }
-  }
 
   .text-gradient-gold {
     @apply bg-clip-text text-transparent;
