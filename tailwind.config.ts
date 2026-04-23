@@ -14,9 +14,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        display: ['"Playfair Display"', 'serif'],
-        body: ['Inter', 'sans-serif'],
-        sans: ['Inter', 'sans-serif'],
+        display: ['Fraunces', '"Playfair Display"', 'serif'],
+        editorial: ['Fraunces', 'serif'],
+        eyebrow: ['Italiana', 'serif'],
+        body: ['"Instrument Sans"', 'Inter', 'sans-serif'],
+        sans: ['"Instrument Sans"', 'Inter', 'sans-serif'],
+        mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       colors: {
         border: "hsl(var(--border))",
@@ -28,6 +31,18 @@ export default {
           DEFAULT: "hsl(var(--gold))",
           light: "hsl(var(--gold-light))",
           dark: "hsl(var(--gold-dark))",
+        },
+        champagne: {
+          DEFAULT: "hsl(var(--champagne))",
+          light: "hsl(var(--champagne-light))",
+          deep: "hsl(var(--champagne-deep))",
+        },
+        obsidian: "hsl(var(--obsidian))",
+        smoke: "hsl(var(--smoke))",
+        bone: {
+          DEFAULT: "hsl(var(--bone))",
+          deep: "hsl(var(--bone-deep))",
+          ink: "hsl(var(--bone-ink))",
         },
         "cyan-accent": {
           DEFAULT: "hsl(var(--cyan-accent))",
@@ -90,6 +105,22 @@ export default {
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
+        },
+        "hairline-draw": {
+          "0%": { transform: "scaleX(0)" },
+          "100%": { transform: "scaleX(1)" },
+        },
+        "mask-rise": {
+          "0%": { transform: "translateY(110%)" },
+          "100%": { transform: "translateY(0)" },
+        },
+        "marquee-x": {
+          "0%": { transform: "translateX(0)" },
+          "100%": { transform: "translateX(-50%)" },
+        },
+        "bracket-in": {
+          "0%": { transform: "translate(-6px,-6px)", opacity: "0.4" },
+          "100%": { transform: "translate(0,0)", opacity: "1" },
         },
         "fade-in": {
           "0%": { opacity: "0", transform: "translateY(20px)" },
