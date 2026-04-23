@@ -1,105 +1,154 @@
 
-The user wants me to enhance every aspect of ResumeCracker. Looking at current state: LandingPage got the cinematic treatment, but Dashboard, Analysis, InterviewPrep, ResumeBuilder, Results, JobMatch, Pricing, About, Auth all need the same ultra-premium polish. Plus add new high-value features. User is on 360px viewport so mobile-first matters.
 
-Let me propose a comprehensive enhancement across UI + features + interactions.
+# Ultra-Luxurious Cinematic Refinement — Editorial Couture Direction
 
-# Total Platform Enhancement — Every Page, Every Aspect
+## Aesthetic Direction: "Maison Cracker"
 
-## Pillar 1: Universal Cinematic Polish (Apply to ALL pages)
+Treating ResumeCracker like a **Hermès × Apple × Pagani editorial** — a fashion-house meets technical-spec aesthetic. Not more effects. Fewer, more deliberate ones. Refinement over intensity.
 
-Bring the landing page's luxury treatment to every internal page so the whole product feels like one cinematic experience.
+**The single thing people will remember:** the typography. Oversized editorial serif headlines, ultra-tight kerning, gold hairline rules, generous negative space, and one perfectly orchestrated page-load reveal per page.
 
-**Apply across Dashboard, Analysis, InterviewPrep, ResumeBuilder, Results, JobMatch, Pricing, About, Auth, Checkout:**
-- Page entrance animation (fade + reveal-up on mount)
-- Blueprint grid background on hero sections
-- Luxury dividers between major sections
-- Glass-gold-deep cards replacing plain cards
-- Border-shine effect on key CTAs
-- Animated number counters wherever stats appear
-- Gold pulse on primary action buttons
-- Floating gentle motion on hero icons
-- Scroll-triggered reveals on cards (staggered)
-- Premium loading skeletons with gold shimmer
+---
 
-## Pillar 2: Page-Specific Enhancements
+## 1. Typography System Overhaul (Maison Cracker)
 
-**Dashboard.tsx** — Add a "Career Command Center" hero with: animated greeting based on time of day, current Career Score gauge, 3 quick-stat cards (resumes built, interview practice hours, jobs matched), recent activity timeline, "Daily Mission" card with a single actionable task.
+Replace current Playfair + Inter with a richer triad:
 
-**Analysis.tsx** — Add live "Market Pulse" ticker (trending skills, hot roles), "Resume Evolution" before/after slider, "Peer Comparison" radar overlay, "Action Plan" prioritized checklist with estimated score impact per task.
+- **Display**: `Fraunces` (variable serif, optical-sized) — for hero numerals, manifesto, section titles. Tight tracking, mixed weights for editorial drama.
+- **Subhead/eyebrow**: `Italiana` — high-contrast didone for eyebrows ("CHAPTER 01 — INTELLIGENCE")
+- **Body**: `Instrument Sans` — neutral, quietly modern, replaces Inter
+- **Mono accent**: `JetBrains Mono` — for spec labels, version tags, "01 / 07"
 
-**InterviewPrep.tsx** — Add "Confidence Meter" tracking practice sessions, "Power Poses" tip cards, real-time speech analysis indicators (filler words, pace), "Mock Interview Replay" with AI scoring breakdown.
+Add type tokens: `text-editorial` (clamp 4rem→9rem, -0.04em tracking), `text-eyebrow` (uppercase, 0.3em tracking, didone), `text-spec` (mono, tabular-nums).
 
-**ResumeBuilder.tsx** — Add live ATS preview side panel that updates per keystroke, "Inspiration Drawer" with phrases from top resumes, "Tone Selector" (executive/creative/technical), keyboard shortcut palette.
+---
 
-**Results.tsx** — Add cinematic score reveal animation, share-to-social preview cards, downloadable "Career Report" PDF teaser, comparison vs last version.
+## 2. Color & Material Refinement
 
-**JobMatch.tsx** — Add "Match Heatmap" visualizing skill overlap, "Apply Strategy" personalized cover letter angles, "Salary Range" estimator per match.
+Current gold is good but flat. Layer it:
 
-**Pricing.tsx** — Add "Value Calculator" (estimated salary boost vs price), animated feature comparison, testimonial carousel per tier, FAQ accordion with luxury styling.
+- **Champagne gold** `45 35% 78%` — primary luxury tone (replaces some yellow-gold)
+- **Deep gold** `42 70% 48%` — accents only
+- **Obsidian** `220 20% 6%` — true near-black for hero panels
+- **Bone** `35 18% 92%` — for the rare light sections (pricing, about)
+- **Smoke** `220 8% 14%` — surface elevation
 
-**About.tsx** — Add cinematic mission video placeholder, founder story timeline, press logos marquee, "Our Promise" manifesto section.
+Add **two-tone sections**: alternate obsidian and bone pages so the product has a rhythm, not one endless dark scroll.
 
-**Auth.tsx** — Add split-screen with cinematic right panel (rotating success quotes), social proof counter ("Joined by 12,847 professionals"), micro-illustrations.
+---
 
-## Pillar 3: New Cross-Cutting Features
+## 3. Signature Visual Devices (used consistently across all pages)
 
-**Global Command Palette (Cmd+K)** — Quick navigation, jump to any page, run AI actions (optimize, score, generate cover letter), search resumes — accessible from anywhere.
+- **Hairline gold rules** (1px gradient lines) framing every section — like a luxury catalog
+- **Chapter numerals** ("I.", "II.", "III.") as oversized faded background numerals behind section titles
+- **Corner brackets** `⌐ ¬ ⌐ ¬` framing key cards (like camera viewfinders / cinema)
+- **Marquee ribbons** — slow-scrolling text strips ("ATELIER · INTELLIGENCE · ATELIER · INTELLIGENCE")
+- **Asymmetric grids** — 7/12 + 4/12 splits with overlap, never centered everything
+- **Grain texture overlay** — subtle SVG noise on dark sections for film-grain depth
+- **Custom cursor** on desktop — small gold dot + ring follower
 
-**Notification Center** — Bell icon in navbar opens slide-over panel with: new job matches, score improvements, weekly insights, achievement unlocks.
+---
 
-**Achievement & Streak System** — Daily login streak counter, milestone badges (first resume, 10 interview practices, 90+ ATS), confetti on unlocks.
+## 4. Per-Page Refinement Pass
 
-**AI Career Coach Chat Widget** — Floating bottom-right chat bubble, opens premium glass chat panel, contextual to current page, uses existing Lovable AI.
+**LandingPage** — Replace generic spec cards with editorial spread layout: oversized numeral + label + hairline rule. Add marquee ribbon between sections. Add chapter numerals behind headings. Refine "CLAIM YOUR FUTURE" CTA to single-line condensed serif with gold hairline underline only.
 
-**Theme Refinements** — Add subtle ambient gold particle layer to all authenticated pages, premium cursor trail on desktop, smoother route transitions.
+**Dashboard** — Convert to "Daily Edition" magazine layout: masthead with date + edition number, lead story (Daily Mission) in 7-column, sidebar widgets (streak, score) in 5-column, footer ticker.
 
-## Pillar 4: Micro-Interactions & Polish
+**Analysis** — Treat as a "Career Report" dossier: cover page with seal/crest, table of contents sidebar, numbered chapters (Market Pulse / Evolution / Peer Comparison / Action Plan), each as a spread.
 
-- Button hover: gold ripple effect
-- Card hover: tilt + glow lift
-- Input focus: gold underline grows from center
-- Tab switch: gold indicator slides
-- Toast notifications: glass-gold styling with slide-in-right-bounce
-- Form success: gold checkmark draw animation
-- Page transitions: subtle gold light streak
+**InterviewPrep** — Theatre programme aesthetic: "ACT I: Research / ACT II: Practice / ACT III: Mastery". Confidence Meter as gauge dial with engraved tick marks.
 
-## Files to Modify/Create
+**ResumeBuilder** — Atelier workshop layout: tools rail on left (gold mono icons), canvas center, live ATS panel right with "INSPECTION" header.
+
+**Results** — Awards ceremony reveal: dim screen → score draws on with gold stroke animation → sub-scores cascade in. Add an embossed "certificate" share card.
+
+**JobMatch** — Listings as auction-catalog lots: "LOT 01 — Senior Engineer · Stripe · 94% match" with hairline frames.
+
+**Pricing** — Bone-colored section (the rhythm break). Three plans as price-tags with string/loop graphics. Engraved-style numerals.
+
+**About** — Manifesto in editorial 2-column drop-cap layout. Founder timeline as horizontal hairline with year markers.
+
+**Auth** — Refine current split-screen: replace rotating quotes with single hand-set verse, add wax-seal motif, gold corner brackets on form.
+
+**Checkout / PaymentSuccess / Failed** — Receipt-paper aesthetic: monospace tabular layout, dotted hairlines, embossed totals.
+
+---
+
+## 5. Motion Refinement (less, but better)
+
+Strip noisy animations. Keep these signature moments:
+
+- **Page enter**: staggered reveal with masking (text rises behind a gold hairline that draws across)
+- **Hero numerals**: count-up only on first view, then static (no constant animation)
+- **Cursor follower**: gold dot with magnetic snap to interactive elements (desktop only)
+- **Section enter**: hairline rule draws left→right, then content fades up
+- **Hover on cards**: corner brackets animate inward, no tilt for editorial cards
+- **Logo wordmark**: subtle weight shift on hover (variable-font axis animation)
+
+Remove: excessive tilts on data cards, pulsing on every CTA, ambient particles on every page (keep only on landing hero + auth).
+
+---
+
+## 6. New Reusable Primitives
+
+| Component | Purpose |
+|-----------|---------|
+| `<EditorialHeading>` | chapter-numeral background + eyebrow + serif title + hairline rule |
+| `<HairlineRule>` | gold gradient 1px line, optional draw-on-scroll |
+| `<CornerBrackets>` | wraps children with animated viewfinder corners |
+| `<MarqueeRibbon>` | infinite horizontal scroll text strip |
+| `<SpecNumeral>` | oversized Fraunces numeral + label + mono unit |
+| `<ChapterNumber>` | huge faded roman numeral background element |
+| `<CursorFollower>` | global gold dot + ring (desktop) |
+| `<GrainOverlay>` | subtle SVG noise texture layer |
+| `<Masthead>` | dashboard/analysis page header with date + edition |
+
+---
+
+## 7. Files to Modify / Create
 
 | File | Action |
 |------|--------|
-| `src/pages/Dashboard.tsx` | Add Command Center hero, daily mission, activity timeline |
-| `src/pages/Analysis.tsx` | Add Market Pulse, Resume Evolution, Peer Comparison, Action Plan |
-| `src/pages/InterviewPrep.tsx` | Add Confidence Meter, Mock Replay, Power Poses |
-| `src/pages/ResumeBuilder.tsx` | Add live ATS panel, Inspiration Drawer, Tone Selector |
-| `src/pages/Results.tsx` | Cinematic score reveal, share cards, comparison |
-| `src/pages/JobMatch.tsx` | Match Heatmap, Apply Strategy, Salary estimator |
-| `src/pages/Pricing.tsx` | Value Calculator, animated comparison, FAQ |
-| `src/pages/About.tsx` | Mission section, timeline, press marquee |
-| `src/pages/Auth.tsx` | Split-screen with rotating quotes |
-| `src/components/CommandPalette.tsx` | New — global Cmd+K palette |
-| `src/components/NotificationCenter.tsx` | New — slide-over notifications |
-| `src/components/AICoachWidget.tsx` | New — floating chat coach |
-| `src/components/StreakCounter.tsx` | New — daily streak badge |
-| `src/components/layout/Navbar.tsx` | Add bell + streak + Cmd+K hint |
-| `src/components/ui/AnimatedCounter.tsx` | New — reusable counter |
-| `src/components/ui/PageTransition.tsx` | New — route transition wrapper |
-| `src/index.css` | Add ripple, cursor trail, success draw, gold underline |
-| `src/App.tsx` | Mount CommandPalette + AICoachWidget globally |
+| `index.html` | Add Fraunces, Italiana, Instrument Sans, JetBrains Mono from Google Fonts |
+| `tailwind.config.ts` | New font families, type tokens, champagne/obsidian/bone colors, draw keyframes |
+| `src/index.css` | Type utilities, hairline gradients, grain SVG, cursor styles, light bone surface |
+| `src/components/editorial/EditorialHeading.tsx` | NEW |
+| `src/components/editorial/HairlineRule.tsx` | NEW |
+| `src/components/editorial/CornerBrackets.tsx` | NEW |
+| `src/components/editorial/MarqueeRibbon.tsx` | NEW |
+| `src/components/editorial/SpecNumeral.tsx` | NEW |
+| `src/components/editorial/ChapterNumber.tsx` | NEW |
+| `src/components/editorial/Masthead.tsx` | NEW |
+| `src/components/CursorFollower.tsx` | NEW (mounted in App) |
+| `src/components/GrainOverlay.tsx` | NEW |
+| `src/App.tsx` | Mount cursor + grain globally |
+| `src/components/layout/Navbar.tsx` | Tighten to editorial bar: wordmark + hairline + minimal nav |
+| `src/components/layout/Footer.tsx` | Editorial colophon style |
+| `src/pages/LandingPage.tsx` | Apply editorial primitives, marquee, chapter numerals |
+| `src/pages/Dashboard.tsx` | Daily Edition masthead layout |
+| `src/pages/Analysis.tsx` | Career Report dossier layout + Market Pulse / Action Plan sections |
+| `src/pages/InterviewPrep.tsx` | ACT I/II/III + Confidence dial |
+| `src/pages/ResumeBuilder.tsx` | Atelier rails + Inspection panel |
+| `src/pages/Results.tsx` | Awards reveal + certificate card |
+| `src/pages/JobMatch.tsx` | Auction lot listings |
+| `src/pages/Pricing.tsx` | Bone-surface price-tag plans |
+| `src/pages/About.tsx` | Drop-cap manifesto + horizontal timeline |
+| `src/pages/Auth.tsx` | Wax-seal + corner brackets refinement |
+| `src/pages/Checkout.tsx` + `PaymentSuccess` + `PaymentFailed` | Receipt-paper aesthetic |
 
-## Database Changes
-Add `streaks` table (user_id, current_streak, longest_streak, last_active_date) and `notifications` table (user_id, type, title, body, read, created_at) with RLS policies.
+### No new dependencies. No database changes. No edge function changes.
 
-## Edge Functions
-New `ai-career-coach` for the floating chat widget, contextual to current page.
-
-## No new dependencies — all using existing stack (framer-motion, three, recharts, shadcn).
+---
 
 ## Implementation Order
-1. Database migration (streaks + notifications tables)
-2. Reusable components (AnimatedCounter, PageTransition, CSS micro-interactions)
-3. Global features (CommandPalette, NotificationCenter, AICoachWidget, StreakCounter, Navbar updates)
-4. Dashboard cinematic upgrade
-5. Analysis page enhancements
-6. InterviewPrep + ResumeBuilder + Results upgrades
-7. JobMatch + Pricing + About + Auth upgrades
-8. AI career coach edge function
+
+1. Typography + color tokens (fonts, tailwind config, CSS variables)
+2. Editorial primitive components (Hairline, Brackets, Marquee, SpecNumeral, ChapterNumber, EditorialHeading, Masthead)
+3. Global polish (CursorFollower, GrainOverlay, Navbar/Footer refinement)
+4. LandingPage editorial pass
+5. Dashboard "Daily Edition" + Analysis "Career Report"
+6. InterviewPrep + ResumeBuilder + Results refinement
+7. JobMatch + Pricing (bone) + About + Auth
+8. Checkout + payment pages (receipt aesthetic)
+
