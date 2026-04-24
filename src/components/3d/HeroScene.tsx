@@ -210,6 +210,27 @@ const Scene = () => {
 };
 
 /* ─── Exported Canvas ─── */
+const StaticFallback = () => (
+  <div className="w-full h-full min-h-[400px] flex items-center justify-center">
+    <div className="relative w-64 h-80 rounded-md border border-primary/30 bg-gradient-to-br from-background via-card to-background shadow-2xl shadow-primary/10">
+      <div className="absolute inset-x-6 top-6 h-8 rounded-sm bg-gradient-to-r from-primary/70 to-primary/40" />
+      <div className="absolute left-6 top-20 w-12 h-12 rounded-full bg-primary/60" />
+      <div className="absolute inset-x-6 top-36 space-y-3">
+        {[100, 90, 80, 70, 85].map((w, i) => (
+          <div key={i} className="h-2 rounded-sm bg-foreground/15" style={{ width: `${w}%` }} />
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+class WebGLBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
+  state = { failed: false };
+  static getDerivedStateFromError() { return { failed: true }; }
+  componentDidCatch() { /* swallow */ }
+  render() { return this.state.failed ? <StaticFallback /> : this.props.children; }
+}
+
 const HeroScene = () => {
   // Detect WebGL support — sandboxed/older GPUs may fail to create a context
   const hasWebGL = (() => {
@@ -226,27 +247,11 @@ const HeroScene = () => {
   })();
 
   if (!hasWebGL) {
-    return (
-      <div className="w-full h-full min-h-[400px] flex items-center justify-center">
-        <div className="relative w-64 h-80 rounded-md border border-primary/30 bg-gradient-to-br from-background via-card to-background shadow-2xl shadow-primary/10">
-          <div className="absolute inset-x-6 top-6 h-8 rounded-sm bg-gradient-to-r from-primary/70 to-primary/40" />
-          <div className="absolute left-6 top-20 w-12 h-12 rounded-full bg-primary/60" />
-          <div className="absolute inset-x-6 top-36 space-y-3">
-            {[100, 90, 80, 70, 85].map((w, i) => (
-              <div
-                key={i}
-                className="h-2 rounded-sm bg-foreground/15"
-                style={{ width: `${w}%` }}
-              />
-            ))}
-          </div>
-          <div className="absolute -inset-px rounded-md border border-primary/20 pointer-events-none" />
-        </div>
-      </div>
-    );
+    return <StaticFallback />;
   }
 
   return (
+    <WebGLBoundary>
     <div className="w-full h-full min-h-[400px]">
       <Suspense
         fallback={
@@ -268,6 +273,7 @@ const HeroScene = () => {
         </Canvas>
       </Suspense>
     </div>
+    </WebGLBoundary>
   );
 };
 
