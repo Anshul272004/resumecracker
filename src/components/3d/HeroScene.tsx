@@ -211,6 +211,41 @@ const Scene = () => {
 
 /* ─── Exported Canvas ─── */
 const HeroScene = () => {
+  // Detect WebGL support — sandboxed/older GPUs may fail to create a context
+  const hasWebGL = (() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const canvas = document.createElement("canvas");
+      return !!(
+        window.WebGLRenderingContext &&
+        (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+      );
+    } catch {
+      return false;
+    }
+  })();
+
+  if (!hasWebGL) {
+    return (
+      <div className="w-full h-full min-h-[400px] flex items-center justify-center">
+        <div className="relative w-64 h-80 rounded-md border border-primary/30 bg-gradient-to-br from-background via-card to-background shadow-2xl shadow-primary/10">
+          <div className="absolute inset-x-6 top-6 h-8 rounded-sm bg-gradient-to-r from-primary/70 to-primary/40" />
+          <div className="absolute left-6 top-20 w-12 h-12 rounded-full bg-primary/60" />
+          <div className="absolute inset-x-6 top-36 space-y-3">
+            {[100, 90, 80, 70, 85].map((w, i) => (
+              <div
+                key={i}
+                className="h-2 rounded-sm bg-foreground/15"
+                style={{ width: `${w}%` }}
+              />
+            ))}
+          </div>
+          <div className="absolute -inset-px rounded-md border border-primary/20 pointer-events-none" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full h-full min-h-[400px]">
       <Suspense
@@ -225,6 +260,9 @@ const HeroScene = () => {
           dpr={[1, 1.5]}
           gl={{ antialias: true, alpha: true }}
           style={{ background: "transparent" }}
+          onCreated={({ gl }) => {
+            gl.domElement.addEventListener("webglcontextlost", (e) => e.preventDefault());
+          }}
         >
           <Scene />
         </Canvas>
